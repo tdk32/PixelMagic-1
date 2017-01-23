@@ -16,6 +16,7 @@ namespace PixelMagic.Rotation
 	 
 		private CheckBox generalint;
         private CheckBox mplusint;
+		private CheckBox CDint;
 		
 		
         public override string Name => "Protection Warrior";
@@ -42,6 +43,17 @@ namespace PixelMagic.Rotation
                 return mythicplusinterrupts != "" && Convert.ToBoolean(mythicplusinterrupts);
             }
             set { ConfigFile.WriteValue("ProtectionLesion", "mythicplusinterrupts", value.ToString()); }
+        }
+		
+		private static bool cooldowns
+        {
+            get
+            {
+                var cooldowns = ConfigFile.ReadValue("ProtectionLesion", "cooldowns").Trim();
+
+                return cooldowns != "" && Convert.ToBoolean(cooldowns);
+            }
+            set { ConfigFile.WriteValue("ProtectionLesion", "cooldowns", value.ToString()); }
         }
 	
 		private readonly Stopwatch swingwatch = new Stopwatch();
@@ -84,31 +96,48 @@ namespace PixelMagic.Rotation
 
             mplusint = new CheckBox {Checked = mythicplusinterrupts, TabIndex = 4, Size = new Size(15, 14), Left = 115, Top = 29};
             SettingsForm.Controls.Add(mplusint);
- 
-            var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 60, Size = new Size(108, 31)};
+			
+			var lblcooldownsText = new Label //12; 129 is first value, Top is second.
+            {
+                Text = "Def Cooldowns used automatically SW/LS/SR",
+                Size = new Size(95, 13), //95; 13
+                Left = 12,
+                Top = 44
+            };
+            SettingsForm.Controls.Add(lblcooldownsText); //113; 114 
+
+            CDint = new CheckBox {Checked = cooldowns, TabIndex = 5, Size = new Size(15, 14), Left = 115, Top = 44};
+            SettingsForm.Controls.Add(CDint);
+			 
+            var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 60, Size = new Size(108, 48)};
 
             generalint.Checked = generalInterrupts;
             mplusint.Checked = mythicplusinterrupts;
+			CDint.Checked = cooldowns;
             
 
             cmdSave.Click += CmdSave_Click;
             generalint.CheckedChanged += GI_Click;
             mplusint.CheckedChanged += MP_Click;
-           
+            CDint.CheckedChanged += CD_Click;
 
             SettingsForm.Controls.Add(cmdSave);
             lblGeneralInterruptsText.BringToFront();
             lblMythicPlusText.BringToFront();
+			lblcooldownsText.BringToFront();
             
 
             Log.Write("Interupt all = " + generalInterrupts);
             Log.Write("Mythic Plus = " + mythicplusinterrupts);
+			Log.Write("Cooldowns being used = " + cooldowns);
 			
         }
 		private void CmdSave_Click(object sender, EventArgs e)
         {
             generalInterrupts = generalint.Checked;
             mythicplusinterrupts = mplusint.Checked;
+			cooldowns = CDint.Checked;
+			
             MessageBox.Show("Settings saved", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SettingsForm.Close();
         }
@@ -123,14 +152,36 @@ namespace PixelMagic.Rotation
             mythicplusinterrupts = mplusint.Checked;
         }
 		
+		private void CD_Click(object sender, EventArgs e)
+        {
+            mythicplusinterrupts = CDint.Checked;
+        }
+		
+		
         public override void Stop()
         {
         }
 			
         public override void Pulse()
-		
-		
-        {
+		{
+			
+			if (cooldowns)
+			{
+			if (WoW.IsInCombat && WoW.HealthPercent < 35 && WoW.CanCast("Last Stand") && !WoW.IsSpellOnCooldown("Last Stand"))
+            {
+                WoW.CastSpell("Last Stand");
+                return;
+            }
+            if (WoW.IsInCombat && WoW.HealthPercent < 20 && WoW.CanCast("Shield Wall") && !WoW.IsSpellOnCooldown("Shield Wall"))
+            {
+                WoW.CastSpell("Shield Wall");
+                return;
+            }
+			if (WoW.TargetIsCasting && WoW.CanCast("SpellReflect") && !WoW.IsSpellOnCooldown("SpellReflect"))
+                        {
+                            WoW.CastSpell("SpellReflect");
+                        }
+			}
 			
 			if (WoW.IsInCombat &&WoW.IsSpellInRange("Shield Slam"))
             {
@@ -227,14 +278,14 @@ if ( WoW.TargetCastingSpellID == 200248
 						}
 					}
 						
-						if (WoW.CanCast("Shield Block") &&WoW.HealthPercent <= 99 && WoW.Rage >= 15 && !WoW.IsSpellOnCooldown("Shield Block") &&!WoW.PlayerHasBuff("Shield Block"))
+						if (WoW.CanCast("Shield Block") &&WoW.HealthPercent <= 90 && WoW.Rage >= 15 && !WoW.IsSpellOnCooldown("Shield Block") &&!WoW.PlayerHasBuff("Shield Block"))
                         {
                             WoW.CastSpell("Shield Block");
                             return;
                         }
 						
-						if (WoW.CanCast("Shield Block") &&WoW.Rage >=15 && WoW.PlayerBuffTimeRemaining("Shield Block") <= 1)
-						 {
+						if (WoW.CanCast("Shield Block") &&WoW.Rage >=15 && WoW.PlayerBuffTimeRemaining("Shield Block") <= 2)
+						{
                             WoW.CastSpell("Shield Block");
                             return;
                         }
@@ -338,6 +389,9 @@ Spell,6552,Pummel,F3
 Spell,34428,Victory Rush,D9
 Spell,46968,Shockwave,None
 Spell,202168,Impending Victory,D9
+Spell,871,Shield Wall,F6
+Spell,12975,Last Stand,F5
+Spell,23920,SpellReflect,D0
 Aura,2565,Shield Block
 Aura,132168,ShockWavestun
 Aura,122510,Ultimatum
