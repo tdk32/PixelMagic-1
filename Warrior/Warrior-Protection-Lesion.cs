@@ -64,8 +64,8 @@ namespace PixelMagic.Rotation
         {
             Log.Write("Welcome to Protection Warrior", Color.Green);
             Log.Write("Suggested build: 1213112", Color.Green);
-			Log.Write("3.0", Color.Green);
-			Log.Write("Last Edited by Lesion 22/01/17 - interruption controlz", Color.Green);
+			Log.Write("3.1", Color.Green);
+			Log.Write("Last Edited by Lesion 23/01/17 - added cooldowns and Spellreflect logic", Color.Green);
             WoW.Speak("Welcome to PixelMagic Protection Warrior by Lesion");
 			
 			SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 150, Height = 150, ShowIcon = false};
@@ -177,11 +177,22 @@ namespace PixelMagic.Rotation
                 WoW.CastSpell("Shield Wall");
                 return;
             }
-			if (WoW.TargetIsCasting && WoW.CanCast("SpellReflect") && !WoW.IsSpellOnCooldown("SpellReflect"))
+				if (generalInterrupts)
+				{
+			if (WoW.TargetIsCasting && WoW.CanCast("SpellReflect") &&WoW.TargetPercentCast >= 80 && !WoW.IsSpellOnCooldown("SpellReflect"))
                         {
                             WoW.CastSpell("SpellReflect");
                         }
+				}
+				if (mythicplusinterrupts)
+				{
+			if (WoW.TargetIsCasting && WoW.CanCast("SpellReflect") &&WoW.TargetPercentCast >= 60 && !WoW.IsSpellOnCooldown("SpellReflect"))
+                        {
+                            WoW.CastSpell("SpellReflect");
+                        }
+				}
 			}
+			
 			
 			if (WoW.IsInCombat &&WoW.IsSpellInRange("Shield Slam"))
             {
@@ -196,7 +207,7 @@ namespace PixelMagic.Rotation
                 {
 					if (generalInterrupts)
 					{
-					if (WoW.CanCast("Pummel")&&WoW.TargetIsCasting &&WoW.TargetIsCastingAndSpellIsInterruptible &&WoW.TargetPercentCast >= 80&& !WoW.IsSpellOnCooldown("Pummel"))
+					if (WoW.CanCast("Pummel")&&WoW.TargetIsCasting &&WoW.TargetIsCastingAndSpellIsInterruptible &&WoW.TargetPercentCast >= 60&& !WoW.IsSpellOnCooldown("Pummel"))
                         {
 						WoW.CastSpell("Pummel");
 							return;	
@@ -207,7 +218,7 @@ namespace PixelMagic.Rotation
 					if (mythicplusinterrupts)
 					{
                     	if (WoW.CanCast("Pummel")&&WoW.TargetIsCasting &&WoW.TargetIsCastingAndSpellIsInterruptible &&WoW.TargetPercentCast >= 40&& !WoW.IsSpellOnCooldown("Pummel"))
-                        {
+							{
 //int spell list for all important spells in M+                        
 if ( WoW.TargetCastingSpellID == 200248
 //Court Of Stars Mythic+ Interrupt list
@@ -292,7 +303,7 @@ if ( WoW.TargetCastingSpellID == 200248
 						
 						
                         // IP Control
-						if (WoW.CanCast("Ignore Pain") && (WoW.Rage >= 50) && !WoW.PlayerHasBuff("Vengeance Ignore Pain"))
+						if (WoW.CanCast("Ignore Pain") && (WoW.Rage >= 30) && !WoW.PlayerHasBuff("Vengeance Ignore Pain"))
                         {
                             WoW.CastSpell("Ignore Pain");
                             return;
@@ -311,10 +322,10 @@ if ( WoW.TargetCastingSpellID == 200248
 						{
 							WoW.CastSpell("Revenge");
 						}
-						if (WoW.CanCast("Revenge") && WoW.Rage >= 34 && WoW.PlayerHasBuff("Vengeance Revenge") &&!WoW.IsSpellOnCooldown("Revenge"))
-						{
-							WoW.CastSpell("Revenge");
-						}
+						//if (WoW.CanCast("Revenge") && WoW.Rage >= 34 && WoW.PlayerHasBuff("Vengeance Revenge") &&!WoW.IsSpellOnCooldown("Revenge"))
+						//{
+						//	WoW.CastSpell("Revenge");
+						//}
 						
 						//Rotational shiz
 						//It will wait 2.7 seconds for a devastate too proc shield slam. (bastardized swing timer)
