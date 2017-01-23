@@ -211,7 +211,7 @@ namespace PixelMagic.Rotation
         }
         public static bool IsMelee()
         {
-            return WoW.CanCast("Frost Strike", false, false, true, false, false);
+            return WoW.CanCast("Obliterate", false, false, true, false, false);
         }
 
         public override void Pulse()
@@ -281,7 +281,7 @@ namespace PixelMagic.Rotation
                     WoW.CastSpell("Howling Blast");
                     return;
                 }
-                if (WoW.CanCast("Frost Strike") && IsMelee() && WoW.RunicPower >= 70 && !WoW.PlayerHasBuff("Breath"))
+                if (WoW.CanCast("Frost Strike",true,true,true,false,true) && WoW.RunicPower >= 70 && !WoW.PlayerHasBuff("Breath"))
                 {
                     WoW.CastSpell("Frost Strike");
                     return;
@@ -307,7 +307,7 @@ namespace PixelMagic.Rotation
                     WoW.CastSpell("Obliterate");
                     return;
                 }
-                if (WoW.CanCast("Frost Strike") && IsMelee() && WoW.RunicPower >= 25 && !WoW.PlayerHasBuff("Breath") && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 12)))
+                if (WoW.CanCast("Frost Strike", true, true, true, false, true) && WoW.RunicPower >= 25 && !WoW.PlayerHasBuff("Breath") && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 12)))
                 {
                     WoW.CastSpell("Frost Strike");
                     return;
@@ -339,7 +339,7 @@ namespace PixelMagic.Rotation
                     WoW.CastSpell("Howling Blast");
                     return;
                 }
-                if (WoW.CanCast("Frost Strike") && IsMelee() && WoW.RunicPower >= 70 && !WoW.PlayerHasBuff("Breath"))
+                if (WoW.CanCast("Frost Strike", true, true, true, false, true) && WoW.RunicPower >= 70 && !WoW.PlayerHasBuff("Breath"))
                 {
                     WoW.CastSpell("Frost Strike");
                     return;
@@ -369,7 +369,7 @@ namespace PixelMagic.Rotation
                     WoW.CastSpell("Frostscythe");
                     return;
                 }
-                if (WoW.CanCast("Frost Strike") && IsMelee() && WoW.RunicPower >= 25 && !WoW.PlayerHasBuff("Breath") && WoW.SpellCooldownTimeRemaining("Breath") >= 12 && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 12)))
+                if (WoW.CanCast("Frost Strike", true, true, true, false, true) && WoW.RunicPower >= 25 && !WoW.PlayerHasBuff("Breath") && WoW.SpellCooldownTimeRemaining("Breath") >= 12 && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 12)))
                 {
                     WoW.CastSpell("Frost Strike");
                     return;
@@ -397,7 +397,7 @@ namespace PixelMagic.Rotation
             }
             if (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave) // Do Single Target Stuff here
             {
-                if (CanCastInRange("Frost Strike") && IsMelee() && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 1) && WoW.RunicPower >= 25 &&
+                if (WoW.CanCast("Frost Strike", true, true, true, false, true) && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 1) && WoW.RunicPower >= 25 &&
                     !(combatRoutine.UseCooldowns && WoW.CanCast("Obliteration") && isTalentOblitaration) && (!isTalentOblitaration || (isTalentOblitaration && !WoW.PlayerHasBuff("Obliteration"))))
                 {
                     WoW.CastSpell("Frost Strike");
@@ -415,7 +415,7 @@ namespace PixelMagic.Rotation
                     WoW.CastSpell("Howling Blast");
                     return;
                 }
-                if (WoW.CanCast("Frost Strike") && IsMelee() && WoW.RunicPower >= 80 && !(combatRoutine.UseCooldowns && WoW.CanCast("Obliteration") && isTalentOblitaration) && (!isTalentOblitaration || (isTalentOblitaration && !WoW.PlayerHasBuff("Obliteration"))))
+                if (WoW.CanCast("Frost Strike", true, true, true, false, true) && WoW.RunicPower >= 80 && !(combatRoutine.UseCooldowns && WoW.CanCast("Obliteration") && isTalentOblitaration) && (!isTalentOblitaration || (isTalentOblitaration && !WoW.PlayerHasBuff("Obliteration"))))
                 {
                     WoW.CastSpell("Frost Strike");
                     return;
@@ -432,7 +432,7 @@ namespace PixelMagic.Rotation
                     WoW.CastSpell("Obliteration");
                     return;
                 }
-                if (WoW.CanCast("Frost Strike") && IsMelee() && WoW.RunicPower >= 25 && isTalentOblitaration && WoW.PlayerHasBuff("Obliteration") && !WoW.PlayerHasBuff("Killing Machine"))
+                if (WoW.CanCast("Frost Strike", true, true, true, false, true) && WoW.RunicPower >= 25 && isTalentOblitaration && WoW.PlayerHasBuff("Obliteration") && !WoW.PlayerHasBuff("Killing Machine"))
                 {
                     WoW.CastSpell("Frost Strike");
                     return;
@@ -472,7 +472,7 @@ namespace PixelMagic.Rotation
             }
             if (combatRoutine.Type == RotationType.AOE)
             {
-                if (CanCastInRange("Frost Strike") && IsMelee() && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 2)
+                if (WoW.CanCast("Frost Strike", true, true, true, false, true) && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 2)
                     && WoW.RunicPower >= 25)
                 {
                     WoW.CastSpell("Frost Strike");
