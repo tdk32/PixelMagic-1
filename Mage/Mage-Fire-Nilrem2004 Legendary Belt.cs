@@ -622,12 +622,7 @@ namespace PixelMagic.Rotation
 						WoW.CastSpell("Living Bomb");
 						return;
 					}	
-					if (WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsSpellInRange("Scorch") && WoW.CanCast("Scorch") && !WoW.PlayerHasBuff("HotStreak")
-						&& WoW.TargetHealthPercent <= 30)
-					{ 
-						WoW.CastSpell("Scorch");
-						return;
-					} 
+					
 					if (WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsSpellInRange("Fireball") && WoW.CanCast("Fireball") && WoW.TargetHealthPercent > 30)
 					{ 
 						WoW.CastSpell("Fireball");

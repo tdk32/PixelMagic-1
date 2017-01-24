@@ -380,8 +380,7 @@ namespace PixelMagic.Rotation
 				
 				// MOVING PHASE //
 				
-				if (WoW.IsMoving && !WoW.PlayerHasBuff("Combustion Aura") && !WoW.LastSpell.Equals("Combustion") && !WoW.WasLastCasted("Combustion") && !Opener
-					&& WoW.TargetHealthPercent > 30)  /* What to do if we are MOVING */
+				if (WoW.IsMoving && !WoW.PlayerHasBuff("Combustion Aura") && !WoW.LastSpell.Equals("Combustion") && !WoW.WasLastCasted("Combustion") && !Opener	)  /* What to do if we are MOVING */
 				{
 					if (ForcePyro)
 					{
@@ -448,8 +447,7 @@ namespace PixelMagic.Rotation
 							
 				// SINGLE TARGET STAND STILL PHASE //
 				
-				if (!WoW.IsMoving && !WoW.PlayerHasBuff("Combustion Aura") && !WoW.LastSpell.Equals("Combustion") && !WoW.WasLastCasted("Combustion") && !Opener 
-					&& WoW.TargetHealthPercent > 30) /* What to do if we are NOT MOVING - NON BURST PHASE */
+				if (!WoW.IsMoving && !WoW.PlayerHasBuff("Combustion Aura") && !WoW.LastSpell.Equals("Combustion") && !WoW.WasLastCasted("Combustion") && !Opener ) /* What to do if we are NOT MOVING - NON BURST PHASE */
 				{
 					/* double dur = WoW.GetDebuffTimeRemaining("Shadowflame");
 					Log.Write(System.Convert.ToString(dur), Color.Red); */
@@ -524,12 +522,6 @@ namespace PixelMagic.Rotation
 						WoW.CastSpell("Living Bomb");
 						return;
 					}	
-					if (WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsSpellInRange("Scorch") && WoW.CanCast("Scorch") && !WoW.PlayerHasBuff("HotStreak")
-						&& WoW.TargetHealthPercent <= 30)
-					{ 
-						WoW.CastSpell("Scorch");
-						return;
-					} 
 					if (WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsSpellInRange("Fireball") && WoW.CanCast("Fireball") && WoW.TargetHealthPercent > 30)
 					{ 
 						WoW.CastSpell("Fireball");
