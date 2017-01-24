@@ -24,6 +24,10 @@ namespace PixelMagic.Rotation
 		private CheckBox SRint;
 		//Tick for ImpendingVictory
 		private CheckBox IVint;
+		//Tick for Indomitable
+		private CheckBox IDint;
+		//Tick for Auto Battlecry
+		private CheckBox BCint;
 		
 		
         public override string Name => "Protection Warrior";
@@ -84,6 +88,28 @@ namespace PixelMagic.Rotation
             }
             set { ConfigFile.WriteValue("ProtectionLesion", "ImpendingVic", value.ToString()); }
         }
+		
+		private static bool Indomitable
+        {
+            get
+            {
+                var Indomitable = ConfigFile.ReadValue("ProtectionLesion", "Indomitable").Trim();
+
+                return Indomitable != "" && Convert.ToBoolean(Indomitable);
+            }
+            set { ConfigFile.WriteValue("ProtectionLesion", "Indomitable", value.ToString()); }
+        }
+		
+		private static bool BattleC
+        {
+            get
+            {
+                var BattleC = ConfigFile.ReadValue("ProtectionLesion", "BattleC").Trim();
+
+                return BattleC != "" && Convert.ToBoolean(BattleC);
+            }
+            set { ConfigFile.WriteValue("ProtectionLesion", "BattleC", value.ToString()); }
+        }
 	
 	
 		private readonly Stopwatch swingwatch = new Stopwatch();
@@ -93,13 +119,13 @@ namespace PixelMagic.Rotation
         public override void Initialize()
         {
 		
-            Log.Write("Welcome to Protection Warrior", Color.Green);
-            Log.Write("Suggested build: 1213112", Color.Green);
-			Log.Write("3.2", Color.Green);
+            Log.Write("Welcome to Protection Warrior", Color.Red);
+            Log.Write("Suggested build: 1213112", Color.Red);
+			Log.Write("3.2", Color.Red);
 			Log.Write("Last Edited by Lesion 24/01/17 - added self heal, weaved SpellReflect into pummel, if it cant interrupt it'll spell reflect. look at Rotation settings in PM Window", Color.Blue);
             WoW.Speak("Welcome to PixelMagic Protection Warrior by Lesion");
 			
-			SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 150, Height = 200, ShowIcon = false};
+			SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 150, Height = 210, ShowIcon = false};
 
             //var picBox = new PictureBox {Left = 0, Top = 0, Width = 800, Height = 100, Image = TopLogo};
             //SettingsForm.Controls.Add(picBox);
@@ -163,14 +189,40 @@ namespace PixelMagic.Rotation
 
             IVint = new CheckBox {Checked = ImpendingVic, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 74};
             SettingsForm.Controls.Add(IVint);
+			
+			var lblIndomitableText = new Label //12; 129 is first value, Top is second.
+            {
+                Text = "Indomitable",
+                Size = new Size(95, 13), //95; 13
+                Left = 12,
+                Top = 89
+            };
+            SettingsForm.Controls.Add(lblIndomitableText); //113; 114 
+
+            IDint = new CheckBox {Checked = Indomitable, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 89};
+            SettingsForm.Controls.Add(IDint);
+			
+			var lblBattleCText = new Label //12; 129 is first value, Top is second.
+            {
+                Text = "Battle Cry",
+                Size = new Size(95, 13), //95; 13
+                Left = 12,
+                Top = 104
+            };
+            SettingsForm.Controls.Add(lblBattleCText); //113; 114 
+
+            BCint = new CheckBox {Checked = BattleC, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 104};
+            SettingsForm.Controls.Add(BCint);
 			 
-            var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 100, Size = new Size(108, 48)};
+            var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 120, Size = new Size(120, 48)};
 
             generalint.Checked = generalInterrupts;
             mplusint.Checked = mythicplusinterrupts;
 			CDint.Checked = defcooldowns;
 			SRint.Checked = spellref;
 			IVint.Checked = ImpendingVic;
+			IDint.Checked = Indomitable;
+			BCint.Checked = BattleC;
             
 
             cmdSave.Click += CmdSave_Click;
@@ -179,6 +231,8 @@ namespace PixelMagic.Rotation
             CDint.CheckedChanged += CD_Click;
 			SRint.CheckedChanged += SR_Click;
 			IVint.CheckedChanged += IV_Click;
+			IDint.CheckedChanged += ID_Click;
+			BCint.CheckedChanged += BC_Click;
 
             SettingsForm.Controls.Add(cmdSave);
             lblGeneralInterruptsText.BringToFront();
@@ -186,13 +240,19 @@ namespace PixelMagic.Rotation
 			lbldefcooldownsText.BringToFront();
 			lblspellrefText.BringToFront();
 			lblImpendingVicText.BringToFront();
+			lblIndomitableText.BringToFront();
+			lblBattleCText.BringToFront();
+			
+			
             
 
-            Log.Write("Interupt all = " + generalInterrupts);
-            Log.Write("Mythic Plus = " + mythicplusinterrupts);
-			Log.Write("Def-cooldowns being used = " + defcooldowns);
-			Log.Write("Spell Reflect = " + spellref);
-			Log.Write("Using Impending Victory = " + lblImpendingVicText);
+            Log.Write("Interupt all = " + generalInterrupts, Color.Red);
+            Log.Write("Mythic Plus = " + mythicplusinterrupts, Color.Red);
+			Log.Write("Def-cooldowns being used = " + defcooldowns, Color.Red);
+			Log.Write("Spell Reflect = " + spellref, Color.Red);
+			Log.Write("Using Impending Victory = " + ImpendingVic, Color.Red);
+			Log.Write("Using Indomitable Talent = " + Indomitable, Color.Red);
+			Log.Write("Auto using Battle Cry = " + BattleC, Color.Red);
 			
         }
 		private void CmdSave_Click(object sender, EventArgs e)
@@ -202,6 +262,9 @@ namespace PixelMagic.Rotation
 			defcooldowns = CDint.Checked;
 			spellref = SRint.Checked;
 			ImpendingVic = IVint.Checked;
+			Indomitable = IDint.Checked;
+			BattleC = BCint.Checked;
+			
 			
             MessageBox.Show("Settings saved", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SettingsForm.Close();
@@ -232,6 +295,15 @@ namespace PixelMagic.Rotation
             ImpendingVic = IVint.Checked;
         }
 		
+		private void ID_Click(object sender, EventArgs e)
+        {
+            Indomitable = IDint.Checked;
+        }
+		private void BC_Click(object sender, EventArgs e)
+        {
+            BattleC = BCint.Checked;
+        }
+		
 		
         public override void Stop()
         {
@@ -257,7 +329,7 @@ namespace PixelMagic.Rotation
 			}
 			
 			
-			if (WoW.IsInCombat &&WoW.IsSpellInRange("Shield Slam"))
+			if (!Indomitable &&WoW.IsInCombat &&WoW.IsSpellInRange("Shield Slam"))
             {
                 swingwatch.Start();
             }
@@ -268,7 +340,13 @@ namespace PixelMagic.Rotation
 				
                 if (WoW.HasTarget && !WoW.PlayerIsChanneling &&WoW.IsSpellInRange("Shield Slam"))
                 {
-					if (generalInterrupts)
+					
+				if (BattleC && !WoW.IsSpellOnCooldown("Battle Cry"))
+						{
+						WoW.CastSpell("Battle Cry");
+						return;
+						}
+				if (generalInterrupts)
 					{
 					if (WoW.TargetIsCasting &&WoW.TargetIsCastingAndSpellIsInterruptible)
                         {
@@ -414,7 +492,7 @@ if ( WoW.TargetCastingSpellID == 200248
 						
 						//Rotational shiz
 						//It will wait 2.7 seconds for a devastate too proc shield slam. (bastardized swing timer)
-						if (!WoW.IsSpellOnCooldown("Shield Slam") &&swingwatch.ElapsedMilliseconds > 2700)
+						if (!Indomitable &&!WoW.IsSpellOnCooldown("Shield Slam") &&swingwatch.ElapsedMilliseconds > 2700)
 					{
 						if (!WoW.IsSpellOverlayed("Shield Slam"))
 						{
@@ -425,18 +503,31 @@ if ( WoW.TargetCastingSpellID == 200248
 										
 						}		
 					}
-						//will cast SS when proc's
+						
+						if (Indomitable &&!WoW.IsSpellOnCooldown("Shield Slam"))
+						{
+							WoW.CastSpell("Shield Slam");
+						}
+						
+						//if (Indomitable &&!WoW.IsSpellOverlayed("Shield Slam"))
+						//{
+						//	WoW.CastSpell("Shield Slam");
+						//	return;
+						//}		
+					//will cast SS when proc's
 						if (WoW.CanCast("Shield Slam") && WoW.IsSpellOverlayed("Shield Slam"))
                         {
                             WoW.CastSpell("Shield Slam");
 							return;
                         }
 					
-						//if (WoW.CanCast("Devastate") && WoW.IsSpellOnCooldown("Revenge"))
-                        //{
-                        //   WoW.CastSpell("Devastate");
-                        //    return;
-                        //}
+					
+						if (Indomitable &&WoW.CanCast("Devastate") && WoW.IsSpellOnCooldown("Shield Slam"))
+                        {
+                           WoW.CastSpell("Devastate");
+                            return;
+                        }
+					
                         if (WoW.CanCast("Thunder Clap") && !WoW.IsSpellOnCooldown("Thunder Clap"))
                         {
                             WoW.CastSpell("Thunder Clap");
@@ -494,6 +585,7 @@ Spell,202168,Impending Victory,D9
 Spell,871,Shield Wall,F6
 Spell,12975,Last Stand,F5
 Spell,23920,SpellReflect,D0
+Spell,1719,Battle Cry,F2
 Aura,2565,Shield Block
 Aura,132168,ShockWavestun
 Aura,122510,Ultimatum
