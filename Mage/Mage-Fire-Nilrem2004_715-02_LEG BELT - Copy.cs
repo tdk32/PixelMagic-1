@@ -378,6 +378,104 @@ namespace PixelMagic.Rotation
 				
 				// END COMBUSTION PHASE //
 				
+				// SUB 30% for BELT ROTATION //
+				
+				if (!WoW.PlayerHasBuff("Combustion Aura") && !WoW.LastSpell.Equals("Combustion") && !Opener
+					&& WoW.TargetHealthPercent <= 30 && !WoW.WasLastCasted("Combustion")) /* What to do if we are NOT MOVING - NON BURST PHASE */
+				{
+					if (WoW.WasLastCasted("Pyroblast") && ForcePyro) ForcePyro = !ForcePyro;
+					if (WoW.PlayerHasBuff("HeatingUp") && WoW.PlayerIsCasting && WoW.LastSpell.Equals("Scorch") && !ForcePyro)
+					{
+						ForcePyro = !ForcePyro;
+					}
+					if (WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsSpellInRange("Fireball") && WoW.CanCast("Pyroblast") && ForcePyro)
+					{ 
+						WoW.CastSpell("Pyroblast");
+						Log.WritePixelMagic("FORCING PYRO....", Color.Red);
+						ForcePyro = !ForcePyro;
+						if (WoW.PlayerSpellCharges("Fire Blast") >= 1 && UseCooldowns
+							&& ((WoW.SpellCooldownTimeRemaining("Combustion") > 22 && WoW.PlayerSpellCharges("Fire Blast") >= 1)
+							|| (WoW.SpellCooldownTimeRemaining("Combustion") > 13 && WoW.PlayerSpellCharges("Fire Blast") >= 2)
+							|| (WoW.SpellCooldownTimeRemaining("Combustion") > 7 && WoW.PlayerSpellCharges("Fire Blast") > 2))) 
+						{
+							Thread.Sleep(500);
+							WoW.CastSpell("Fire Blast");
+							return;
+						}
+						else if (WoW.PlayerSpellCharges("Fire Blast") >= 1 && !UseCooldowns) 
+						{
+							Thread.Sleep(500);
+							WoW.CastSpell("Fire Blast");
+							return;
+						}
+						
+						return;	
+					} 
+					if (WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsSpellInRange("Fireball") && WoW.PlayerHasBuff("HotStreak") && WoW.CanCast("Pyroblast")
+						&& !ForcePyro)
+					{ 
+						WoW.CastSpell("Pyroblast");
+						return;	
+					} 
+					/* if (WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsSpellInRange("Fireball") && WoW.CanCast("Mirror Image") 
+						 && !WoW.IsSpellOnCooldown("Mirror Image"))
+					{ 
+						WoW.CastSpell("Mirror Image");
+						return;
+					}  */ 
+					/* if (!UseCooldowns && WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsSpellInRange("Fireball") && WoW.PlayerSpellCharges("Fire Blast") >= 1 
+						&& !WoW.LastSpell.Equals("Fire Blast") && !WoW.PlayerHasBuff("HotStreak") && !WoW.PlayerHasBuff("HeatingUp"))
+					{
+						Thread.Sleep(350);
+						WoW.CastSpell("Fire Blast");
+						return;
+					}  */
+					if (WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsSpellInRange("Fireball") && WoW.PlayerSpellCharges("Fire Blast") >= 1 
+						&& !WoW.PlayerHasBuff("HeatingUp") && !WoW.LastSpell.Equals("Fire Blast") && !WoW.PlayerHasBuff("HotStreak") && WoW.IsSpellOnCooldown("Combustion")
+						&& ((WoW.SpellCooldownTimeRemaining("Combustion") > 22 && WoW.PlayerSpellCharges("Fire Blast") >= 1)
+						|| (WoW.SpellCooldownTimeRemaining("Combustion") > 13 && WoW.PlayerSpellCharges("Fire Blast") >= 2)
+						|| (WoW.SpellCooldownTimeRemaining("Combustion") > 7 && WoW.PlayerSpellCharges("Fire Blast") > 2)))
+					{ 
+						Thread.Sleep(500);
+						WoW.CastSpell("Fire Blast");
+						return;
+					} 
+					if (!UseCooldowns && WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.PlayerSpellCharges("Fire Blast") == 0 && WoW.CanCast("Phoenix")
+						&& !WoW.PlayerHasBuff("HotStreak") && !WoW.PlayerHasBuff("HeatingUp") && WoW.IsSpellOnCooldown("Fire Blast") 
+						&& WoW.IsSpellInRange("Fireball") && !WoW.LastSpell.Equals("Fire Blast") && (WoW.PlayerSpellCharges("Phoenix") > 1))
+					{ 
+						WoW.CastSpell("Phoenix");
+						return;
+					} 
+					if (WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.PlayerSpellCharges("Fire Blast") == 0 && WoW.CanCast("Phoenix")
+						&& !WoW.PlayerHasBuff("HotStreak") && !WoW.PlayerHasBuff("HeatingUp") && WoW.IsSpellOnCooldown("Fire Blast") 
+						&& WoW.IsSpellInRange("Fireball") && !WoW.LastSpell.Equals("Fire Blast")
+						&& ((WoW.PlayerSpellCharges("Phoenix") > 2)
+						|| (WoW.SpellCooldownTimeRemaining("Combustion") > 20 && WoW.PlayerSpellCharges("Phoenix") > 1)
+						|| (WoW.SpellCooldownTimeRemaining("Combustion") > 45 && WoW.PlayerSpellCharges("Phoenix") == 1)))
+					{ 
+						WoW.CastSpell("Phoenix");
+						return;
+					} 
+					if (UseLB && WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.CanCast("Living Bomb") && !WoW.IsSpellOnCooldown("Living Bomb")
+						&& !WoW.PlayerHasBuff("HotStreak") && WoW.IsSpellInRange("Fireball"))
+					{	
+						WoW.CastSpell("Living Bomb");
+						return;
+					}	
+					if (WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsSpellInRange("Scorch") && WoW.CanCast("Scorch") && WoW.TargetHealthPercent <= 30
+						&& !WoW.PlayerHasBuff("HotStreak") && !WoW.IsSpellOnGCD("Scorch") && !WoW.PlayerIsCasting && !ForcePyro)
+					{ 
+						WoW.CastSpell("Scorch");
+						return;
+					} 
+
+					return;
+				}
+				
+				// END SUB 30% for BELT ROTATION //
+				
+								
 				// MOVING PHASE //
 				
 				if (WoW.IsMoving && !WoW.PlayerHasBuff("Combustion Aura") && !WoW.LastSpell.Equals("Combustion") && !WoW.WasLastCasted("Combustion") && !Opener
