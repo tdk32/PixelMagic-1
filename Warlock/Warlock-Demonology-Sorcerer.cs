@@ -29,7 +29,7 @@ namespace PixelMagic.Rotation
         {
         }				
 		
-        public override void Pulse() // Updated for Legion (tested and working for single target)
+        public override void Pulse() // Updated for Legion (tested and working for single target)/
         {   
             //Dark Pact
             if (WoW.CanCast("Dark Pact")
