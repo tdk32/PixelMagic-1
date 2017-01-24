@@ -13,10 +13,17 @@ namespace PixelMagic.Rotation
 {
     public class ProtectionLesion : CombatRoutine
     {	
-	 
+
+	    //will interrupt anything it can
 		private CheckBox generalint;
+		//will check a list of spells and interrupt ones deemed important by wowhead guides
         private CheckBox mplusint;
+		//will automatically use def cooldowns
 		private CheckBox CDint;
+		//weaves spell reflect into pummel. it wont use it on cooldown.
+		private CheckBox SRint;
+		//Tick for ImpendingVictory
+		private CheckBox IVint;
 		
 		
         public override string Name => "Protection Warrior";
@@ -45,16 +52,39 @@ namespace PixelMagic.Rotation
             set { ConfigFile.WriteValue("ProtectionLesion", "mythicplusinterrupts", value.ToString()); }
         }
 		
-		private static bool cooldowns
+		private static bool defcooldowns
         {
             get
             {
-                var cooldowns = ConfigFile.ReadValue("ProtectionLesion", "cooldowns").Trim();
+                var defcooldowns = ConfigFile.ReadValue("ProtectionLesion", "defcooldowns").Trim();
 
-                return cooldowns != "" && Convert.ToBoolean(cooldowns);
+                return defcooldowns != "" && Convert.ToBoolean(defcooldowns);
             }
-            set { ConfigFile.WriteValue("ProtectionLesion", "cooldowns", value.ToString()); }
+            set { ConfigFile.WriteValue("ProtectionLesion", "defcooldowns", value.ToString()); }
         }
+		
+		private static bool spellref
+        {
+            get
+            {
+                var spellref = ConfigFile.ReadValue("ProtectionLesion", "spellref").Trim();
+
+                return spellref != "" && Convert.ToBoolean(spellref);
+            }
+            set { ConfigFile.WriteValue("ProtectionLesion", "spellref", value.ToString()); }
+        }
+		
+		private static bool ImpendingVic
+        {
+            get
+            {
+                var ImpendingVic = ConfigFile.ReadValue("ProtectionLesion", "ImpendingVic").Trim();
+
+                return ImpendingVic != "" && Convert.ToBoolean(ImpendingVic);
+            }
+            set { ConfigFile.WriteValue("ProtectionLesion", "ImpendingVic", value.ToString()); }
+        }
+	
 	
 		private readonly Stopwatch swingwatch = new Stopwatch();
 
@@ -62,20 +92,21 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
+		
             Log.Write("Welcome to Protection Warrior", Color.Green);
             Log.Write("Suggested build: 1213112", Color.Green);
-			Log.Write("3.1", Color.Green);
-			Log.Write("Last Edited by Lesion 23/01/17 - added cooldowns and Spellreflect logic", Color.Green);
+			Log.Write("3.2", Color.Green);
+			Log.Write("Last Edited by Lesion 24/01/17 - added self heal, weaved SpellReflect into pummel, if it cant interrupt it'll spell reflect. look at Rotation settings in PM Window", Color.Blue);
             WoW.Speak("Welcome to PixelMagic Protection Warrior by Lesion");
 			
-			SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 150, Height = 150, ShowIcon = false};
+			SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 150, Height = 200, ShowIcon = false};
 
             //var picBox = new PictureBox {Left = 0, Top = 0, Width = 800, Height = 100, Image = TopLogo};
             //SettingsForm.Controls.Add(picBox);
 
             var lblGeneralInterruptsText = new Label //12; 114 LEFT is first value, Top is second.
             {
-                Text = "Interrupt all Spells",
+                Text = "Interrupt all",
                 Size = new Size(81, 13), //81; 13
                 Left = 12,
                 Top = 14
@@ -87,7 +118,7 @@ namespace PixelMagic.Rotation
 
             var lblMythicPlusText = new Label //12; 129 is first value, Top is second.
             {
-                Text = "Mythic Plus Interrupts",
+                Text = "M+ Interrupts",
                 Size = new Size(95, 13), //95; 13
                 Left = 12,
                 Top = 29
@@ -97,46 +128,80 @@ namespace PixelMagic.Rotation
             mplusint = new CheckBox {Checked = mythicplusinterrupts, TabIndex = 4, Size = new Size(15, 14), Left = 115, Top = 29};
             SettingsForm.Controls.Add(mplusint);
 			
-			var lblcooldownsText = new Label //12; 129 is first value, Top is second.
+			var lbldefcooldownsText = new Label //12; 129 is first value, Top is second.
             {
-                Text = "Def Cooldowns used automatically SW/LS/SR",
+                Text = "Def Cooldowns used automatically SW/LS",
                 Size = new Size(95, 13), //95; 13
                 Left = 12,
                 Top = 44
             };
-            SettingsForm.Controls.Add(lblcooldownsText); //113; 114 
+            SettingsForm.Controls.Add(lbldefcooldownsText); //113; 114 
 
-            CDint = new CheckBox {Checked = cooldowns, TabIndex = 5, Size = new Size(15, 14), Left = 115, Top = 44};
+            CDint = new CheckBox {Checked = defcooldowns, TabIndex = 5, Size = new Size(15, 14), Left = 115, Top = 44};
             SettingsForm.Controls.Add(CDint);
+			
+			var lblspellrefText = new Label //12; 129 is first value, Top is second.
+            {
+                Text = "Spell Reflect",
+                Size = new Size(95, 13), //95; 13
+                Left = 12,
+                Top = 59
+            };
+            SettingsForm.Controls.Add(lblspellrefText); //113; 114 
+
+            SRint = new CheckBox {Checked = spellref, TabIndex = 6, Size = new Size(15, 14), Left = 115, Top = 59};
+            SettingsForm.Controls.Add(SRint);
+			
+			var lblImpendingVicText = new Label //12; 129 is first value, Top is second.
+            {
+                Text = "Impending Victory",
+                Size = new Size(95, 13), //95; 13
+                Left = 12,
+                Top = 74
+            };
+            SettingsForm.Controls.Add(lblImpendingVicText); //113; 114 
+
+            IVint = new CheckBox {Checked = ImpendingVic, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 74};
+            SettingsForm.Controls.Add(IVint);
 			 
-            var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 60, Size = new Size(108, 48)};
+            var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 100, Size = new Size(108, 48)};
 
             generalint.Checked = generalInterrupts;
             mplusint.Checked = mythicplusinterrupts;
-			CDint.Checked = cooldowns;
+			CDint.Checked = defcooldowns;
+			SRint.Checked = spellref;
+			IVint.Checked = ImpendingVic;
             
 
             cmdSave.Click += CmdSave_Click;
             generalint.CheckedChanged += GI_Click;
             mplusint.CheckedChanged += MP_Click;
             CDint.CheckedChanged += CD_Click;
+			SRint.CheckedChanged += SR_Click;
+			IVint.CheckedChanged += IV_Click;
 
             SettingsForm.Controls.Add(cmdSave);
             lblGeneralInterruptsText.BringToFront();
             lblMythicPlusText.BringToFront();
-			lblcooldownsText.BringToFront();
+			lbldefcooldownsText.BringToFront();
+			lblspellrefText.BringToFront();
+			lblImpendingVicText.BringToFront();
             
 
             Log.Write("Interupt all = " + generalInterrupts);
             Log.Write("Mythic Plus = " + mythicplusinterrupts);
-			Log.Write("Cooldowns being used = " + cooldowns);
+			Log.Write("Def-cooldowns being used = " + defcooldowns);
+			Log.Write("Spell Reflect = " + spellref);
+			Log.Write("Using Impending Victory = " + lblImpendingVicText);
 			
         }
 		private void CmdSave_Click(object sender, EventArgs e)
         {
             generalInterrupts = generalint.Checked;
             mythicplusinterrupts = mplusint.Checked;
-			cooldowns = CDint.Checked;
+			defcooldowns = CDint.Checked;
+			spellref = SRint.Checked;
+			ImpendingVic = IVint.Checked;
 			
             MessageBox.Show("Settings saved", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SettingsForm.Close();
@@ -154,7 +219,17 @@ namespace PixelMagic.Rotation
 		
 		private void CD_Click(object sender, EventArgs e)
         {
-            mythicplusinterrupts = CDint.Checked;
+            defcooldowns = CDint.Checked;
+        }
+		
+		private void SR_Click(object sender, EventArgs e)
+        {
+            spellref = SRint.Checked;
+        }
+		
+		private void IV_Click(object sender, EventArgs e)
+        {
+            ImpendingVic = IVint.Checked;
         }
 		
 		
@@ -164,33 +239,21 @@ namespace PixelMagic.Rotation
 			
         public override void Pulse()
 		{
+		
+		
 			
-			if (cooldowns)
+			if (defcooldowns && WoW.IsInCombat)
 			{
-			if (WoW.IsInCombat && WoW.HealthPercent < 35 && WoW.CanCast("Last Stand") && !WoW.IsSpellOnCooldown("Last Stand"))
+			if (WoW.HealthPercent < 35 && WoW.CanCast("Last Stand") && !WoW.IsSpellOnCooldown("Last Stand"))
             {
                 WoW.CastSpell("Last Stand");
                 return;
             }
-            if (WoW.IsInCombat && WoW.HealthPercent < 20 && WoW.CanCast("Shield Wall") && !WoW.IsSpellOnCooldown("Shield Wall"))
+            if (WoW.HealthPercent < 20 && WoW.CanCast("Shield Wall") && !WoW.IsSpellOnCooldown("Shield Wall"))
             {
                 WoW.CastSpell("Shield Wall");
                 return;
             }
-				if (generalInterrupts)
-				{
-			if (WoW.TargetIsCasting && WoW.CanCast("SpellReflect") &&WoW.TargetPercentCast >= 80 && !WoW.IsSpellOnCooldown("SpellReflect"))
-                        {
-                            WoW.CastSpell("SpellReflect");
-                        }
-				}
-				if (mythicplusinterrupts)
-				{
-			if (WoW.TargetIsCasting && WoW.CanCast("SpellReflect") &&WoW.TargetPercentCast >= 60 && !WoW.IsSpellOnCooldown("SpellReflect"))
-                        {
-                            WoW.CastSpell("SpellReflect");
-                        }
-				}
 			}
 			
 			
@@ -203,21 +266,29 @@ namespace PixelMagic.Rotation
             {
 							
 				
-                if (WoW.HasTarget && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Shield Slam"))
+                if (WoW.HasTarget && !WoW.PlayerIsChanneling &&WoW.IsSpellInRange("Shield Slam"))
                 {
 					if (generalInterrupts)
 					{
-					if (WoW.CanCast("Pummel")&&WoW.TargetIsCasting &&WoW.TargetIsCastingAndSpellIsInterruptible &&WoW.TargetPercentCast >= 60&& !WoW.IsSpellOnCooldown("Pummel"))
+					if (WoW.TargetIsCasting &&WoW.TargetIsCastingAndSpellIsInterruptible)
                         {
+						if (!WoW.IsSpellOnCooldown("Pummel")&& WoW.IsSpellInRange("Shield Slam")&&WoW.TargetPercentCast >= 50)
+						{
 						WoW.CastSpell("Pummel");
-							return;	
+						return;
+						}
+						if (spellref &&!WoW.IsSpellOnCooldown("SpellReflect")&&WoW.TargetIsCasting &&WoW.TargetIsCastingAndSpellIsInterruptible &&WoW.TargetPercentCast >= 80)
+						{
+						WoW.CastSpell("SpellReflect");
+						return;	
+						}
 						}
 							
 					}
 					
 					if (mythicplusinterrupts)
 					{
-                    	if (WoW.CanCast("Pummel")&&WoW.TargetIsCasting &&WoW.TargetIsCastingAndSpellIsInterruptible &&WoW.TargetPercentCast >= 40&& !WoW.IsSpellOnCooldown("Pummel"))
+                    	if (WoW.CanCast("Pummel")&&WoW.TargetIsCasting &&WoW.TargetIsCastingAndSpellIsInterruptible)
 							{
 //int spell list for all important spells in M+                        
 if ( WoW.TargetCastingSpellID == 200248
@@ -282,11 +353,23 @@ if ( WoW.TargetCastingSpellID == 200248
 || WoW.TargetCastingSpellID == 201488
 || WoW.TargetCastingSpellID == 195332)
 								
-							{
-							WoW.CastSpell("Pummel");
-							return;
+								{
+								if (!WoW.IsSpellOnCooldown("Pummel")&&WoW.TargetPercentCast >= 40)
+									{
+									WoW.CastSpell("Pummel");
+									return;
+									}
+								if (spellref &&!WoW.IsSpellOnCooldown("SpellReflect")&&WoW.TargetPercentCast >= 80)
+									{
+									WoW.CastSpell("SpellReflect");
+									return;	
+									}
+									
+							//		WoW.CastSpell("Pummel");
+							//WoW.CastSpell("SpellReflect");
+							//return;
+								}
 							}
-						}
 					}
 						
 						if (WoW.CanCast("Shield Block") &&WoW.HealthPercent <= 90 && WoW.Rage >= 15 && !WoW.IsSpellOnCooldown("Shield Block") &&!WoW.PlayerHasBuff("Shield Block"))
@@ -314,7 +397,7 @@ if ( WoW.TargetCastingSpellID == 200248
 						}
 						
 						// Revenge Control
-                        if (WoW.CanCast("Revenge") && WoW.Rage >= 45 && !WoW.PlayerHasBuff("Vengeance Revenge"))
+                        if (WoW.CanCast("Revenge") && WoW.Rage >= 43 && !WoW.PlayerHasBuff("Vengeance Revenge"))
                         {
                             WoW.CastSpell("Revenge");
                         }
@@ -322,6 +405,8 @@ if ( WoW.TargetCastingSpellID == 200248
 						{
 							WoW.CastSpell("Revenge");
 						}
+						//Re-add the lines below if you are swimmming in rage
+						//
 						//if (WoW.CanCast("Revenge") && WoW.Rage >= 34 && WoW.PlayerHasBuff("Vengeance Revenge") &&!WoW.IsSpellOnCooldown("Revenge"))
 						//{
 						//	WoW.CastSpell("Revenge");
@@ -357,12 +442,18 @@ if ( WoW.TargetCastingSpellID == 200248
                             WoW.CastSpell("Thunder Clap");
                             return;
                         }
-                        
-						//if (WoW.CanCast("Impending Victory") && WoW.Rage >= 10 && !WoW.IsSpellOnCooldown("Impending Victory") && WoW.HealthPercent <= 80)
-						//{
-						//	WoW.CastSpell("Impending Victory");
-						//}
-															
+                        					
+							if (ImpendingVic &&!WoW.IsSpellOnCooldown("Impending Victory") && WoW.HealthPercent <= 80)
+							{
+							WoW.CastSpell("Impending Victory");
+							return;
+							}
+							if (!ImpendingVic &&WoW.IsSpellOverlayed("Victory Rush") && WoW.HealthPercent <= 70)
+							{
+							WoW.CastSpell("Victory Rush");
+							return;
+							}
+																					
                       
                         
                     }
