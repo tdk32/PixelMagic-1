@@ -3,763 +3,1166 @@
 // ReSharper disable ConvertPropertyToExpressionBody
 
 using System;
+using System.IO;
+using System.Diagnostics;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using PixelMagic.Helpers;
 
 namespace PixelMagic.Rotation
 {
-    public class WarlockDemoSorc : CombatRoutine
-    {
+    public class WarlockDemonology : CombatRoutine
+    {  
         public override string Name
         {
-            get { return "Affliction Warlock"; }
+            get { return "Demonology Warlock"; }
         }
 
         public override string Class
         {
             get { return "Warlock"; }
-        }
+        }     
 
         public override void Stop()
         {
-        }
-
+        }				
+		
         public override void Pulse() // Updated for Legion (tested and working for single target)
-        {
-            if (combatRoutine.Type == RotationType.SingleTarget) // Do Single Target Stuff here
+        {   
+            //Dark Pact
+            if (WoW.CanCast("Dark Pact")
+                && DarkPact
+                && WoW.HealthPercent <= 30
+                && !WoW.PlayerHasBuff("Mount"))
+            {
+                WoW.CastSpell("Dark Pact");
+                return;
+            }           
+
+            //Shadowfury
+            if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0
+                && Shadowfury
+                && !WoW.IsMoving
+                && WoW.CanCast("Shadowfury"))
+            {
+                WoW.CastSpell("Shadowfury");
+                return;
+            }
+
+            if (UseCooldowns)
             {
                 if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerIsChanneling && WoW.IsInCombat && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Mount"))
-                {
-                    if ((!WoW.TargetHasDebuff("Doom") || WoW.TargetDebuffTimeRemaining("Doom") <= 1.5) && WoW.CanCast("Doom") && WoW.IsSpellInRange("Doom"))
-                    {
-                        WoW.CastSpell("Doom");
-                        return;
-                    }
-
-                    /* if (WoW.CanCast("Darkglare")
+                { 
+                    //Doomguard
+                    if (WoW.CanCast("Doomguard")
+                        && !GrimoireofSupremacy
                         && WoW.CurrentSoulShards >= 1
                         && WoW.IsSpellInRange("Doom"))
-                    {
-                        WoW.CastSpell("Darkglare");
-                        return;
-                    }*/
-
-                    if (WoW.CanCast("Call Dreadstalkers") && (WoW.CurrentSoulShards >= 2 || WoW.TargetHasDebuff("Demonic Calling")) && WoW.IsSpellInRange("Doom") && !WoW.IsMoving)
-                    {
-                        WoW.CastSpell("Call Dreadstalkers");
-                        return;
-                    }
-
-                    if (WoW.CanCast("Grimoire: Felguard") && WoW.CurrentSoulShards >= 1 && WoW.IsSpellInRange("Doom"))
-                    {
-                        WoW.CastSpell("Grimoire: Felguard");
-                        return;
-                    }
-
-                    if (WoW.CanCast("Doomguard") && WoW.CurrentSoulShards >= 1 && WoW.IsSpellInRange("Doom"))
                     {
                         WoW.CastSpell("Doomguard");
                         return;
                     }
 
-                    if (WoW.CanCast("Hand of Guldan") && WoW.CurrentSoulShards >= 4 && WoW.IsSpellInRange("Doom") && !WoW.IsMoving)
+                    //Grimoire of Service
+                    if (WoW.CanCast("Grimoire: Felguard")
+                        && GrimoireofService
+                        && WoW.CurrentSoulShards >= 1
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Grimoire: Felguard");
+                        return;
+                    }
+
+                    //Soul Harvest
+                    if (WoW.CanCast("Soul Harvest")
+                        && SoulHarvest
+                        && !WoW.IsMoving
+                        && WoW.IsSpellInRange("Doom")
+                        && (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War") || WoW.PlayerHasBuff("Heroism")))
+                    {
+                        WoW.CastSpell("Soul Harvest");
+                        return;
+                    }
+                }
+            }
+
+            if (combatRoutine.Type == RotationType.SingleTarget) // Do Single Target Stuff here
+            {
+                if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerIsChanneling && WoW.IsInCombat && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Mount"))
+                {
+                    if ((!WoW.TargetHasDebuff("Doom") || WoW.TargetDebuffTimeRemaining("Doom") <= 1.5)                        
+                        && WoW.CanCast("Doom")
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Doom");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Darkglare")
+                        && SummonDarkglare
+                        && WoW.CurrentSoulShards >= 1
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Darkglare");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Call Dreadstalkers")
+                        && (WoW.CurrentSoulShards >= 2 || WoW.TargetHasDebuff("Demonic Calling"))
+                        && WoW.IsSpellInRange("Doom")
+                        && !WoW.IsMoving)
+                    {
+                        WoW.CastSpell("Call Dreadstalkers");
+                        return;
+                    }
+                   
+                    if (WoW.CanCast("Hand of Guldan")
+                        && WoW.CurrentSoulShards >= 4
+                        && WoW.IsSpellInRange("Doom")
+                        && !WoW.IsMoving)
                     {
                         WoW.CastSpell("Hand of Guldan");
                         return;
                     }
 
-                    if (WoW.CanCast("Demonic Empowerment") && !WoW.IsMoving && !WoW.WasLastCasted("Demonic Empowerment") &&
-                        (!WoW.PetHasBuff("Demonic Empowerment") || WoW.PetBuffTimeRemaining("Demonic Empowerment") <= 1.5 || WoW.WasLastCasted("Call Dreadstalkers") ||
-                         WoW.WasLastCasted("Grimoire: Felguard") || WoW.WasLastCasted("Doomguard") || WoW.WasLastCasted("Hand of Guldan")))
+                    if (WoW.CanCast("Demonic Empowerment")
+                        && !WoW.IsMoving
+                        && !WoW.WasLastCasted("Demonic Empowerment")
+                        && (!WoW.PetHasBuff("Demonic Empowerment") || WoW.PetBuffTimeRemaining("Demonic Empowerment") <= 1.5
+                        || WoW.WasLastCasted("Call Dreadstalkers") || WoW.WasLastCasted("Grimoire: Felguard") || WoW.WasLastCasted("Doomguard") || WoW.WasLastCasted("Hand of Guldan")))
                     {
                         WoW.CastSpell("Demonic Empowerment");
                         Thread.Sleep(1000);
                         return;
                     }
 
-                    if (WoW.CanCast("Talkiels Consumption") && WoW.PetHasBuff("Demonic Empowerment") && WoW.PetBuffTimeRemaining("Demonic Empowerment") >= 2 && WoW.WildImpsCount >= 1 &&
-                        WoW.DreadstalkersCount >= 1 && WoW.IsSpellInRange("Doom") && !WoW.IsMoving)
+                    if (WoW.CanCast("Talkiels Consumption")
+                        && WoW.PetHasBuff("Demonic Empowerment")
+                        && WoW.PetBuffTimeRemaining("Demonic Empowerment") >= 2
+                        && WoW.WildImpsCount >= 1
+                        && WoW.DreadstalkersCount >= 1
+                        && WoW.IsSpellInRange("Doom")
+                        && !WoW.IsMoving)
                     {
                         WoW.CastSpell("Talkiels Consumption");
                         return;
                     }
 
-                    if (WoW.CanCast("Felstorm") && WoW.PetHasBuff("Demonic Empowerment") && WoW.PetBuffTimeRemaining("Demonic Empowerment") >= 6 && WoW.IsSpellInRange("Doom"))
+                    if (WoW.CanCast("Felstorm")
+                        && WoW.PetHasBuff("Demonic Empowerment") 
+                        && WoW.PetBuffTimeRemaining("Demonic Empowerment") >= 6
+                        && WoW.IsSpellInRange("Doom"))
                     {
                         WoW.CastSpell("Felstorm");
                         return;
                     }
 
-                    if (WoW.CanCast("Life Tap") && WoW.Mana < 60 && WoW.HealthPercent > 50)
+                    if (WoW.CanCast("Shadowflame")
+                        && Shadowflame
+                        && !WoW.TargetHasDebuff("Shadowflame")
+                        && WoW.CanCast("Shadowflame")
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Shadowflame");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Life Tap")
+                        && WoW.Mana < 60
+                        && WoW.HealthPercent > 50)
                     {
                         WoW.CastSpell("Life Tap");
                         return;
                     }
 
-                    if (WoW.CanCast("Demonwrath") && WoW.Mana > 60 && WoW.IsMoving)
+                    if (WoW.CanCast("Demonwrath")
+                        && WoW.Mana > 60
+                        && WoW.IsMoving)
                     {
                         WoW.CastSpell("Demonwrath");
                         return;
                     }
 
-                    if ((WoW.CanCast("Shadow Bolt") || WoW.CanCast("Demonbolt")) && WoW.IsSpellInRange("Doom") && !WoW.IsMoving)
+                    if ((WoW.CanCast("Shadow Bolt") || WoW.CanCast("Demonbolt"))                        
+                        && WoW.IsSpellInRange("Doom")
+                        && !WoW.IsMoving)
                     {
                         WoW.CastSpell("Shadow Bolt");
                         WoW.CastSpell("Demonbolt");
                         return;
-                    }
+                    }                  
                 }
             }
             if (combatRoutine.Type == RotationType.AOE)
             {
+                if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerIsChanneling && WoW.IsInCombat && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Mount"))
+                {
+                    if (WoW.CanCast("Hand of Guldan")
+                        && WoW.CurrentSoulShards >= 4
+                        && WoW.IsSpellInRange("Doom")
+                        && !WoW.IsMoving)
+                    {
+                        WoW.CastSpell("Hand of Guldan");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Implosion")
+                        && Implosion
+                        && WoW.WildImpsCount >= 1
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Implosion");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Darkglare")
+                        && SummonDarkglare
+                        && WoW.CurrentSoulShards >= 1
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Darkglare");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Demonic Empowerment")
+                       && WoW.CanCast("Felstorm")
+                       && !WoW.IsMoving
+                       && !WoW.WasLastCasted("Demonic Empowerment")
+                       && (!WoW.PetHasBuff("Demonic Empowerment") || WoW.PetBuffTimeRemaining("Demonic Empowerment") <= 6))
+                    {
+                        WoW.CastSpell("Demonic Empowerment");
+                        Thread.Sleep(2000);
+                        return;
+                    }
+
+                    if (WoW.CanCast("Felstorm")
+                        && WoW.PetHasBuff("Demonic Empowerment")
+                        && WoW.PetBuffTimeRemaining("Demonic Empowerment") >= 6
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Felstorm");
+                        return;
+                    }                    
+
+                    if (WoW.CanCast("Life Tap")
+                        && WoW.Mana < 60
+                        && WoW.HealthPercent > 50)
+                    {
+                        WoW.CastSpell("Life Tap");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Demonwrath")
+                        && WoW.Mana > 60)
+                    {
+                        WoW.CastSpell("Demonwrath");
+                        return;
+                    }
+
+                }
             }
             if (combatRoutine.Type == RotationType.SingleTargetCleave)
             {
                 // Do Single Target Cleave stuff here if applicable else ignore this one
             }
         }
-
         #region Talents
+        public class DetectKeyPress
+        {
+            public static int Num1 = 0x31;
+            public static int Num2 = 0x32;
+            public static int Num3 = 0x33;
+            public static int Num4 = 0x34;
+            public static int Num5 = 0x35;
+            public static int Num6 = 0x36;
+            public static int Numpad0 = 0x60;
+            public static int Numpad1 = 0x61;
+            public static int Numpad2 = 0x62;
+            public static int Numpad3 = 0x63;
+            public static int Numpad4 = 0x64;
+            public static int Numpad5 = 0x65;
+            public static int Numpad6 = 0x66;
+            public static int Numpad7 = 0x67;
+            public static int Numpad8 = 0x68;
+            public static int Numpad9 = 0x69;
+            public static int NumpadDot = 0x6E;
+            public static int NumpadADD = 0x6B;
 
-        private CheckBox HauntBox;
-        private CheckBox WritheinAgonyBox;
-        private CheckBox DrainSoulBox;
-        private CheckBox ContagionBox;
-        private CheckBox AbsoluteCorruptionBox;
-        private CheckBox ManaTapBox;
+            public static int Shift = 0x10;
+            public static int Ctrl = 0x11;
+            public static int Alt = 0x12;
+
+            public static int Z = 0x5A;
+            public static int X = 0x58;
+            public static int C = 0x43;
+            public static int V = 0x56;
+            public static int Slash = 0xDC;
+
+            [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+            internal static extern short GetKeyState(int virtualKeyCode);
+        }
+
+        private CheckBox ShadowyInspirationBox;
+        private CheckBox ShadowflameBox;
+        private CheckBox DemonicCallingBox;
+        private CheckBox ImpendingDoomBox;
+        private CheckBox ImprovedDreadstalkersBox;
+        private CheckBox ImplosionBox;
         private CheckBox DemonicCircleBox;
         private CheckBox MortalCoilBox;
-        private CheckBox HowlofTerrorBox;
-        private CheckBox SiphonLifeBox;
-        private CheckBox SowtheSeedsBox;
+        private CheckBox ShadowfuryBox;
+        private CheckBox HandofDoomBox;
+        private CheckBox PowerTripBox;
         private CheckBox SoulHarvestBox;
         private CheckBox DemonSkinBox;
         private CheckBox BurningRushBox;
         private CheckBox DarkPactBox;
         private CheckBox GrimoireofSupremacyBox;
         private CheckBox GrimoireofServiceBox;
-        private CheckBox GrimoireofSacrificeBox;
-        private CheckBox SoulEffigyBox;
-        private CheckBox PhantomSingularityBox;
+        private CheckBox GrimoireofSynergyBox;
+        private CheckBox SummonDarkglareBox;
+        private CheckBox DemonboltBox;
         private CheckBox SoulConduitBox;
 
         public override Form SettingsForm { get; set; }
 
         public override void Initialize()
         {
-            Log.Write("Welcome to Demonology Warlock", Color.Purple);
+            Log.Write("Welcome to the Demonology Warlock rotation", Color.Purple);
             Log.Write("READ ME:", Color.Red);
-            Log.Write("Talents selection not implemented yet", Color.Red);
+            Log.Write("Please select your talents from the Rotation settings menu", Color.Red);
             Log.Write("Some talents won't impact your rotation, they are there for future use if necesary", Color.Red);
-            Log.Write("NOT supported talents: Shadowflame, Implosion, Mortal Coil, Shadowfury, Burning Rush, Darkglare", Color.Red);
-            Log.Write("Talents that work if used manually: Soul Harvest, Dark Pact", Color.Red);
-            Log.Write("This is version 1 of the Demonology Rotation so will have some bugs/kinks, please report them as you find them", Color.Red);
+            Log.Write("The script is not retard proof so please don't select more than 1 talent on each row", Color.Red);
+            Log.Write("NOT supported talents: Mortal Coil, Burning Rush", Color.Red);
+            Log.Write("Soul Harvest used automatically if you have Bloodlust and Cooldowns activated, Dark Pact activates at 30% or less HP", Color.Red);
+            Log.Write("Doomguard and Grimoire: Felguard only cast if you have Cooldowns enabled)", Color.Red);
+            Log.Write("To cast Shadowfury you need to use the macro instead of the spell, it will be cast at your mouse when you press the ALT key:", Color.Red);
+            Log.Write("#Showtooltip /cast [@cursor] Shadowfury", Color.Red);
             Log.Write("The rotation is based on Icy Veins data", Color.Red);
             WoW.Speak("Welcome to PixelMagic Demonology Warlock");
 
-            SettingsForm = new Form {Text = "Talents", StartPosition = FormStartPosition.CenterScreen, Width = 555, Height = 350, ShowIcon = true};
+            SettingsForm = new Form
+            {
+                Text = "Talents",
+                StartPosition = FormStartPosition.CenterScreen,
+                Width = 555,
+                Height = 350,
+                ShowIcon = true
+            };
 
-            var lblHauntText = new Label //Haunt LABEL
-            {Text = "Haunt", Size = new Size(150, 15), Left = 30, Top = 30};
-            SettingsForm.Controls.Add(lblHauntText); //Haunt TEXT
+            var lblShadowyInspirationText = new Label //ShadowyInspiration LABEL
+            {
+                Text = "Shadowy Inspiration",
+                Size = new Size(150, 15),
+                Left = 30,
+                Top = 30
+            };
+            SettingsForm.Controls.Add(lblShadowyInspirationText); //ShadowyInspiration TEXT
 
-            HauntBox = new CheckBox {Checked = Haunt, TabIndex = 2, Size = new Size(15, 15), Left = 15, Top = 30};
-            SettingsForm.Controls.Add(HauntBox); //Haunt BOX
+            ShadowyInspirationBox = new CheckBox
+            {
+                Checked = ShadowyInspiration,
+                TabIndex = 2,
+                Size = new Size(15, 15),
+                Left = 15,
+                Top = 30
+            };
+            SettingsForm.Controls.Add(ShadowyInspirationBox); //ShadowyInspiration BOX
 
-            var lblWritheinAgonyText = new Label //Writhe in Agony LABEL
-            {Text = "Writhe in Agony", Size = new Size(150, 15), Left = 210, Top = 30};
-            SettingsForm.Controls.Add(lblWritheinAgonyText); //Writhe in Agony TEXT
+            var lblShadowflameText = new Label //Shadowflame LABEL
+            {
+                Text = "Shadowflame",
+                Size = new Size(150, 15),
+                Left = 210,
+                Top = 30
+            };
+            SettingsForm.Controls.Add(lblShadowflameText); //Shadowflame TEXT
 
-            WritheinAgonyBox = new CheckBox {Checked = WritheinAgony, TabIndex = 4, Size = new Size(15, 15), Left = 195, Top = 30};
-            SettingsForm.Controls.Add(WritheinAgonyBox); //Writhe in Agony BOX		
+            ShadowflameBox = new CheckBox
+            {
+                Checked = Shadowflame,
+                TabIndex = 4,
+                Size = new Size(15, 15),
+                Left = 195,
+                Top = 30
+            };
+            SettingsForm.Controls.Add(ShadowflameBox);	//Shadowflame BOX		
 
-            var lblDrainSoulText = new Label // Drain Soul LABEL
-            {Text = "Drain Soul", Size = new Size(150, 15), Left = 390, Top = 30};
-            SettingsForm.Controls.Add(lblDrainSoulText); //Drain Soul TEXT
+            var lblDemonicCallingText = new Label  // Demonic Calling LABEL
+            {
+                Text = "Demonic Calling",
+                Size = new Size(150, 15),
+                Left = 390,
+                Top = 30
+            };
+            SettingsForm.Controls.Add(lblDemonicCallingText); //Demonic Calling TEXT
 
-            DrainSoulBox = new CheckBox {Checked = DrainSoul, TabIndex = 6, Size = new Size(15, 15), Left = 375, Top = 30};
-            SettingsForm.Controls.Add(DrainSoulBox); // Drain Soul BOX
+            DemonicCallingBox = new CheckBox
+            {
+                Checked = DemonicCalling,
+                TabIndex = 6,
+                Size = new Size(15, 15),
+                Left = 375,
+                Top = 30
+            };
+            SettingsForm.Controls.Add(DemonicCallingBox);   // Demonic Calling BOX
 
-            var lblContagionText = new Label // Contagion LABEL
-            {Text = "Contagion", Size = new Size(150, 15), Left = 30, Top = 60};
-            SettingsForm.Controls.Add(lblContagionText); //Contagion TEXT
+            var lblImpendingDoomText = new Label  // ImpendingDoom LABEL
+            {
+                Text = "Impending Doom",
+                Size = new Size(150, 15),
+                Left = 30,
+                Top = 60
+            };
+            SettingsForm.Controls.Add(lblImpendingDoomText); //ImpendingDoom TEXT
 
-            ContagionBox = new CheckBox {Checked = Contagion, TabIndex = 8, Size = new Size(15, 15), Left = 15, Top = 60};
-            SettingsForm.Controls.Add(ContagionBox); //Contagion Box
+            ImpendingDoomBox = new CheckBox
+            {
+                Checked = ImpendingDoom,
+                TabIndex = 8,
+                Size = new Size(15, 15),
+                Left = 15,
+                Top = 60
+            };
+            SettingsForm.Controls.Add(ImpendingDoomBox); //ImpendingDoom Box
 
-            var lblAbsoluteCorruptionText = new Label //Absolute Corruption label
-            {Text = "Absolute Corruption", Size = new Size(150, 15), Left = 210, Top = 60};
-            SettingsForm.Controls.Add(lblAbsoluteCorruptionText); //Absolute Corruption text
+            var lblImprovedDreadstalkersText = new Label //Improved Dreadstalkers label
+            {
+                Text = "Improved Dreadstalkers",
+                Size = new Size(150, 15),
+                Left = 210,
+                Top = 60
+            };
+            SettingsForm.Controls.Add(lblImprovedDreadstalkersText);  //Improved Dreadstalkers text
 
-            AbsoluteCorruptionBox = new CheckBox {Checked = AbsoluteCorruption, TabIndex = 10, Size = new Size(15, 15), Left = 195, Top = 60};
-            SettingsForm.Controls.Add(AbsoluteCorruptionBox); //Absolute Corruption box
+            ImprovedDreadstalkersBox = new CheckBox
+            {
+                Checked = ImprovedDreadstalkers,
+                TabIndex = 10,
+                Size = new Size(15, 15),
+                Left = 195,
+                Top = 60
+            };
+            SettingsForm.Controls.Add(ImprovedDreadstalkersBox);   //Improved Dreadstalkers box
 
-            var lblManaTapText = new Label //Mana Tap label
-            {Text = "Mana Tap", Size = new Size(150, 15), Left = 390, Top = 60};
-            SettingsForm.Controls.Add(lblManaTapText); //Mana Tap text
+            var lblImplosionText = new Label //Implosion label
+            {
+                Text = "Implosion",
+                Size = new Size(150, 15),
+                Left = 390,
+                Top = 60
+            };
+            SettingsForm.Controls.Add(lblImplosionText); //Implosion text
 
-            ManaTapBox = new CheckBox {Checked = ManaTap, TabIndex = 12, Size = new Size(15, 15), Left = 375, Top = 60};
-            SettingsForm.Controls.Add(ManaTapBox); //Mana Tap box	
+            ImplosionBox = new CheckBox
+            {
+                Checked = Implosion,
+                TabIndex = 12,
+                Size = new Size(15, 15),
+                Left = 375,
+                Top = 60
+            };
+            SettingsForm.Controls.Add(ImplosionBox);   //Implosion box	
 
             var lblDemonicCircleText = new Label //Demonic Circle label
-            {Text = "Demonic Circle", Size = new Size(150, 15), Left = 30, Top = 90};
+            {
+                Text = "Demonic Circle",
+                Size = new Size(150, 15),
+                Left = 30,
+                Top = 90
+            };
             SettingsForm.Controls.Add(lblDemonicCircleText); //Demonic Circle text
 
-            DemonicCircleBox = new CheckBox {Checked = DemonicCircle, TabIndex = 12, Size = new Size(15, 15), Left = 15, Top = 90};
-            SettingsForm.Controls.Add(DemonicCircleBox); //Demonic Circle box			
+            DemonicCircleBox = new CheckBox
+            {
+                Checked = DemonicCircle,
+                TabIndex = 12,
+                Size = new Size(15, 15),
+                Left = 15,
+                Top = 90
+            };
+            SettingsForm.Controls.Add(DemonicCircleBox);   //Demonic Circle box			
 
             var lblMortalCoilText = new Label //Mortal Coil LABEL
-            {Text = "Mortal Coil", Size = new Size(150, 15), Left = 210, Top = 90};
+            {
+                Text = "Mortal Coil",
+                Size = new Size(150, 15),
+                Left = 210,
+                Top = 90
+            };
             SettingsForm.Controls.Add(lblMortalCoilText); //Mortal Coil TEXT
 
-            MortalCoilBox = new CheckBox {Checked = MortalCoil, TabIndex = 4, Size = new Size(15, 15), Left = 195, Top = 90};
-            SettingsForm.Controls.Add(MortalCoilBox); //Mortal Coil BOX		
+            MortalCoilBox = new CheckBox
+            {
+                Checked = MortalCoil,
+                TabIndex = 4,
+                Size = new Size(15, 15),
+                Left = 195,
+                Top = 90
+            };
+            SettingsForm.Controls.Add(MortalCoilBox);	//Mortal Coil BOX		
 
-            var lblHowlofTerrorText = new Label // Howl of Terror LABEL
-            {Text = "Howl of Terror", Size = new Size(150, 15), Left = 390, Top = 90};
-            SettingsForm.Controls.Add(lblHowlofTerrorText); //Howl of Terror TEXT
+            var lblShadowfuryText = new Label  // Shadowfury LABEL
+            {
+                Text = "Shadowfury",
+                Size = new Size(150, 15),
+                Left = 390,
+                Top = 90
+            };
+            SettingsForm.Controls.Add(lblShadowfuryText); //Shadowfury TEXT
 
-            HowlofTerrorBox = new CheckBox {Checked = HowlofTerror, TabIndex = 6, Size = new Size(15, 15), Left = 375, Top = 90};
-            SettingsForm.Controls.Add(HowlofTerrorBox); // Howl of Terror BOX
+            ShadowfuryBox = new CheckBox
+            {
+                Checked = Shadowfury,
+                TabIndex = 6,
+                Size = new Size(15, 15),
+                Left = 375,
+                Top = 90
+            };
+            SettingsForm.Controls.Add(ShadowfuryBox);   // Shadowfury BOX
 
-            var lblSiphonLifeText = new Label //Siphon Life LABEL
-            {Text = "Siphon Life", Size = new Size(150, 15), Left = 30, Top = 120};
-            SettingsForm.Controls.Add(lblSiphonLifeText); //Siphon Life TEXT
+            var lblHandofDoomText = new Label //Hand of Doom LABEL
+            {
+                Text = "Hand of Doom",
+                Size = new Size(150, 15),
+                Left = 30,
+                Top = 120
+            };
+            SettingsForm.Controls.Add(lblHandofDoomText); //Hand of Doom TEXT
 
-            SiphonLifeBox = new CheckBox {Checked = SiphonLife, TabIndex = 2, Size = new Size(15, 15), Left = 15, Top = 120};
-            SettingsForm.Controls.Add(SiphonLifeBox); //Siphon Life BOX
+            HandofDoomBox = new CheckBox
+            {
+                Checked = HandofDoom,
+                TabIndex = 2,
+                Size = new Size(15, 15),
+                Left = 15,
+                Top = 120
+            };
+            SettingsForm.Controls.Add(HandofDoomBox); //Hand of Doom BOX
 
-            var lblSowtheSeedsText = new Label //Sow the Seeds LABEL
-            {Text = "Sow the Seeds", Size = new Size(150, 15), Left = 210, Top = 120};
-            SettingsForm.Controls.Add(lblSowtheSeedsText); //Sow the Seeds TEXT
+            var lblPowerTripText = new Label //Power Trip LABEL
+            {
+                Text = "Power Trip",
+                Size = new Size(150, 15),
+                Left = 210,
+                Top = 120
+            };
+            SettingsForm.Controls.Add(lblPowerTripText); //Power Trip TEXT
 
-            SowtheSeedsBox = new CheckBox {Checked = SowtheSeeds, TabIndex = 4, Size = new Size(15, 15), Left = 195, Top = 120};
-            SettingsForm.Controls.Add(SowtheSeedsBox); //Sow the Seeds BOX		
+            PowerTripBox = new CheckBox
+            {
+                Checked = PowerTrip,
+                TabIndex = 4,
+                Size = new Size(15, 15),
+                Left = 195,
+                Top = 120
+            };
+            SettingsForm.Controls.Add(PowerTripBox);	//Power Trip BOX		
 
-            var lblSoulHarvestText = new Label // Soul Harvest LABEL
-            {Text = "Soul Harvest", Size = new Size(150, 15), Left = 390, Top = 120};
+            var lblSoulHarvestText = new Label  // Soul Harvest LABEL
+            {
+                Text = "Soul Harvest",
+                Size = new Size(150, 15),
+                Left = 390,
+                Top = 120
+            };
             SettingsForm.Controls.Add(lblSoulHarvestText); //Soul Harvest TEXT
 
-            SoulHarvestBox = new CheckBox {Checked = SoulHarvest, TabIndex = 6, Size = new Size(15, 15), Left = 375, Top = 120};
-            SettingsForm.Controls.Add(SoulHarvestBox); // Soul Harvest BOX
+            SoulHarvestBox = new CheckBox
+            {
+                Checked = SoulHarvest,
+                TabIndex = 6,
+                Size = new Size(15, 15),
+                Left = 375,
+                Top = 120
+            };
+            SettingsForm.Controls.Add(SoulHarvestBox);   // Soul Harvest BOX
 
             var lblDemonSkinText = new Label //Demon Skin LABEL
-            {Text = "Demon Skin", Size = new Size(150, 15), Left = 30, Top = 150};
+            {
+                Text = "Demon Skin",
+                Size = new Size(150, 15),
+                Left = 30,
+                Top = 150
+            };
             SettingsForm.Controls.Add(lblDemonSkinText); //Demon Skin TEXT
 
-            DemonSkinBox = new CheckBox {Checked = DemonSkin, TabIndex = 2, Size = new Size(15, 15), Left = 15, Top = 150};
+            DemonSkinBox = new CheckBox
+            {
+                Checked = DemonSkin,
+                TabIndex = 2,
+                Size = new Size(15, 15),
+                Left = 15,
+                Top = 150
+            };
             SettingsForm.Controls.Add(DemonSkinBox); //Demon Skin BOX
 
             var lblBurningRushText = new Label //Burning Rush LABEL
-            {Text = "Burning Rush", Size = new Size(150, 15), Left = 210, Top = 150};
+            {
+                Text = "Burning Rush",
+                Size = new Size(150, 15),
+                Left = 210,
+                Top = 150
+            };
             SettingsForm.Controls.Add(lblBurningRushText); //Burning Rush TEXT
 
-            BurningRushBox = new CheckBox {Checked = BurningRush, TabIndex = 4, Size = new Size(15, 15), Left = 195, Top = 150};
+            BurningRushBox = new CheckBox
+            {
+                Checked = BurningRush,
+                TabIndex = 4,
+                Size = new Size(15, 15),
+                Left = 195,
+                Top = 150
+            };
             SettingsForm.Controls.Add(BurningRushBox); //Burning Rush BOX		
 
             var lblDarkPactText = new Label //Dark Pact LABEL
-            {Text = "DarkPact", Size = new Size(150, 15), Left = 390, Top = 150};
+            {
+                Text = "Dark Pact",
+                Size = new Size(150, 15),
+                Left = 390,
+                Top = 150
+            };
             SettingsForm.Controls.Add(lblDarkPactText); //Dark Pact TEXT
 
-            DarkPactBox = new CheckBox {Checked = DarkPact, TabIndex = 6, Size = new Size(15, 15), Left = 375, Top = 150};
+            DarkPactBox = new CheckBox
+            {
+                Checked = DarkPact,
+                TabIndex = 6,
+                Size = new Size(15, 15),
+                Left = 375,
+                Top = 150
+            };
             SettingsForm.Controls.Add(DarkPactBox); //Dark Pact BOX
 
             var lblGrimoireofSupremacyText = new Label //Grimoire of Supremacy LABEL
-            {Text = "Grimoire of Supremacy", Size = new Size(150, 15), Left = 30, Top = 180};
+            {
+                Text = "Grimoire of Supremacy",
+                Size = new Size(150, 15),
+                Left = 30,
+                Top = 180
+            };
             SettingsForm.Controls.Add(lblGrimoireofSupremacyText); //Grimoire of Supremacy TEXT
 
-            GrimoireofSupremacyBox = new CheckBox {Checked = GrimoireofSupremacy, TabIndex = 2, Size = new Size(15, 15), Left = 15, Top = 180};
+            GrimoireofSupremacyBox = new CheckBox
+            {
+                Checked = GrimoireofSupremacy,
+                TabIndex = 2,
+                Size = new Size(15, 15),
+                Left = 15,
+                Top = 180
+            };
             SettingsForm.Controls.Add(GrimoireofSupremacyBox); //Grimoire of Supremacy BOX
 
             var lblGrimoireofServiceText = new Label //Grimoire of Service LABEL
-            {Text = "Grimoire of Service", Size = new Size(150, 15), Left = 210, Top = 180};
+            {
+                Text = "Grimoire of Service",
+                Size = new Size(150, 15),
+                Left = 210,
+                Top = 180
+            };
             SettingsForm.Controls.Add(lblGrimoireofServiceText); //Grimoire of Service TEXT
 
-            GrimoireofServiceBox = new CheckBox {Checked = GrimoireofService, TabIndex = 4, Size = new Size(15, 15), Left = 195, Top = 180};
-            SettingsForm.Controls.Add(GrimoireofServiceBox); //Grimoire of Service BOX		
+            GrimoireofServiceBox = new CheckBox
+            {
+                Checked = GrimoireofService,
+                TabIndex = 4,
+                Size = new Size(15, 15),
+                Left = 195,
+                Top = 180
+            };
+            SettingsForm.Controls.Add(GrimoireofServiceBox);	//Grimoire of Service BOX		
 
-            var lblGrimoireofSacrificeText = new Label //Grimoire of Sacrifice LABEL
-            {Text = "Grimoire of Sacrifice", Size = new Size(150, 15), Left = 390, Top = 180};
-            SettingsForm.Controls.Add(lblGrimoireofSacrificeText); //Grimoire of Sacrifice TEXT
+            var lblGrimoireofSynergyText = new Label  //Grimoire of Synergy LABEL
+            {
+                Text = "Grimoire of Synergy",
+                Size = new Size(150, 15),
+                Left = 390,
+                Top = 180
+            };
+            SettingsForm.Controls.Add(lblGrimoireofSynergyText); //Grimoire of Synergy TEXT
 
-            GrimoireofSacrificeBox = new CheckBox {Checked = GrimoireofSacrifice, TabIndex = 6, Size = new Size(15, 15), Left = 375, Top = 180};
-            SettingsForm.Controls.Add(GrimoireofSacrificeBox); // Grimoire of Sacrifice BOX
+            GrimoireofSynergyBox = new CheckBox
+            {
+                Checked = GrimoireofSynergy,
+                TabIndex = 6,
+                Size = new Size(15, 15),
+                Left = 375,
+                Top = 180
+            };
+            SettingsForm.Controls.Add(GrimoireofSynergyBox);   // Grimoire of Synergy BOX
 
-            var lblSoulEffigyText = new Label //Soul Effigy LABEL
-            {Text = "Soul Effigy", Size = new Size(150, 15), Left = 30, Top = 210};
-            SettingsForm.Controls.Add(lblSoulEffigyText); //Soul Effigy TEXT
+            var lblSummonDarkglareText = new Label //Summon Darkglare LABEL
+            {
+                Text = "Summon Darkglare",
+                Size = new Size(150, 15),
+                Left = 30,
+                Top = 210
+            };
+            SettingsForm.Controls.Add(lblSummonDarkglareText); //Summon Darkglare TEXT
 
-            SoulEffigyBox = new CheckBox {Checked = SoulEffigy, TabIndex = 2, Size = new Size(15, 15), Left = 15, Top = 210};
-            SettingsForm.Controls.Add(SoulEffigyBox); //Soul Effigy BOX
+            SummonDarkglareBox = new CheckBox
+            {
+                Checked = SummonDarkglare,
+                TabIndex = 2,
+                Size = new Size(15, 15),
+                Left = 15,
+                Top = 210
+            };
+            SettingsForm.Controls.Add(SummonDarkglareBox); //Summon Darkglare BOX
 
-            var lblPhantomSingularityText = new Label //Phantom Singularity LABEL
-            {Text = "Phantom Singularity", Size = new Size(150, 15), Left = 210, Top = 210};
-            SettingsForm.Controls.Add(lblPhantomSingularityText); //Phantom Singularity TEXT
+            var lblDemonboltText = new Label //Demonbolt LABEL
+            {
+                Text = "Demonbolt",
+                Size = new Size(150, 15),
+                Left = 210,
+                Top = 210
+            };
+            SettingsForm.Controls.Add(lblDemonboltText); //Demonbolt TEXT
 
-            PhantomSingularityBox = new CheckBox {Checked = PhantomSingularity, TabIndex = 4, Size = new Size(15, 15), Left = 195, Top = 210};
-            SettingsForm.Controls.Add(PhantomSingularityBox); //Phantom Singularity BOX		
+            DemonboltBox = new CheckBox
+            {
+                Checked = Demonbolt,
+                TabIndex = 4,
+                Size = new Size(15, 15),
+                Left = 195,
+                Top = 210
+            };
+            SettingsForm.Controls.Add(DemonboltBox);	//Demonbolt BOX		
 
-            var lblSoulConduitText = new Label //Soul Conduit LABEL
-            {Text = "Soul Conduit", Size = new Size(150, 15), Left = 390, Top = 210};
+            var lblSoulConduitText = new Label  //Soul Conduit LABEL
+            {
+                Text = "Soul Conduit",
+                Size = new Size(150, 15),
+                Left = 390,
+                Top = 210
+            };
             SettingsForm.Controls.Add(lblSoulConduitText); //Soul Conduit TEXT
 
-            SoulConduitBox = new CheckBox {Checked = SoulConduit, TabIndex = 6, Size = new Size(15, 15), Left = 375, Top = 210};
-            SettingsForm.Controls.Add(SoulConduitBox); //Soul Conduit BOX
+            SoulConduitBox = new CheckBox
+            {
+                Checked = SoulConduit,
+                TabIndex = 6,
+                Size = new Size(15, 15),
+                Left = 375,
+                Top = 210
+            };
+            SettingsForm.Controls.Add(SoulConduitBox);   //Soul Conduit BOX
 
             var cmdSave = new Button //Save Button
-            {Text = "Save", Width = 40, Height = 20, Left = 445, Top = 270, Size = new Size(80, 30)};
+            {
+                Text = "Save",
+                Width = 40,
+                Height = 20,
+                Left = 445,
+                Top = 270,
+                Size = new Size(80, 30)
+            };
 
-            HauntBox.Checked = Haunt;
-            WritheinAgonyBox.Checked = WritheinAgony;
-            DrainSoulBox.Checked = DrainSoul;
-            ContagionBox.Checked = Contagion;
-            AbsoluteCorruptionBox.Checked = AbsoluteCorruption;
-            ManaTapBox.Checked = ManaTap;
+            ShadowyInspirationBox.Checked = ShadowyInspiration;
+            ShadowflameBox.Checked = Shadowflame;
+            DemonicCallingBox.Checked = DemonicCalling;
+            ImpendingDoomBox.Checked = ImpendingDoom;
+            ImprovedDreadstalkersBox.Checked = ImprovedDreadstalkers;
+            ImplosionBox.Checked = Implosion;
             DemonicCircleBox.Checked = DemonicCircle;
             MortalCoilBox.Checked = MortalCoil;
-            HowlofTerrorBox.Checked = HowlofTerror;
-            SiphonLifeBox.Checked = SiphonLife;
-            SowtheSeedsBox.Checked = SowtheSeeds;
+            ShadowfuryBox.Checked = Shadowfury;
+            HandofDoomBox.Checked = HandofDoom;
+            PowerTripBox.Checked = PowerTrip;
             SoulHarvestBox.Checked = SoulHarvest;
             DemonSkinBox.Checked = DemonSkin;
             BurningRushBox.Checked = BurningRush;
             DarkPactBox.Checked = DarkPact;
             GrimoireofSupremacyBox.Checked = GrimoireofSupremacy;
             GrimoireofServiceBox.Checked = GrimoireofService;
-            GrimoireofSacrificeBox.Checked = GrimoireofSacrifice;
-            SoulEffigyBox.Checked = SoulEffigy;
-            PhantomSingularityBox.Checked = PhantomSingularity;
+            GrimoireofSynergyBox.Checked = GrimoireofSynergy;
+            SummonDarkglareBox.Checked = SummonDarkglare;
+            DemonboltBox.Checked = Demonbolt;
             SoulConduitBox.Checked = SoulConduit;
 
             cmdSave.Click += CmdSave_Click;
-            HauntBox.CheckedChanged += Haunt_Click;
-            WritheinAgonyBox.CheckedChanged += WritheinAgony_Click;
-            DrainSoulBox.CheckedChanged += DrainSoul_Click;
-            ContagionBox.CheckedChanged += Contagion_Click;
-            AbsoluteCorruptionBox.CheckedChanged += AbsoluteCorruption_Click;
-            ManaTapBox.CheckedChanged += ManaTap_Click;
+            ShadowyInspirationBox.CheckedChanged += ShadowyInspiration_Click;
+            ShadowflameBox.CheckedChanged += Shadowflame_Click;
+            DemonicCallingBox.CheckedChanged += DemonicCalling_Click;
+            ImpendingDoomBox.CheckedChanged += ImpendingDoom_Click;
+            ImprovedDreadstalkersBox.CheckedChanged += ImprovedDreadstalkers_Click;
+            ImplosionBox.CheckedChanged += Implosion_Click;
             DemonicCircleBox.CheckedChanged += DemonicCircle_Click;
             MortalCoilBox.CheckedChanged += MortalCoil_Click;
-            HowlofTerrorBox.CheckedChanged += HowlofTerror_Click;
-            SiphonLifeBox.CheckedChanged += SiphonLife_Click;
-            SowtheSeedsBox.CheckedChanged += SowtheSeeds_Click;
+            ShadowfuryBox.CheckedChanged += Shadowfury_Click;
+            HandofDoomBox.CheckedChanged += HandofDoom_Click;
+            PowerTripBox.CheckedChanged += PowerTrip_Click;
             SoulHarvestBox.CheckedChanged += SoulHarvest_Click;
             DemonSkinBox.CheckedChanged += DemonSkin_Click;
             BurningRushBox.CheckedChanged += BurningRush_Click;
             DarkPactBox.CheckedChanged += DarkPact_Click;
             GrimoireofSupremacyBox.CheckedChanged += GrimoireofSupremacy_Click;
             GrimoireofServiceBox.CheckedChanged += GrimoireofService_Click;
-            GrimoireofSacrificeBox.CheckedChanged += GrimoireofSacrifice_Click;
-            SoulEffigyBox.CheckedChanged += SoulEffigy_Click;
-            PhantomSingularityBox.CheckedChanged += PhantomSingularity_Click;
+            GrimoireofSynergyBox.CheckedChanged += GrimoireofSynergy_Click;
+            SummonDarkglareBox.CheckedChanged += SummonDarkglare_Click;
+            DemonboltBox.CheckedChanged += Demonbolt_Click;
             SoulConduitBox.CheckedChanged += SoulConduit_Click;
 
             SettingsForm.Controls.Add(cmdSave);
-            lblHauntText.BringToFront();
-            lblWritheinAgonyText.BringToFront();
-            lblDrainSoulText.BringToFront();
-            lblContagionText.BringToFront();
-            lblAbsoluteCorruptionText.BringToFront();
-            lblManaTapText.BringToFront();
+            lblShadowyInspirationText.BringToFront();
+            lblShadowflameText.BringToFront();
+            lblDemonicCallingText.BringToFront();
+            lblImpendingDoomText.BringToFront();
+            lblImprovedDreadstalkersText.BringToFront();
+            lblImplosionText.BringToFront();
             lblDemonicCircleText.BringToFront();
             lblMortalCoilText.BringToFront();
-            lblHowlofTerrorText.BringToFront();
-            lblSiphonLifeText.BringToFront();
-            lblSowtheSeedsText.BringToFront();
+            lblShadowfuryText.BringToFront();
+            lblHandofDoomText.BringToFront();
+            lblPowerTripText.BringToFront();
             lblSoulHarvestText.BringToFront();
             lblDemonSkinText.BringToFront();
             lblBurningRushText.BringToFront();
             lblDarkPactText.BringToFront();
             lblGrimoireofSupremacyText.BringToFront();
             lblGrimoireofServiceText.BringToFront();
-            lblGrimoireofSacrificeText.BringToFront();
-            lblSoulEffigyText.BringToFront();
-            lblPhantomSingularityText.BringToFront();
+            lblGrimoireofSynergyText.BringToFront();
+            lblSummonDarkglareText.BringToFront();
+            lblDemonboltText.BringToFront();
             lblSoulConduitText.BringToFront();
 
-            Log.Write("Haunt = " + Haunt + "                                                  " + "Writhe in Agony = " + WritheinAgony + "                                                   " +
-                      "Drain Soul = " + DrainSoul);
-            Log.Write("Contagion = " + Contagion + "                                           " + "Absolute Corruption = " + AbsoluteCorruption + "                                           " +
-                      "Mana Tap = " + ManaTap);
-            Log.Write("Demonic Circle = " + DemonicCircle + "                                  " + "Mortal Coil = " + MortalCoil +
-                      "                                                            " + "Howl of Terror = " + HowlofTerror);
-            Log.Write("Siphon Life = " + SiphonLife + "                                          " + "Sow the Seeds = " + SowtheSeeds + "                                                      " +
-                      "Soul Harvest = " + SoulHarvest);
-            Log.Write("Demon Skin = " + DemonSkin + "                                        " + "Burning Rush = " + BurningRush + "                                                        " +
-                      "Dark Pact = " + DarkPact);
-            Log.Write("Grimoire of Supremacy = " + GrimoireofSupremacy + "                     " + "Grimoire of Service = " + GrimoireofService +
-                      "                                              " + "Grimoire of Sacrifice = " + GrimoireofSacrifice);
-            Log.Write("Soul Effigy = " + SoulEffigy + "                                          " + "PhantomSingularity = " + PhantomSingularity +
-                      "                                             " + "Soul Conduit = " + SoulConduit);
+            Log.Write("Shadowy Inspiration = " + ShadowyInspiration + "                                             " + "Shadowflame = " + Shadowflame + "                                                      " + "Demonic Calling = " + DemonicCalling);
+            Log.Write("Impending Doom = " + ImpendingDoom + "                                                 " + "Improved Dreadstalkers = " + ImprovedDreadstalkers + "                                     " + "Implosion = " + Implosion);
+            Log.Write("Demonic Circle = " + DemonicCircle + "                                                     " + "Mortal Coil = " + MortalCoil + "                                                           " + "Shadowfury = " + Shadowfury);
+            Log.Write("Hand of Doom = " + HandofDoom + "                                                      " + "Power Trip = " + PowerTrip + "                                                           " + "Soul Harvest = " + SoulHarvest);
+            Log.Write("Demon Skin = " + DemonSkin + "                                                           " + "Burning Rush = " + BurningRush + "                                                       " + "Dark Pact = " + DarkPact);
+            Log.Write("Grimoire of Supremacy = " + GrimoireofSupremacy + "                                       " + "Grimoire of Service = " + GrimoireofService + "                                              " + "Grimoire of Synergy = " + GrimoireofSynergy);
+            Log.Write("Summon Darkglare = " + SummonDarkglare + "                                              " + "Demonbolt = " + Demonbolt + "                                                           " + "Soul Conduit = " + SoulConduit);
         }
 
         private void CmdSave_Click(object sender, EventArgs e)
         {
-            Haunt = HauntBox.Checked;
-            WritheinAgony = WritheinAgonyBox.Checked;
-            DrainSoul = DrainSoulBox.Checked;
-            Contagion = ContagionBox.Checked;
-            AbsoluteCorruption = AbsoluteCorruptionBox.Checked;
-            ManaTap = ManaTapBox.Checked;
+            ShadowyInspiration = ShadowyInspirationBox.Checked;
+            Shadowflame = ShadowflameBox.Checked;
+            DemonicCalling = DemonicCallingBox.Checked;
+            ImpendingDoom = ImpendingDoomBox.Checked;
+            ImprovedDreadstalkers = ImprovedDreadstalkersBox.Checked;
+            Implosion = ImplosionBox.Checked;
             DemonicCircle = DemonicCircleBox.Checked;
             MortalCoil = MortalCoilBox.Checked;
-            HowlofTerror = HowlofTerrorBox.Checked;
-            SiphonLife = SiphonLifeBox.Checked;
-            SowtheSeeds = SowtheSeedsBox.Checked;
+            Shadowfury = ShadowfuryBox.Checked;
+            HandofDoom = HandofDoomBox.Checked;
+            PowerTrip = PowerTripBox.Checked;
             SoulHarvest = SoulHarvestBox.Checked;
             DemonSkin = DemonSkinBox.Checked;
             BurningRush = BurningRushBox.Checked;
             DarkPact = DarkPactBox.Checked;
             GrimoireofSupremacy = GrimoireofSupremacyBox.Checked;
             GrimoireofService = GrimoireofServiceBox.Checked;
-            GrimoireofSacrifice = GrimoireofSacrificeBox.Checked;
-            SoulEffigy = SoulEffigyBox.Checked;
-            PhantomSingularity = PhantomSingularityBox.Checked;
+            GrimoireofSynergy = GrimoireofSynergyBox.Checked;
+            SummonDarkglare = SummonDarkglareBox.Checked;
+            Demonbolt = DemonboltBox.Checked;
             SoulConduit = SoulConduitBox.Checked;
             MessageBox.Show("Settings saved", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SettingsForm.Close();
         }
 
-        private void Haunt_Click(object sender, EventArgs e)
+        private void ShadowyInspiration_Click(object sender, EventArgs e)
         {
-            Haunt = HauntBox.Checked;
+            ShadowyInspiration = ShadowyInspirationBox.Checked;
         }
 
-        private void WritheinAgony_Click(object sender, EventArgs e)
+        private void Shadowflame_Click(object sender, EventArgs e)
         {
-            WritheinAgony = WritheinAgonyBox.Checked;
+            Shadowflame = ShadowflameBox.Checked;
         }
-
-        private void DrainSoul_Click(object sender, EventArgs e)
+        private void DemonicCalling_Click(object sender, EventArgs e)
         {
-            DrainSoul = DrainSoulBox.Checked;
+            DemonicCalling = DemonicCallingBox.Checked;
         }
-
-        private void Contagion_Click(object sender, EventArgs e)
+        private void ImpendingDoom_Click(object sender, EventArgs e)
         {
-            Contagion = ContagionBox.Checked;
+            ImpendingDoom = ImpendingDoomBox.Checked;
         }
-
-        private void AbsoluteCorruption_Click(object sender, EventArgs e)
+        private void ImprovedDreadstalkers_Click(object sender, EventArgs e)
         {
-            AbsoluteCorruption = AbsoluteCorruptionBox.Checked;
+            ImprovedDreadstalkers = ImprovedDreadstalkersBox.Checked;
         }
-
-        private void ManaTap_Click(object sender, EventArgs e)
+        private void Implosion_Click(object sender, EventArgs e)
         {
-            ManaTap = ManaTapBox.Checked;
+            Implosion = ImplosionBox.Checked;
         }
-
         private void DemonicCircle_Click(object sender, EventArgs e)
         {
             DemonicCircle = DemonicCircleBox.Checked;
         }
-
         private void MortalCoil_Click(object sender, EventArgs e)
         {
             MortalCoil = MortalCoilBox.Checked;
         }
-
-        private void HowlofTerror_Click(object sender, EventArgs e)
+        private void Shadowfury_Click(object sender, EventArgs e)
         {
-            HowlofTerror = HowlofTerrorBox.Checked;
+            Shadowfury = ShadowfuryBox.Checked;
         }
-
-        private void SiphonLife_Click(object sender, EventArgs e)
+        private void HandofDoom_Click(object sender, EventArgs e)
         {
-            SiphonLife = SiphonLifeBox.Checked;
+            HandofDoom = HandofDoomBox.Checked;
         }
-
-        private void SowtheSeeds_Click(object sender, EventArgs e)
+        private void PowerTrip_Click(object sender, EventArgs e)
         {
-            SowtheSeeds = SowtheSeedsBox.Checked;
+            PowerTrip = PowerTripBox.Checked;
         }
-
         private void SoulHarvest_Click(object sender, EventArgs e)
         {
             SoulHarvest = SoulHarvestBox.Checked;
         }
-
         private void DemonSkin_Click(object sender, EventArgs e)
         {
             DemonSkin = DemonSkinBox.Checked;
         }
-
         private void BurningRush_Click(object sender, EventArgs e)
         {
             BurningRush = BurningRushBox.Checked;
         }
-
         private void DarkPact_Click(object sender, EventArgs e)
         {
             DarkPact = DarkPactBox.Checked;
         }
-
         private void GrimoireofSupremacy_Click(object sender, EventArgs e)
         {
             GrimoireofSupremacy = GrimoireofSupremacyBox.Checked;
         }
-
         private void GrimoireofService_Click(object sender, EventArgs e)
         {
             GrimoireofService = GrimoireofServiceBox.Checked;
         }
-
-        private void GrimoireofSacrifice_Click(object sender, EventArgs e)
+        private void GrimoireofSynergy_Click(object sender, EventArgs e)
         {
-            GrimoireofSacrifice = GrimoireofSacrificeBox.Checked;
+            GrimoireofSynergy = GrimoireofSynergyBox.Checked;
         }
-
-        private void SoulEffigy_Click(object sender, EventArgs e)
+        private void SummonDarkglare_Click(object sender, EventArgs e)
         {
-            SoulEffigy = SoulEffigyBox.Checked;
+            SummonDarkglare = SummonDarkglareBox.Checked;
         }
-
-        private void PhantomSingularity_Click(object sender, EventArgs e)
+        private void Demonbolt_Click(object sender, EventArgs e)
         {
-            PhantomSingularity = PhantomSingularityBox.Checked;
+            Demonbolt = DemonboltBox.Checked;
         }
-
         private void SoulConduit_Click(object sender, EventArgs e)
         {
             SoulConduit = SoulConduitBox.Checked;
         }
 
-        public static bool Haunt
+        public static bool ShadowyInspiration
         {
             get
             {
-                var Haunt = ConfigFile.ReadValue("WarlockAffliction", "Haunt").Trim();
+                var ShadowyInspiration = ConfigFile.ReadValue("WarlockDemonology", "Shadowy Inspiration").Trim();
 
-                return Haunt != "" && Convert.ToBoolean(Haunt);
+                return ShadowyInspiration != "" && Convert.ToBoolean(ShadowyInspiration);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Haunt", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Shadowy Inspiration", value.ToString()); }
         }
-
-        private static bool WritheinAgony
+        private static bool Shadowflame
         {
             get
             {
-                var WritheinAgony = ConfigFile.ReadValue("WarlockAffliction", "Writhe in Agony").Trim();
+                var Shadowflame = ConfigFile.ReadValue("WarlockDemonology", "Shadowflame").Trim();
 
-                return WritheinAgony != "" && Convert.ToBoolean(WritheinAgony);
+                return Shadowflame != "" && Convert.ToBoolean(Shadowflame);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Writhe in Agony", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Shadowflame", value.ToString()); }
         }
-
-        private static bool DrainSoul
+        private static bool DemonicCalling
         {
             get
             {
-                var DrainSoul = ConfigFile.ReadValue("WarlockAffliction", "Drain Soul").Trim();
+                var DemonicCalling = ConfigFile.ReadValue("WarlockDemonology", "Demonic Calling").Trim();
 
-                return DrainSoul != "" && Convert.ToBoolean(DrainSoul);
+                return DemonicCalling != "" && Convert.ToBoolean(DemonicCalling);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Drain Soul", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Demonic Calling", value.ToString()); }
         }
-
-        private static bool Contagion
+        private static bool ImpendingDoom
         {
             get
             {
-                var Contagion = ConfigFile.ReadValue("WarlockAffliction", "Contagion").Trim();
+                var ImpendingDoom = ConfigFile.ReadValue("WarlockDemonology", "Impending Doom").Trim();
 
-                return Contagion != "" && Convert.ToBoolean(Contagion);
+                return ImpendingDoom != "" && Convert.ToBoolean(ImpendingDoom);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Contagion", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Impending Doom", value.ToString()); }
         }
-
-        private static bool AbsoluteCorruption
+        private static bool ImprovedDreadstalkers
         {
             get
             {
-                var AbsoluteCorruption = ConfigFile.ReadValue("WarlockAffliction", "Absolute Corruption").Trim();
+                var ImprovedDreadstalkers = ConfigFile.ReadValue("WarlockDemonology", "Improved Dreadstalkers").Trim();
 
-                return AbsoluteCorruption != "" && Convert.ToBoolean(AbsoluteCorruption);
+                return ImprovedDreadstalkers != "" && Convert.ToBoolean(ImprovedDreadstalkers);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Absolute Corruption", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Improved Dreadstalkers", value.ToString()); }
         }
-
-        private static bool ManaTap
+        private static bool Implosion
         {
             get
             {
-                var ManaTap = ConfigFile.ReadValue("WarlockAffliction", "Mana Tap").Trim();
+                var Implosion = ConfigFile.ReadValue("WarlockDemonology", "Implosion").Trim();
 
-                return ManaTap != "" && Convert.ToBoolean(ManaTap);
+                return Implosion != "" && Convert.ToBoolean(Implosion);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Mana Tap", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Implosion", value.ToString()); }
         }
-
         private static bool DemonicCircle
         {
             get
             {
-                var DemonicCircle = ConfigFile.ReadValue("WarlockAffliction", "Demonic Circle").Trim();
+                var DemonicCircle = ConfigFile.ReadValue("WarlockDemonology", "Demonic Circle").Trim();
 
                 return DemonicCircle != "" && Convert.ToBoolean(DemonicCircle);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Demonic Circle", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Demonic Circle", value.ToString()); }
         }
-
         private static bool MortalCoil
         {
             get
             {
-                var MortalCoil = ConfigFile.ReadValue("WarlockAffliction", "Mortal Coil").Trim();
+                var MortalCoil = ConfigFile.ReadValue("WarlockDemonology", "Mortal Coil").Trim();
 
                 return MortalCoil != "" && Convert.ToBoolean(MortalCoil);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Mortal Coil", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Mortal Coil", value.ToString()); }
         }
-
-        private static bool HowlofTerror
+        private static bool Shadowfury
         {
             get
             {
-                var HowlofTerror = ConfigFile.ReadValue("WarlockAffliction", "Howl of Terror").Trim();
+                var Shadowfury = ConfigFile.ReadValue("WarlockDemonology", "Shadowfury").Trim();
 
-                return HowlofTerror != "" && Convert.ToBoolean(HowlofTerror);
+                return Shadowfury != "" && Convert.ToBoolean(Shadowfury);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Howl of Terror", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Shadowfury", value.ToString()); }
         }
-
-        private static bool SiphonLife
+        private static bool HandofDoom
         {
             get
             {
-                var SiphonLife = ConfigFile.ReadValue("WarlockAffliction", "Siphon Life").Trim();
+                var HandofDoom = ConfigFile.ReadValue("WarlockDemonology", "Hand of Doom").Trim();
 
-                return SiphonLife != "" && Convert.ToBoolean(SiphonLife);
+                return HandofDoom != "" && Convert.ToBoolean(HandofDoom);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Siphon Life", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Hand of Doom", value.ToString()); }
         }
-
-        private static bool SowtheSeeds
+        private static bool PowerTrip
         {
             get
             {
-                var SowtheSeeds = ConfigFile.ReadValue("WarlockAffliction", "Sow the Seeds").Trim();
+                var PowerTrip = ConfigFile.ReadValue("WarlockDemonology", "Power Trip").Trim();
 
-                return SowtheSeeds != "" && Convert.ToBoolean(SowtheSeeds);
+                return PowerTrip != "" && Convert.ToBoolean(PowerTrip);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Sow the Seeds", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Power Trip", value.ToString()); }
         }
-
         private static bool SoulHarvest
         {
             get
             {
-                var SoulHarvest = ConfigFile.ReadValue("WarlockAffliction", "Soul Harvest").Trim();
+                var SoulHarvest = ConfigFile.ReadValue("WarlockDemonology", "Soul Harvest").Trim();
 
                 return SoulHarvest != "" && Convert.ToBoolean(SoulHarvest);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Soul Harvest", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Soul Harvest", value.ToString()); }
         }
-
         private static bool DemonSkin
         {
             get
             {
-                var DemonSkin = ConfigFile.ReadValue("WarlockAffliction", "Demon Skin").Trim();
+                var DemonSkin = ConfigFile.ReadValue("WarlockDemonology", "Demon Skin").Trim();
 
                 return DemonSkin != "" && Convert.ToBoolean(DemonSkin);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Demon Skin", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Demon Skin", value.ToString()); }
         }
-
         private static bool BurningRush
         {
             get
             {
-                var BurningRush = ConfigFile.ReadValue("WarlockAffliction", "Burning Rush").Trim();
+                var BurningRush = ConfigFile.ReadValue("WarlockDemonology", "Burning Rush").Trim();
 
                 return BurningRush != "" && Convert.ToBoolean(BurningRush);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Burning Rush", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Burning Rush", value.ToString()); }
         }
-
         private static bool DarkPact
         {
             get
             {
-                var DarkPact = ConfigFile.ReadValue("WarlockAffliction", "Dark Pact").Trim();
+                var DarkPact = ConfigFile.ReadValue("WarlockDemonology", "Dark Pact").Trim();
 
                 return DarkPact != "" && Convert.ToBoolean(DarkPact);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Dark Pact", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Dark Pact", value.ToString()); }
         }
-
         private static bool GrimoireofSupremacy
         {
             get
             {
-                var GrimoireofSupremacy = ConfigFile.ReadValue("WarlockAffliction", "Grimoire of Supremacy").Trim();
+                var GrimoireofSupremacy = ConfigFile.ReadValue("WarlockDemonology", "Grimoire of Supremacy").Trim();
 
                 return GrimoireofSupremacy != "" && Convert.ToBoolean(GrimoireofSupremacy);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Grimoire of Supremacy", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Grimoire of Supremacy", value.ToString()); }
         }
-
         private static bool GrimoireofService
         {
             get
             {
-                var GrimoireofService = ConfigFile.ReadValue("WarlockAffliction", "Grimoire of Service").Trim();
+                var GrimoireofService = ConfigFile.ReadValue("WarlockDemonology", "Grimoire of Service").Trim();
 
                 return GrimoireofService != "" && Convert.ToBoolean(GrimoireofService);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Grimoire of Service", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Grimoire of Service", value.ToString()); }
         }
-
-        private static bool GrimoireofSacrifice
+        private static bool GrimoireofSynergy
         {
             get
             {
-                var GrimoireofSacrifice = ConfigFile.ReadValue("WarlockAffliction", "Grimoire of Sacrifice").Trim();
+                var GrimoireofSynergy = ConfigFile.ReadValue("WarlockDemonology", "Grimoire of Synergy").Trim();
 
-                return GrimoireofSacrifice != "" && Convert.ToBoolean(GrimoireofSacrifice);
+                return GrimoireofSynergy != "" && Convert.ToBoolean(GrimoireofSynergy);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Grimoire of Sacrifice", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Grimoire of Synergy", value.ToString()); }
         }
-
-        private static bool SoulEffigy
+        private static bool SummonDarkglare
         {
             get
             {
-                var SoulEffigy = ConfigFile.ReadValue("WarlockAffliction", "Soul Effigy").Trim();
+                var SummonDarkglare = ConfigFile.ReadValue("WarlockDemonology", "Summon Darkglare").Trim();
 
-                return SoulEffigy != "" && Convert.ToBoolean(SoulEffigy);
+                return SummonDarkglare != "" && Convert.ToBoolean(SummonDarkglare);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Soul Effigy", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Summon Darkglare", value.ToString()); }
         }
-
-        private static bool PhantomSingularity
+        private static bool Demonbolt
         {
             get
             {
-                var PhantomSingularity = ConfigFile.ReadValue("WarlockAffliction", "Phantom Singularity").Trim();
+                var Demonbolt = ConfigFile.ReadValue("WarlockDemonology", "Demonbolt").Trim();
 
-                return PhantomSingularity != "" && Convert.ToBoolean(PhantomSingularity);
+                return Demonbolt != "" && Convert.ToBoolean(Demonbolt);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Phantom Singularity", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Demonbolt", value.ToString()); }
         }
-
         private static bool SoulConduit
         {
             get
             {
-                var SoulConduit = ConfigFile.ReadValue("WarlockAffliction", "Soul Conduit").Trim();
+                var SoulConduit = ConfigFile.ReadValue("WarlockDemonology", "Soul Conduit").Trim();
 
                 return SoulConduit != "" && Convert.ToBoolean(SoulConduit);
             }
-            set { ConfigFile.WriteValue("WarlockAffliction", "Soul Conduit", value.ToString()); }
+            set { ConfigFile.WriteValue("WarlockDemonology", "Soul Conduit", value.ToString()); }
         }
     }
-
-    #endregion
+        #endregion
 }
 
 /*
@@ -782,8 +1185,18 @@ Spell,211714,Talkiels Consumption,Add
 Spell,205181,Shadowflame,NumPad0
 Spell,18540,Doomguard,Decimal
 Spell,119914,Felstorm,D4
+Spell,196098,Soul Harvest,D0
+Spell,196277,Implosion,D7
+Spell,30283,Shadowfury,D3
+Spell,108416,Dark Pact,Multiply
+Aura,2825,Bloodlust
+Aura,32182,Heroism
+Aura,80353,Time Warp
+Aura,160452,Netherwinds
+Aura,230935,Drums of War
 Aura,603,Doom
 Aura,193396,Demonic Empowerment
 Aura,205146,Demonic Calling
+Aura,205181,Shadowflame
 Aura,127271,Mount
 */
