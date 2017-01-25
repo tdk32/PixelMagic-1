@@ -257,7 +257,6 @@ namespace PixelMagic.Rotation.DeathKnight.DK
                         WoW.CastSpell("DnD");
                         return;
                     }
-                    Log.Write("test " + isTalentBoneStorm+" test2 "+ WoW.SpellCooldownTimeRemaining("Bonestorm")+ " test3: "+ WoW.IsSpellOnCooldown("Bonestorm"));
                     if (isTalentBoneStorm && WoW.SpellCooldownTimeRemaining("Bonestorm")==0 && isMelee && runicPower >= 100)
                     {
                         WoW.CastSpell("Bonestorm");
