@@ -121,8 +121,8 @@ namespace PixelMagic.Rotation
 		
             Log.Write("Welcome to Protection Warrior", Color.Red);
             Log.Write("Suggested build: 1213112", Color.Red);
-			Log.Write("3.2", Color.Red);
-			Log.Write("Last Edited by Lesion 24/01/17 - added self heal, weaved SpellReflect into pummel, if it cant interrupt it'll spell reflect. look at Rotation settings in PM Window", Color.Blue);
+			Log.Write("3.21", Color.Red);
+			Log.Write("Last Edited by Lesion 25/01/17 - added rage limit for impending victory ", Color.Blue);
             WoW.Speak("Welcome to PixelMagic Protection Warrior by Lesion");
 			
 			SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 150, Height = 210, ShowIcon = false};
@@ -534,7 +534,7 @@ if ( WoW.TargetCastingSpellID == 200248
                             return;
                         }
                         					
-							if (ImpendingVic &&!WoW.IsSpellOnCooldown("Impending Victory") && WoW.HealthPercent <= 80)
+							if (ImpendingVic &&WoW.Rage >= 10&&!WoW.IsSpellOnCooldown("Impending Victory") && WoW.HealthPercent <= 80)
 							{
 							WoW.CastSpell("Impending Victory");
 							return;
@@ -573,7 +573,6 @@ WoWVersion=Legion - 70100
 Spell,23922,Shield Slam,D1
 Spell,20243,Devastate,D2
 Spell,6572,Revenge,D3
-Spell,204488,Focused Rage,F4
 Spell,6343,Thunder Clap,F9
 Spell,2565,Shield Block,D4
 Spell,190456,Ignore Pain,D5
@@ -588,7 +587,6 @@ Spell,23920,SpellReflect,D0
 Spell,1719,Battle Cry,F2
 Aura,2565,Shield Block
 Aura,132168,ShockWavestun
-Aura,122510,Ultimatum
 Aura,202573,Vengeance Revenge
 Aura,202574,Vengeance Ignore Pain
 Aura,190456,Ignore Pain
