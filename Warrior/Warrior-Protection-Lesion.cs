@@ -28,6 +28,8 @@ namespace PixelMagic.Rotation
 		private CheckBox IDint;
 		//Tick for Auto Battlecry
 		private CheckBox BCint;
+		//Tick for HP Pots
+		private CheckBox HPint;
 		
 		
         public override string Name => "Protection Warrior";
@@ -110,6 +112,17 @@ namespace PixelMagic.Rotation
             }
             set { ConfigFile.WriteValue("ProtectionLesion", "BattleC", value.ToString()); }
         }
+		
+		private static bool Pots
+        {
+            get
+            {
+                var Pots = ConfigFile.ReadValue("ProtectionLesion", "Pots").Trim();
+
+                return Pots != "" && Convert.ToBoolean(Pots);
+            }
+            set { ConfigFile.WriteValue("ProtectionLesion", "Pots", value.ToString()); }
+        }
 	
 	
 		private readonly Stopwatch swingwatch = new Stopwatch();
@@ -125,7 +138,7 @@ namespace PixelMagic.Rotation
 			Log.Write("Last Edited by Lesion 25/01/17 - added rage limit for impending victory ", Color.Blue);
             WoW.Speak("Welcome to PixelMagic Protection Warrior by Lesion");
 			
-			SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 150, Height = 210, ShowIcon = false};
+			SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 160, Height = 250, ShowIcon = false};
 
             //var picBox = new PictureBox {Left = 0, Top = 0, Width = 800, Height = 100, Image = TopLogo};
             //SettingsForm.Controls.Add(picBox);
@@ -213,8 +226,20 @@ namespace PixelMagic.Rotation
 
             BCint = new CheckBox {Checked = BattleC, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 104};
             SettingsForm.Controls.Add(BCint);
+			
+			var lblHPText = new Label //12; 129 is first value, Top is second.
+            {
+                Text = "Use HP Pot",
+                Size = new Size(95, 13), //95; 13
+                Left = 12,
+                Top = 119
+            };
+            SettingsForm.Controls.Add(lblHPText); //113; 114 
+
+            HPint = new CheckBox {Checked = BattleC, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 119};
+            SettingsForm.Controls.Add(HPint);
 			 
-            var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 120, Size = new Size(120, 48)};
+            var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 150, Size = new Size(120, 48)};
 
             generalint.Checked = generalInterrupts;
             mplusint.Checked = mythicplusinterrupts;
@@ -223,6 +248,7 @@ namespace PixelMagic.Rotation
 			IVint.Checked = ImpendingVic;
 			IDint.Checked = Indomitable;
 			BCint.Checked = BattleC;
+			HPint.Checked = Pots;
             
 
             cmdSave.Click += CmdSave_Click;
@@ -233,6 +259,7 @@ namespace PixelMagic.Rotation
 			IVint.CheckedChanged += IV_Click;
 			IDint.CheckedChanged += ID_Click;
 			BCint.CheckedChanged += BC_Click;
+			HPint.CheckedChanged += HP_Click;
 
             SettingsForm.Controls.Add(cmdSave);
             lblGeneralInterruptsText.BringToFront();
@@ -242,6 +269,7 @@ namespace PixelMagic.Rotation
 			lblImpendingVicText.BringToFront();
 			lblIndomitableText.BringToFront();
 			lblBattleCText.BringToFront();
+			lblHPText.BringToFront();
 			
 			
             
@@ -253,6 +281,7 @@ namespace PixelMagic.Rotation
 			Log.Write("Using Impending Victory = " + ImpendingVic, Color.Red);
 			Log.Write("Using Indomitable Talent = " + Indomitable, Color.Red);
 			Log.Write("Auto using Battle Cry = " + BattleC, Color.Red);
+			Log.Write("Use HP Pots = " + Pots, Color.Red);
 			
         }
 		private void CmdSave_Click(object sender, EventArgs e)
@@ -264,6 +293,7 @@ namespace PixelMagic.Rotation
 			ImpendingVic = IVint.Checked;
 			Indomitable = IDint.Checked;
 			BattleC = BCint.Checked;
+			Pots = HPint.Checked;
 			
 			
             MessageBox.Show("Settings saved", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -303,7 +333,10 @@ namespace PixelMagic.Rotation
         {
             BattleC = BCint.Checked;
         }
-		
+		private void HP_Click(object sender, EventArgs e)
+        {
+            Pots = HPint.Checked;
+        }
 		
         public override void Stop()
         {
@@ -327,6 +360,25 @@ namespace PixelMagic.Rotation
                 return;
             }
 			}
+			
+			if (Pots && WoW.IsInCombat && WoW.HealthPercent < 30)
+			{
+				if(WoW.ItemCount("Healthstone") >= 1 && !WoW.ItemOnCooldown("Healthstone") &&WoW.ItemCount("HealthPotion") == 0)
+				{
+					WoW.CastSpell("Healthstone");
+					return;
+				}
+				
+				if(WoW.ItemCount("HealthPotion") >= 1 && !WoW.ItemOnCooldown("HealthPotion"))
+				{
+					WoW.CastSpell("HealthPotion");
+					return;
+				}
+				
+				
+			}
+			
+			
 			
 			
 			if (!Indomitable &&WoW.IsInCombat &&WoW.IsSpellInRange("Shield Slam"))
@@ -429,7 +481,29 @@ if ( WoW.TargetCastingSpellID == 200248
 || WoW.TargetCastingSpellID == 191823
 || WoW.TargetCastingSpellID == 202661
 || WoW.TargetCastingSpellID == 201488
-|| WoW.TargetCastingSpellID == 195332)
+|| WoW.TargetCastingSpellID == 195332
+//Raid Interrupts
+|| WoW.TargetCastingSpellID == 209485
+|| WoW.TargetCastingSpellID == 209410
+|| WoW.TargetCastingSpellID == 211470
+|| WoW.TargetCastingSpellID == 225100
+|| WoW.TargetCastingSpellID == 207980
+|| WoW.TargetCastingSpellID == 196870
+|| WoW.TargetCastingSpellID == 195284
+|| WoW.TargetCastingSpellID == 192005
+|| WoW.TargetCastingSpellID == 228255
+|| WoW.TargetCastingSpellID == 228239
+|| WoW.TargetCastingSpellID == 227917
+|| WoW.TargetCastingSpellID == 228625
+|| WoW.TargetCastingSpellID == 228606
+|| WoW.TargetCastingSpellID == 229714
+|| WoW.TargetCastingSpellID == 227592
+|| WoW.TargetCastingSpellID == 229083
+|| WoW.TargetCastingSpellID == 228025
+|| WoW.TargetCastingSpellID == 228019
+|| WoW.TargetCastingSpellID == 227987
+|| WoW.TargetCastingSpellID == 227420
+|| WoW.TargetCastingSpellID == 200905)
 								
 								{
 								if (!WoW.IsSpellOnCooldown("Pummel")&&WoW.TargetPercentCast >= 40)
@@ -449,7 +523,7 @@ if ( WoW.TargetCastingSpellID == 200248
 								}
 							}
 					}
-						
+																
 						if (WoW.CanCast("Shield Block") &&WoW.HealthPercent <= 90 && WoW.Rage >= 15 && !WoW.IsSpellOnCooldown("Shield Block") &&!WoW.PlayerHasBuff("Shield Block"))
                         {
                             WoW.CastSpell("Shield Block");
@@ -549,7 +623,7 @@ if ( WoW.TargetCastingSpellID == 200248
                         
                     }
 					//Artifact / Shockwave Combo.
-                    if (WoW.CanCast("Neltharion's Fury") && WoW.TargetHasDebuff("ShockWavestun"))
+                    if (WoW.CanCast("Neltharion's Fury") && WoW.TargetHasDebuff("ShockWavestun") &&WoW.IsSpellOnCooldown("Neltharion's Fury"))
                     {
                         WoW.CastSpell("Neltharion's Fury");
                         return;
@@ -585,6 +659,8 @@ Spell,871,Shield Wall,F6
 Spell,12975,Last Stand,F5
 Spell,23920,SpellReflect,D0
 Spell,1719,Battle Cry,F2
+Spell,0,HealthPotion,D7
+Item,127834,HealthPotion,D7
 Aura,2565,Shield Block
 Aura,132168,ShockWavestun
 Aura,202573,Vengeance Revenge
