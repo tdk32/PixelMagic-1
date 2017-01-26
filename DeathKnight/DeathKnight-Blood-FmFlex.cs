@@ -6,7 +6,11 @@ using System.IO;
 using System;
 using System.Data;
 using System.Linq;
-
+/*
+DnD Should be assigned to a macro :
+#showtooltip Death and Decay
+/cast [@player] Death and Decay
+*/
 namespace PixelMagic.Rotation.DeathKnight.DK
 
 {
