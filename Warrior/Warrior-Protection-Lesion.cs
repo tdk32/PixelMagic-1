@@ -596,7 +596,7 @@ if ( WoW.TargetCastingSpellID == 200248
                         }
 					
 					
-						if (Indomitable &&WoW.CanCast("Devastate") && WoW.IsSpellOnCooldown("Shield Slam"))
+						if (Indomitable &&WoW.CanCast("Devastate") && WoW.IsSpellOnCooldown("Shield Slam") && WoW.IsSpellOnCooldown("Thunder Clap"))
                         {
                            WoW.CastSpell("Devastate");
                             return;
