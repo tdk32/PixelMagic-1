@@ -405,9 +405,10 @@ namespace PixelMagic.Rotation
             }
             if (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave) // Do Single Target Stuff here
             {
-                if (CanCastInRange("Frost Strike") && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 1) && runicPower >= 25 &&
+                if (CanCastInRange("Frost Strike") && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 2) && runicPower >= 25 &&
                     !(combatRoutine.UseCooldowns && CanCastNoRange("Obliteration") && isTalentOblitaration) && (!isTalentOblitaration || (isTalentOblitaration && !WoW.PlayerHasBuff("Obliteration"))))
                 {
+                    Log.Write("Hasbuff " + WoW.PlayerHasBuff("Icy Talons") + " Remaining " + WoW.PlayerBuffTimeRemaining("Icy Talons"));
                     WoW.CastSpell("Frost Strike");
                     return;
                 }
@@ -423,14 +424,10 @@ namespace PixelMagic.Rotation
                     WoW.CastSpell("Howling Blast");
                     return;
                 }
-                if (runicPower >= 80 && CanCastInRange("Frost Strike") && !(combatRoutine.UseCooldowns && CanCastNoRange("Obliteration") && isTalentOblitaration) && (!isTalentOblitaration || (isTalentOblitaration && !WoW.PlayerHasBuff("Obliteration"))))
+                if (isTalentFrostscythe && runicPower >= 80 && CanCastInRange("Frost Strike"))
                 {
                     WoW.CastSpell("Frost Strike");
                     return;
-                }
-                if (WoW.PlayerHasBuff("Rime"))
-                {
-                    Log.Write("Test: " + CanCastInRange("Howling Blast"));
                 }
                 if ((CanCastInRange("Howling Blast") && WoW.PlayerHasBuff("Rime"))
                     && (!isTalentOblitaration || (isTalentOblitaration && !WoW.PlayerHasBuff("Obliteration"))))
@@ -469,6 +466,11 @@ namespace PixelMagic.Rotation
                 if (isTalentGlacialAdvance && isMelee && currentRunes >= 1 && CanCastNoRange("Glacial Advance") && (!isTalentOblitaration || (isTalentOblitaration && !WoW.PlayerHasBuff("Obliteration"))))
                 {
                     WoW.CastSpell("Glacial Advance");
+                    return;
+                }
+                if (isTalentOblitaration && runicPower >= 40 && CanCastInRange("Frost Strike") && !(combatRoutine.UseCooldowns && CanCastNoRange("Obliteration")) && (isTalentOblitaration && !WoW.PlayerHasBuff("Obliteration")))
+                {
+                    WoW.CastSpell("Frost Strike");
                     return;
                 }
                 if (isMelee && currentRunes >= 1 && CanCastNoRange("Remorseless Winter") && (!isTalentOblitaration || (isTalentOblitaration && !WoW.PlayerHasBuff("Obliteration"))))
@@ -1217,7 +1219,7 @@ Spell,47528,Mind Freeze,F
 Spell,152279,Breath,D0
 Spell,57330,Horn,D6
 Aura,51124,Killing Machine
-Aura,94879,Icy Talons
+Aura,194879,Icy Talons
 Aura,55095,Frost Fever
 Aura,59057,Rime
 Aura,101568,Free DeathStrike
