@@ -1,39 +1,30 @@
-// noaxeqtr@gmail.com
+// winifix@gmail.com
 // ReSharper disable UnusedMember.Global
 // ReSharper disable ConvertPropertyToExpressionBody
-// Reccomended Talent Build 1312112
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Timers;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
 using System.Windows.Forms;
 using PixelMagic.Helpers;
+using PixelMagic.GUI;
 
 namespace PixelMagic.Rotation
 {
     public class RetributionPaladin : CombatRoutine
     {
-        private CheckBox BladeofWrathBox;
-        private CheckBox BlindingLightBox;
-        private CheckBox CavalierBox;
-        private CheckBox ConsecrationBox;
-        private CheckBox CrusadeBox;
-        private CheckBox DivineHammerBox;
-        private CheckBox DivineInterventionBox;
-        private CheckBox DivinePurposeBox;
-        private CheckBox ExecutionSentenceBox;
-        private CheckBox EyeforanEyeBox;
-
-        private CheckBox FinalVerdictBox;
-        private CheckBox FistofJusticeBox;
-        private CheckBox GreaterJudgmentBox;
-        private CheckBox HolyWrathBox;
-        private CheckBox JusticarsVengeanceBox;
-        private CheckBox RepentanceBox;
-        private CheckBox SealofLightBox;
-        private CheckBox TheFireofJusticeBox;
-        private CheckBox VirtuesBladeBox;
-        private CheckBox WordofGloryBox;
-        private CheckBox ZealBox;
+        private readonly Stopwatch BeastCleave = new Stopwatch();
 
         public override string Name
         {
@@ -45,801 +36,595 @@ namespace PixelMagic.Rotation
             get { return "Paladin"; }
         }
 
-
-        public override Form SettingsForm { get; set; }
-
-        public static bool FinalVerdict
+        public override void Initialize()
         {
-            get
-            {
-                var FinalVerdict = ConfigFile.ReadValue("RetributionPaladin", "Final Verdict").Trim();
-
-                return FinalVerdict != "" && Convert.ToBoolean(FinalVerdict);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Final Verdict", value.ToString()); }
-        }
-
-        private static bool ExecutionSentence
-        {
-            get
-            {
-                var ExecutionSentence = ConfigFile.ReadValue("RetributionPaladin", "Execution Sentence").Trim();
-
-                return ExecutionSentence != "" && Convert.ToBoolean(ExecutionSentence);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Execution Sentence", value.ToString()); }
-        }
-
-        private static bool Consecration
-        {
-            get
-            {
-                var Consecration = ConfigFile.ReadValue("RetributionPaladin", "Consecration").Trim();
-
-                return Consecration != "" && Convert.ToBoolean(Consecration);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Consecration", value.ToString()); }
-        }
-
-        private static bool TheFireofJustice
-        {
-            get
-            {
-                var TheFireofJustice = ConfigFile.ReadValue("RetributionPaladin", "The Fire of Justice").Trim();
-
-                return TheFireofJustice != "" && Convert.ToBoolean(TheFireofJustice);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "The Fire of Justice", value.ToString()); }
-        }
-
-        private static bool Zeal
-        {
-            get
-            {
-                var Zeal = ConfigFile.ReadValue("RetributionPaladin", "Absolute Corruption").Trim();
-
-                return Zeal != "" && Convert.ToBoolean(Zeal);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Absolute Corruption", value.ToString()); }
-        }
-
-        private static bool GreaterJudgment
-        {
-            get
-            {
-                var GreaterJudgment = ConfigFile.ReadValue("RetributionPaladin", "Mana Tap").Trim();
-
-                return GreaterJudgment != "" && Convert.ToBoolean(GreaterJudgment);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Mana Tap", value.ToString()); }
-        }
-
-        private static bool FistofJustice
-        {
-            get
-            {
-                var FistofJustice = ConfigFile.ReadValue("RetributionPaladin", "Demonic Circle").Trim();
-
-                return FistofJustice != "" && Convert.ToBoolean(FistofJustice);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Demonic Circle", value.ToString()); }
-        }
-
-        private static bool Repentance
-        {
-            get
-            {
-                var Repentance = ConfigFile.ReadValue("RetributionPaladin", "Mortal Coil").Trim();
-
-                return Repentance != "" && Convert.ToBoolean(Repentance);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Mortal Coil", value.ToString()); }
-        }
-
-        private static bool BlindingLight
-        {
-            get
-            {
-                var BlindingLight = ConfigFile.ReadValue("RetributionPaladin", "Howl of Terror").Trim();
-
-                return BlindingLight != "" && Convert.ToBoolean(BlindingLight);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Howl of Terror", value.ToString()); }
-        }
-
-        private static bool VirtuesBlade
-        {
-            get
-            {
-                var VirtuesBlade = ConfigFile.ReadValue("RetributionPaladin", "Siphon Life").Trim();
-
-                return VirtuesBlade != "" && Convert.ToBoolean(VirtuesBlade);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Siphon Life", value.ToString()); }
-        }
-
-        private static bool BladeofWrath
-        {
-            get
-            {
-                var BladeofWrath = ConfigFile.ReadValue("RetributionPaladin", "Sow the Seeds").Trim();
-
-                return BladeofWrath != "" && Convert.ToBoolean(BladeofWrath);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Sow the Seeds", value.ToString()); }
-        }
-
-        private static bool DivineHammer
-        {
-            get
-            {
-                var DivineHammer = ConfigFile.ReadValue("RetributionPaladin", "Soul Harvest").Trim();
-
-                return DivineHammer != "" && Convert.ToBoolean(DivineHammer);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Soul Harvest", value.ToString()); }
-        }
-
-        private static bool JusticarsVengeance
-        {
-            get
-            {
-                var JusticarsVengeance = ConfigFile.ReadValue("RetributionPaladin", "Demon Skin").Trim();
-
-                return JusticarsVengeance != "" && Convert.ToBoolean(JusticarsVengeance);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Demon Skin", value.ToString()); }
-        }
-
-        private static bool EyeforanEye
-        {
-            get
-            {
-                var EyeforanEye = ConfigFile.ReadValue("RetributionPaladin", "Burning Rush").Trim();
-
-                return EyeforanEye != "" && Convert.ToBoolean(EyeforanEye);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Burning Rush", value.ToString()); }
-        }
-
-        private static bool WordofGlory
-        {
-            get
-            {
-                var WordofGlory = ConfigFile.ReadValue("RetributionPaladin", "Dark Pact").Trim();
-
-                return WordofGlory != "" && Convert.ToBoolean(WordofGlory);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Dark Pact", value.ToString()); }
-        }
-
-        private static bool DivineIntervention
-        {
-            get
-            {
-                var DivineIntervention = ConfigFile.ReadValue("RetributionPaladin", "Grimoire of Supremacy").Trim();
-
-                return DivineIntervention != "" && Convert.ToBoolean(DivineIntervention);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Grimoire of Supremacy", value.ToString()); }
-        }
-
-        private static bool Cavalier
-        {
-            get
-            {
-                var Cavalier = ConfigFile.ReadValue("RetributionPaladin", "Grimoire of Service").Trim();
-
-                return Cavalier != "" && Convert.ToBoolean(Cavalier);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Grimoire of Service", value.ToString()); }
-        }
-
-        private static bool SealofLight
-        {
-            get
-            {
-                var SealofLight = ConfigFile.ReadValue("RetributionPaladin", "Grimoire of Sacrifice").Trim();
-
-                return SealofLight != "" && Convert.ToBoolean(SealofLight);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Grimoire of Sacrifice", value.ToString()); }
-        }
-
-        private static bool DivinePurpose
-        {
-            get
-            {
-                var DivinePurpose = ConfigFile.ReadValue("RetributionPaladin", "Soul Effigy").Trim();
-
-                return DivinePurpose != "" && Convert.ToBoolean(DivinePurpose);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Soul Effigy", value.ToString()); }
-        }
-
-        private static bool Crusade
-        {
-            get
-            {
-                var Crusade = ConfigFile.ReadValue("RetributionPaladin", "Phantom Singularity").Trim();
-
-                return Crusade != "" && Convert.ToBoolean(Crusade);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Phantom Singularity", value.ToString()); }
-        }
-
-        private static bool HolyWrath
-        {
-            get
-            {
-                var HolyWrath = ConfigFile.ReadValue("RetributionPaladin", "Soul Conduit").Trim();
-
-                return HolyWrath != "" && Convert.ToBoolean(HolyWrath);
-            }
-            set { ConfigFile.WriteValue("RetributionPaladin", "Soul Conduit", value.ToString()); }
+            Log.Write("Welcome to Retribution Paladin", Color.Green);
+            Log.Write("IN ORDER FOR THIS ROTATION TO WORK YOU WILL NEED TO DOWNLOAD AND INSTALL THE ADDON.", Color.Red);
+            Log.Write("https://github.com/winifix/PixelMagicCR/tree/master/Hunter", Color.Blue);
         }
 
         public override void Stop()
         {
         }
 
-        public override void Pulse()
+        public override void Pulse()        // Updated for Legion (tested and working for single target)
         {
-            //
-            if (WoW.CanCast("Shield of Vengeance") && WoW.HealthPercent <= 40)
+            AddonCreationPulse();
+            PlayerStats();
+            AoEStuff();
+            if (WoW.IsInCombat && !WoW.PlayerHasBuff("Mount"))
+            {
+                SelectRotation();
+            }
+
+            //Healthstone - Potion
+            if ((WoW.CanCast("Healthstone") || WoW.CanCast("Potion"))
+                && (WoW.ItemCount("Healthstone") >= 1 || WoW.ItemCount("Potion") >= 1)
+                && (!WoW.ItemOnCooldown("Healthstone") || !WoW.ItemOnCooldown("Potion"))                
+                && WoW.HealthPercent <= 30
+                && !WoW.PlayerHasBuff("Mount"))
+            {
+                WoW.CastSpell("Healthstone");
+                WoW.CastSpell("Potion");
+                return;
+            }
+
+            //Shield of Vengeance
+            if (WoW.CanCast("Shield of Vengeance")
+                && WoW.HealthPercent <= 40
+                && !WoW.PlayerHasBuff("Mount"))
             {
                 WoW.CastSpell("Shield of Vengeance");
                 return;
             }
 
-            //
-            if (WoW.CanCast("Lay on Hands") && WoW.HealthPercent <= 20)
+            //Lay on Hands
+            if (WoW.CanCast("Lay on Hands")
+                && WoW.HealthPercent <= 20
+                && !WoW.PlayerHasBuff("Mount"))
             {
                 WoW.CastSpell("Lay on Hands");
                 return;
             }
 
-            if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !WoW.PlayerIsChanneling && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Mount"))
+            //Divine Steed
+            if (DetectKeyPress.GetKeyState(DetectKeyPress.Num4) < 0
+                && WoW.CanCast("Divine Steed")
+                && !WoW.PlayerHasBuff("Divine Steed"))
+            {
+                WoW.CastSpell("Divine Steed");
+                return;
+            }
+
+            if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !WoW.PlayerHasBuff("Mount") && !WoW.PlayerIsChanneling && !WoW.PlayerIsCasting && WoW.HealthPercent != 0)
             {
                 //Crusade
-                if (WoW.CanCast("Crusade") && Crusade && WoW.CurrentHolyPower >= 3 && WoW.IsSpellInRange("Templar Verdict") &&
-                    (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War")))
+                if (WoW.CanCast("Crusade")
+                    && CharInfo.T7 == 2
+                    && WoW.CurrentHolyPower >= 3
+                    && WoW.IsSpellInRange("Templar Verdict")
+                    && (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War")))
                 {
                     WoW.CastSpell("Crusade");
                     return;
                 }
 
                 //Avenging Wrath
-                if (WoW.CanCast("Avenging Wrath") && WoW.CurrentHolyPower >= 3 && WoW.IsSpellInRange("Templar Verdict") &&
-                    (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War")))
+                if (WoW.CanCast("Avenging Wrath")
+                    && WoW.CurrentHolyPower >= 3
+                    && WoW.IsSpellInRange("Templar Verdict")
+                    && (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War")))
                 {
                     WoW.CastSpell("Avenging Wrath");
                     return;
                 }
 
                 //Hammer of Justice
-                if (Control.ModifierKeys == Keys.Shift && WoW.CanCast("Hammer of Justice"))
+                if (DetectKeyPress.GetKeyState(DetectKeyPress.NumpadADD) < 0
+                   && WoW.CanCast("Hammer of Justice")
+                    )
                 {
                     WoW.CastSpell("Hammer of Justice");
                     return;
                 }
 
                 //Holy Wrath
-                if (WoW.CanCast("Holy Wrath") && HolyWrath && WoW.HealthPercent <= 40 && WoW.IsSpellInRange("Templar Verdict"))
+                if (WoW.CanCast("Holy Wrath")
+                    && CharInfo.T7 == 3
+                    && WoW.HealthPercent <= 40
+                    && WoW.IsSpellInRange("Templar Verdict"))
                 {
                     WoW.CastSpell("Holy Wrath");
                     return;
                 }
 
                 //Single Target Rotation
-                if (combatRoutine.Type == RotationType.SingleTarget)
+
+                //Execution Sentence
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CanCast("Execution Sentence")                    
+                    && WoW.TargetHasDebuff("Judgement")
+                    && WoW.TargetDebuffTimeRemaining("Judgement") >= 6.5
+                    && CharInfo.T1 == 2)
                 {
-                    //Execution Sentence
-                    if (WoW.CanCast("Execution Sentence") && ExecutionSentence && WoW.TargetHasDebuff("Judgement") && WoW.TargetDebuffTimeRemaining("Judgement") >= 6.5)
-                    {
-                        WoW.CastSpell("Execution Sentence");
-                        return;
-                    }
+                    WoW.CastSpell("Execution Sentence");
+                    return;
+                }
 
-                    //Justicar's Vengeance
-                    if (WoW.CanCast("Justicars Vengeance") && JusticarsVengeance && WoW.PlayerHasBuff("Divine Purpose") && WoW.IsSpellInRange("Templar Verdict"))
-                    {
-                        WoW.CastSpell("Justicars Vengeance");
-                        return;
-                    }
+                //Justicar's Vengeance
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CanCast("Justicars Vengeance")                    
+                    && WoW.PlayerHasBuff("Divine Purpose")
+                    && WoW.IsSpellInRange("Templar Verdict")
+                    && CharInfo.T5 == 1)
+                {
+                    WoW.CastSpell("Justicars Vengeance");
+                    return;
+                }
 
-                    //Templar's Verdict
-                    if ((WoW.CurrentHolyPower >= 3 || WoW.PlayerHasBuff("Divine Purpose") || (WoW.CurrentHolyPower >= 2 && WoW.PlayerHasBuff("The Fires of Justice"))) &&
-                        WoW.CanCast("Templar Verdict") && WoW.IsSpellInRange("Templar Verdict") && WoW.TargetHasDebuff("Judgement") && WoW.TargetDebuffTimeRemaining("Judgement") >= 0.5)
-                    {
-                        WoW.CastSpell("Templar Verdict");
-                        return;
-                    }
+                //Templar's Verdict
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && (WoW.CurrentHolyPower >= 3 || WoW.PlayerHasBuff("Divine Purpose") || (WoW.CurrentHolyPower >= 2 && WoW.PlayerHasBuff("The Fires of Justice")))
+                    && WoW.CanCast("Templar Verdict")
+                    && WoW.IsSpellInRange("Templar Verdict")
+                    && WoW.TargetHasDebuff("Judgement")
+                    && WoW.TargetDebuffTimeRemaining("Judgement") >= 0.5)
+                {
+                    WoW.CastSpell("Templar Verdict");
+                    return;
+                }
 
-                    //Judgement
-                    if (WoW.CanCast("Judgement") && WoW.CurrentHolyPower >= 3)
-                    {
-                        WoW.CastSpell("Judgement");
-                        return;
-                    }
+                //Judgement
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CanCast("Judgement")
+                    && WoW.CurrentHolyPower >= 3)
+                {
+                    WoW.CastSpell("Judgement");
+                    return;
+                }
 
-                    //Wake of Ashes
-                    if (WoW.CurrentHolyPower == 0 && WoW.CanCast("Wake of Ashes") && WoW.IsSpellInRange("Templar Verdict"))
-                    {
-                        WoW.CastSpell("Wake of Ashes");
-                        return;
-                    }
+                //Wake of Ashes
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CurrentHolyPower == 0
+                    && WoW.CanCast("Wake of Ashes")
+                    && WoW.IsSpellInRange("Templar Verdict"))
+                {
+                    WoW.CastSpell("Wake of Ashes");
+                    return;
+                }
 
-                    //Blade of Justice
-                    if (WoW.CanCast("Blade of Justice") && !DivineHammer && WoW.CurrentHolyPower <= 3)
-                    {
-                        WoW.CastSpell("Blade of Justice");
-                        return;
-                    }
+                //Blade of Justice
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CanCast("Blade of Justice")                    
+                    && WoW.CurrentHolyPower <= 3
+                    && CharInfo.T4 != 3)
+                {
+                    WoW.CastSpell("Blade of Justice");
+                    return;
+                }
 
-                    //Divine Hammer
-                    if (WoW.CanCast("Divine Hammer") && DivineHammer && WoW.CurrentHolyPower <= 3)
-                    {
-                        WoW.CastSpell("Divine Hammer");
-                        return;
-                    }
+                //Divine Hammer
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CanCast("Divine Hammer")                    
+                    && WoW.CurrentHolyPower <= 3
+                    && CharInfo.T4 == 3)
+                {
+                    WoW.CastSpell("Divine Hammer");
+                    return;
+                }
 
-                    //Crusader Strike
-                    if (WoW.CurrentHolyPower < 5 && !Zeal && WoW.PlayerSpellCharges("Crusader Strike") >= 1 && WoW.CanCast("Crusader Strike"))
-                    {
-                        WoW.CastSpell("Crusader Strike");
-                        return;
-                    }
+                //Crusader Strike
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CurrentHolyPower < 5
+                    && WoW.PlayerSpellCharges("Crusader Strike") >= 1
+                    && WoW.CanCast("Crusader Strike")
+                    && CharInfo.T2 != 2)
+                {
+                    WoW.CastSpell("Crusader Strike");
+                    return;
+                }
 
-                    //Zeal
-                    if (WoW.CurrentHolyPower < 5 && Zeal && WoW.PlayerSpellCharges("Zeal") >= 1 && WoW.CanCast("Zeal"))
-                    {
-                        WoW.CastSpell("Zeal");
-                        return;
-                    }
+                //Zeal
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CurrentHolyPower < 5
+                    && WoW.PlayerSpellCharges("Zeal") >= 1
+                    && WoW.CanCast("Zeal")
+                    && CharInfo.T2 == 2)
+                {
+                    WoW.CastSpell("Zeal");
+                    return;
+                }
 
-                    //Consecration
-                    if (WoW.CanCast("Consecration") && Consecration && WoW.IsSpellInRange("Templar Verdict"))
-                    {
-                        WoW.CastSpell("Consecration");
-                        return;
-                    }
+                //Consecration
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CanCast("Consecration")
+                    && WoW.IsSpellInRange("Templar Verdict")
+                    && CharInfo.T1 == 3)
+                {
+                    WoW.CastSpell("Consecration");
+                    return;
                 }
 
                 //AoE Rotation = 3+ Targets
-                if (combatRoutine.Type == RotationType.AOE)
+
+                //Divine Storm
+                if (combatRoutine.Type == RotationType.AOE
+                    && (WoW.CurrentHolyPower >= 3 || WoW.PlayerHasBuff("Divine Purpose") || (WoW.CurrentHolyPower >= 2 && WoW.PlayerHasBuff("The Fires of Justice")))
+                    && WoW.CanCast("Divine Storm")
+                    && WoW.IsSpellInRange("Templar Verdict"))
                 {
-                    //Divine Storm
-                    if ((WoW.CurrentHolyPower >= 3 || WoW.PlayerHasBuff("Divine Purpose") || (WoW.CurrentHolyPower >= 2 && WoW.PlayerHasBuff("The Fires of Justice"))) &&
-                        WoW.CanCast("Divine Storm") && WoW.IsSpellInRange("Templar Verdict"))
-                    {
-                        WoW.CastSpell("Divine Storm");
-                        return;
-                    }
-
-                    //Judgement
-                    if (WoW.CanCast("Judgement"))
-                    {
-                        WoW.CastSpell("Judgement");
-                        return;
-                    }
-
-                    //Wake of Ashes
-                    if (WoW.CurrentHolyPower == 0 && WoW.CanCast("Wake of Ashes") && WoW.IsSpellInRange("Templar Verdict"))
-                    {
-                        WoW.CastSpell("Wake of Ashes");
-                        return;
-                    }
-
-                    //Consecration
-                    if (WoW.CanCast("Consecration") && Consecration && WoW.IsSpellInRange("Templar Verdict"))
-                    {
-                        WoW.CastSpell("Consecration");
-                        return;
-                    }
-
-                    //Blade of Justice
-                    if (WoW.CanCast("Blade of Justice") && !DivineHammer && WoW.CurrentHolyPower <= 3)
-                    {
-                        WoW.CastSpell("Blade of Justice");
-                        return;
-                    }
-
-                    //Divine Hammer
-                    if (WoW.CanCast("Divine Hammer") && DivineHammer && WoW.CurrentHolyPower <= 3)
-                    {
-                        WoW.CastSpell("Divine Hammer");
-                        return;
-                    }
-
-                    //Crusader Strike
-                    if (WoW.CurrentHolyPower < 5 && !Zeal && WoW.PlayerSpellCharges("Crusader Strike") >= 1 && WoW.CanCast("Crusader Strike"))
-                    {
-                        WoW.CastSpell("Crusader Strike");
-                        return;
-                    }
-
-                    //Zeal
-                    if (WoW.CurrentHolyPower < 5 && Zeal && WoW.PlayerSpellCharges("Zeal") >= 1 && WoW.CanCast("Zeal"))
-                    {
-                        WoW.CastSpell("Zeal");
-                        return;
-                    }
+                    WoW.CastSpell("Divine Storm");
+                    return;
                 }
+
+                //Judgement
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CanCast("Judgement"))
+                {
+                    WoW.CastSpell("Judgement");
+                    return;
+                }
+
+                //Wake of Ashes
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CurrentHolyPower == 0
+                    && WoW.CanCast("Wake of Ashes")
+                    && WoW.IsSpellInRange("Templar Verdict"))
+                {
+                    WoW.CastSpell("Wake of Ashes");
+                    return;
+                }
+
+                //Consecration
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CanCast("Consecration")
+                    && WoW.IsSpellInRange("Templar Verdict")
+                    && CharInfo.T1 == 3)
+                {
+                    WoW.CastSpell("Consecration");
+                    return;
+                }
+
+                //Blade of Justice
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CanCast("Blade of Justice")                    
+                    && WoW.CurrentHolyPower <= 3
+                    && CharInfo.T4 != 3)
+                {
+                    WoW.CastSpell("Blade of Justice");
+                    return;
+                }
+
+                //Divine Hammer
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CanCast("Divine Hammer")
+                    && WoW.CurrentHolyPower <= 3
+                    && CharInfo.T4 == 3)
+                {
+                    WoW.CastSpell("Divine Hammer");
+                    return;
+                }
+
+                //Crusader Strike
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CurrentHolyPower < 5
+                    && WoW.PlayerSpellCharges("Crusader Strike") >= 1
+                    && WoW.CanCast("Crusader Strike")
+                    && CharInfo.T2 != 2)
+                {
+                    WoW.CastSpell("Crusader Strike");
+                    return;
+                }
+
+                //Zeal
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CurrentHolyPower < 5
+                    && WoW.PlayerSpellCharges("Zeal") >= 1
+                    && WoW.CanCast("Zeal")
+                    && CharInfo.T2 == 2)
+                {
+                    WoW.CastSpell("Zeal");
+                    return;
+                }
+
 
                 if (combatRoutine.Type == RotationType.SingleTargetCleave) //Cleave rotation = 2 targets
                 {
                     // Do Single Target Cleave stuff here if applicable else ignore this one
                 }
+
             }
         }
 
-        public override void Initialize()
+
+        public struct char_data
         {
-            Log.Write("READ ME:", Color.Red);
-            Log.Write("Select your talents from the Rotation settings menu. Some talents won't impact your rotation, they are there for future use.", Color.Red);
-            Log.Write("Please don't select more than 1 talent on each row.", Color.Red);
-            Log.Write("After selecting your talents reload the rotation before starting it.", Color.Red);
-            Log.Write("Crusade/Avenging Wrath autocasts only if you have Bloodlust and 3 or more holy power otherwise it's manual", Color.Red);
-            Log.Write("Press the Shift (try both Shift Keys) key to cast Hammer of Justice", Color.Red);
-            Log.Write("Autocast Shield of Vengeance and Holy Wrath under 40% health and Lay on Hands under 20%", Color.Red);
-            Log.Write("Justicar's Vengeance talent only works with Divine Purpose procs (Icy Veins)", Color.Red);
-            Log.Write("Talents that are not implemented: Repentance, Blinding Light, Eye for an Eye, Word of Glory, Seal of Light", Color.Red);
-            Log.Write("The rotation is based on Icy Veins and Noxic data and will not start if you are mounted on the Crimson Water Strider (for questing).", Color.Red);
-            WoW.Speak("Welcome to PixelMagic Retribution Paladin Rotation");
-            Log.Write("Selected Talents:", Color.Blue);
-            Log.Write(
-                "Final Verdict = " + FinalVerdict + "                                                  " + "Execution Sentence = " + ExecutionSentence +
-                "                                                 " + "Consecration = " + Consecration, Color.Blue);
-            Log.Write(
-                "The Fire of Justice = " + TheFireofJustice + "                                         " + "Zeal = " + Zeal +
-                "                                                                            " + "Greater Judgment = " + GreaterJudgment, Color.Blue);
-            Log.Write(
-                "Fistof Justice = " + FistofJustice + "                                                  " + "Repentance = " + Repentance +
-                "                                                               " + "Blinding Light = " + BlindingLight, Color.Blue);
-            Log.Write(
-                "Virtues Blade = " + VirtuesBlade + "                                                 " + "Blade of Wrath = " + BladeofWrath +
-                "                                                          " + "Divine Hammer = " + DivineHammer, Color.Blue);
-            Log.Write(
-                "Justicar's Vengeance = " + JusticarsVengeance + "                                     " + "Eye for an Eye = " + EyeforanEye +
-                "                                                            " + "Word of Glory = " + WordofGlory, Color.Blue);
-            Log.Write(
-                "Divine Intervention = " + DivineIntervention + "                                      " + "Cavalier = " + Cavalier +
-                "                                                                       " + "Seal of Light = " + SealofLight, Color.Blue);
-            Log.Write(
-                "Divine Purpose = " + DivinePurpose + "                                             " + "Crusade = " + Crusade +
-                "                                                                       " + "Holy Wrath = " + HolyWrath, Color.Blue);
+            public int T1;
+            public int T2;
+            public int T3;
+            public int T4;
+            public int T5;
+            public int T6;
+            public int T7;
+            public float Mana;
+            public string Spec;
+            public string Race;
 
-            SettingsForm = new Form {Text = "Talents", StartPosition = FormStartPosition.CenterScreen, Width = 555, Height = 350, ShowIcon = true};
-
-            var lblFinalVerdictText = new Label {Text = "Final Verdict", Size = new Size(150, 15), Left = 30, Top = 30};
-            SettingsForm.Controls.Add(lblFinalVerdictText);
-
-            FinalVerdictBox = new CheckBox {Checked = FinalVerdict, TabIndex = 2, Size = new Size(15, 15), Left = 15, Top = 30};
-            SettingsForm.Controls.Add(FinalVerdictBox);
-
-            var lblExecutionSentenceText = new Label {Text = "Execution Sentence", Size = new Size(150, 15), Left = 210, Top = 30};
-            SettingsForm.Controls.Add(lblExecutionSentenceText);
-
-            ExecutionSentenceBox = new CheckBox {Checked = ExecutionSentence, TabIndex = 4, Size = new Size(15, 15), Left = 195, Top = 30};
-            SettingsForm.Controls.Add(ExecutionSentenceBox);
-
-            var lblConsecrationText = new Label {Text = "Consecration", Size = new Size(150, 15), Left = 390, Top = 30};
-            SettingsForm.Controls.Add(lblConsecrationText);
-
-            ConsecrationBox = new CheckBox {Checked = Consecration, TabIndex = 6, Size = new Size(15, 15), Left = 375, Top = 30};
-            SettingsForm.Controls.Add(ConsecrationBox);
-
-            var lblTheFireofJusticeText = new Label {Text = "The Fire of Justice", Size = new Size(150, 15), Left = 30, Top = 60};
-            SettingsForm.Controls.Add(lblTheFireofJusticeText);
-
-            TheFireofJusticeBox = new CheckBox {Checked = TheFireofJustice, TabIndex = 8, Size = new Size(15, 15), Left = 15, Top = 60};
-            SettingsForm.Controls.Add(TheFireofJusticeBox);
-
-            var lblZealText = new Label {Text = "Zeal", Size = new Size(150, 15), Left = 210, Top = 60};
-            SettingsForm.Controls.Add(lblZealText);
-
-            ZealBox = new CheckBox {Checked = Zeal, TabIndex = 10, Size = new Size(15, 15), Left = 195, Top = 60};
-            SettingsForm.Controls.Add(ZealBox);
-
-            var lblGreaterJudgmentText = new Label {Text = "Greater Judgment", Size = new Size(150, 15), Left = 390, Top = 60};
-            SettingsForm.Controls.Add(lblGreaterJudgmentText);
-
-            GreaterJudgmentBox = new CheckBox {Checked = GreaterJudgment, TabIndex = 12, Size = new Size(15, 15), Left = 375, Top = 60};
-            SettingsForm.Controls.Add(GreaterJudgmentBox);
-
-            var lblFistofJusticeText = new Label {Text = "Fist of Justice", Size = new Size(150, 15), Left = 30, Top = 90};
-            SettingsForm.Controls.Add(lblFistofJusticeText);
-
-            FistofJusticeBox = new CheckBox {Checked = FistofJustice, TabIndex = 12, Size = new Size(15, 15), Left = 15, Top = 90};
-            SettingsForm.Controls.Add(FistofJusticeBox);
-
-            var lblRepentanceText = new Label {Text = "Repentance", Size = new Size(150, 15), Left = 210, Top = 90};
-            SettingsForm.Controls.Add(lblRepentanceText);
-
-            RepentanceBox = new CheckBox {Checked = Repentance, TabIndex = 4, Size = new Size(15, 15), Left = 195, Top = 90};
-            SettingsForm.Controls.Add(RepentanceBox);
-
-            var lblBlindingLightText = new Label {Text = "Blinding Light", Size = new Size(150, 15), Left = 390, Top = 90};
-            SettingsForm.Controls.Add(lblBlindingLightText);
-
-            BlindingLightBox = new CheckBox {Checked = BlindingLight, TabIndex = 6, Size = new Size(15, 15), Left = 375, Top = 90};
-            SettingsForm.Controls.Add(BlindingLightBox);
-
-            var lblVirtuesBladeText = new Label {Text = "Virtue's Blade", Size = new Size(150, 15), Left = 30, Top = 120};
-            SettingsForm.Controls.Add(lblVirtuesBladeText);
-
-            VirtuesBladeBox = new CheckBox {Checked = VirtuesBlade, TabIndex = 2, Size = new Size(15, 15), Left = 15, Top = 120};
-            SettingsForm.Controls.Add(VirtuesBladeBox);
-
-            var lblBladeofWrathText = new Label {Text = "Blade of Wrath", Size = new Size(150, 15), Left = 210, Top = 120};
-            SettingsForm.Controls.Add(lblBladeofWrathText);
-
-            BladeofWrathBox = new CheckBox {Checked = BladeofWrath, TabIndex = 4, Size = new Size(15, 15), Left = 195, Top = 120};
-            SettingsForm.Controls.Add(BladeofWrathBox);
-
-            var lblDivineHammerText = new Label {Text = "Divine Hammer", Size = new Size(150, 15), Left = 390, Top = 120};
-            SettingsForm.Controls.Add(lblDivineHammerText);
-
-            DivineHammerBox = new CheckBox {Checked = DivineHammer, TabIndex = 6, Size = new Size(15, 15), Left = 375, Top = 120};
-            SettingsForm.Controls.Add(DivineHammerBox);
-
-            var lblJusticarsVengeanceText = new Label {Text = "Justicar's Vengeance", Size = new Size(150, 15), Left = 30, Top = 150};
-            SettingsForm.Controls.Add(lblJusticarsVengeanceText);
-
-            JusticarsVengeanceBox = new CheckBox {Checked = JusticarsVengeance, TabIndex = 2, Size = new Size(15, 15), Left = 15, Top = 150};
-            SettingsForm.Controls.Add(JusticarsVengeanceBox);
-
-            var lblEyeforanEyeText = new Label {Text = "Eye for an Eye", Size = new Size(150, 15), Left = 210, Top = 150};
-            SettingsForm.Controls.Add(lblEyeforanEyeText);
-
-            EyeforanEyeBox = new CheckBox {Checked = EyeforanEye, TabIndex = 4, Size = new Size(15, 15), Left = 195, Top = 150};
-            SettingsForm.Controls.Add(EyeforanEyeBox);
-
-            var lblWordofGloryText = new Label {Text = "Word of Glory", Size = new Size(150, 15), Left = 390, Top = 150};
-            SettingsForm.Controls.Add(lblWordofGloryText);
-
-            WordofGloryBox = new CheckBox {Checked = WordofGlory, TabIndex = 6, Size = new Size(15, 15), Left = 375, Top = 150};
-            SettingsForm.Controls.Add(WordofGloryBox);
-
-            var lblDivineInterventionText = new Label {Text = "Divine Intervention", Size = new Size(150, 15), Left = 30, Top = 180};
-            SettingsForm.Controls.Add(lblDivineInterventionText);
-
-            DivineInterventionBox = new CheckBox {Checked = DivineIntervention, TabIndex = 2, Size = new Size(15, 15), Left = 15, Top = 180};
-            SettingsForm.Controls.Add(DivineInterventionBox);
-
-            var lblCavalierText = new Label {Text = "Cavalier", Size = new Size(150, 15), Left = 210, Top = 180};
-            SettingsForm.Controls.Add(lblCavalierText);
-
-            CavalierBox = new CheckBox {Checked = Cavalier, TabIndex = 4, Size = new Size(15, 15), Left = 195, Top = 180};
-            SettingsForm.Controls.Add(CavalierBox);
-
-            var lblSealofLightText = new Label {Text = "Seal of Light", Size = new Size(150, 15), Left = 390, Top = 180};
-            SettingsForm.Controls.Add(lblSealofLightText);
-
-            SealofLightBox = new CheckBox {Checked = SealofLight, TabIndex = 6, Size = new Size(15, 15), Left = 375, Top = 180};
-            SettingsForm.Controls.Add(SealofLightBox);
-
-            var lblDivinePurposeText = new Label {Text = "Divine Purpose", Size = new Size(150, 15), Left = 30, Top = 210};
-            SettingsForm.Controls.Add(lblDivinePurposeText);
-
-            DivinePurposeBox = new CheckBox {Checked = DivinePurpose, TabIndex = 2, Size = new Size(15, 15), Left = 15, Top = 210};
-            SettingsForm.Controls.Add(DivinePurposeBox);
-
-            var lblCrusadeText = new Label {Text = "Crusade", Size = new Size(150, 15), Left = 210, Top = 210};
-            SettingsForm.Controls.Add(lblCrusadeText);
-
-            CrusadeBox = new CheckBox {Checked = Crusade, TabIndex = 4, Size = new Size(15, 15), Left = 195, Top = 210};
-            SettingsForm.Controls.Add(CrusadeBox);
-
-            var lblHolyWrathText = new Label {Text = "Holy Wrath", Size = new Size(150, 15), Left = 390, Top = 210};
-            SettingsForm.Controls.Add(lblHolyWrathText);
-
-            HolyWrathBox = new CheckBox {Checked = HolyWrath, TabIndex = 6, Size = new Size(15, 15), Left = 375, Top = 210};
-            SettingsForm.Controls.Add(HolyWrathBox);
-
-            //Save Button
-            var cmdSave = new Button {Text = "Save", Width = 40, Height = 20, Left = 445, Top = 270, Size = new Size(80, 30)};
-
-            FinalVerdictBox.Checked = FinalVerdict;
-            ExecutionSentenceBox.Checked = ExecutionSentence;
-            ConsecrationBox.Checked = Consecration;
-            TheFireofJusticeBox.Checked = TheFireofJustice;
-            ZealBox.Checked = Zeal;
-            GreaterJudgmentBox.Checked = GreaterJudgment;
-            FistofJusticeBox.Checked = FistofJustice;
-            RepentanceBox.Checked = Repentance;
-            BlindingLightBox.Checked = BlindingLight;
-            VirtuesBladeBox.Checked = VirtuesBlade;
-            BladeofWrathBox.Checked = BladeofWrath;
-            DivineHammerBox.Checked = DivineHammer;
-            JusticarsVengeanceBox.Checked = JusticarsVengeance;
-            EyeforanEyeBox.Checked = EyeforanEye;
-            WordofGloryBox.Checked = WordofGlory;
-            DivineInterventionBox.Checked = DivineIntervention;
-            CavalierBox.Checked = Cavalier;
-            SealofLightBox.Checked = SealofLight;
-            DivinePurposeBox.Checked = DivinePurpose;
-            CrusadeBox.Checked = Crusade;
-            HolyWrathBox.Checked = HolyWrath;
-
-            cmdSave.Click += CmdSave_Click;
-            FinalVerdictBox.CheckedChanged += FinalVerdict_Click;
-            ExecutionSentenceBox.CheckedChanged += ExecutionSentence_Click;
-            ConsecrationBox.CheckedChanged += Consecration_Click;
-            TheFireofJusticeBox.CheckedChanged += TheFireofJustice_Click;
-            ZealBox.CheckedChanged += Zeal_Click;
-            GreaterJudgmentBox.CheckedChanged += GreaterJudgment_Click;
-            FistofJusticeBox.CheckedChanged += FistofJustice_Click;
-            RepentanceBox.CheckedChanged += Repentance_Click;
-            BlindingLightBox.CheckedChanged += BlindingLight_Click;
-            VirtuesBladeBox.CheckedChanged += VirtuesBlade_Click;
-            BladeofWrathBox.CheckedChanged += BladeofWrath_Click;
-            DivineHammerBox.CheckedChanged += DivineHammer_Click;
-            JusticarsVengeanceBox.CheckedChanged += JusticarsVengeance_Click;
-            EyeforanEyeBox.CheckedChanged += EyeforanEye_Click;
-            WordofGloryBox.CheckedChanged += WordofGlory_Click;
-            DivineInterventionBox.CheckedChanged += DivineIntervention_Click;
-            CavalierBox.CheckedChanged += Cavalier_Click;
-            SealofLightBox.CheckedChanged += SealofLight_Click;
-            DivinePurposeBox.CheckedChanged += DivinePurpose_Click;
-            CrusadeBox.CheckedChanged += Crusade_Click;
-            HolyWrathBox.CheckedChanged += HolyWrath_Click;
-
-            SettingsForm.Controls.Add(cmdSave);
-            lblFinalVerdictText.BringToFront();
-            lblExecutionSentenceText.BringToFront();
-            lblConsecrationText.BringToFront();
-            lblTheFireofJusticeText.BringToFront();
-            lblZealText.BringToFront();
-            lblGreaterJudgmentText.BringToFront();
-            lblFistofJusticeText.BringToFront();
-            lblRepentanceText.BringToFront();
-            lblBlindingLightText.BringToFront();
-            lblVirtuesBladeText.BringToFront();
-            lblBladeofWrathText.BringToFront();
-            lblDivineHammerText.BringToFront();
-            lblJusticarsVengeanceText.BringToFront();
-            lblEyeforanEyeText.BringToFront();
-            lblWordofGloryText.BringToFront();
-            lblDivineInterventionText.BringToFront();
-            lblCavalierText.BringToFront();
-            lblSealofLightText.BringToFront();
-            lblDivinePurposeText.BringToFront();
-            lblCrusadeText.BringToFront();
-            lblHolyWrathText.BringToFront();
+            private char_data(int p1, int p2, int p3, int p4, int p5, int p6, int p7, float mana, string spec, string race)
+            {
+                T1 = p1;
+                T2 = p2;
+                T3 = p3;
+                T4 = p4;
+                T5 = p5;
+                T6 = p6;
+                T7 = p7;
+                Mana = mana;
+                Spec = spec;
+                Race = race;
+            }
         }
 
-        private void CmdSave_Click(object sender, EventArgs e)
+        public string[] Race = new string[] { "None", "Human", "Dwarf", "NightElf", "Gnome", "Dreanei", "Pandaren", "Orc", "Undead", "Tauren", "Troll", "BloodElf", "Goblin", "none" };
+        public string[] Spec = new string[] { "None", "Blood", "Frost", "Unholy", "Havoc", "Vengeance", "Balance", "Feral", "Guardian", "Restoration", "Beast Mastery", "Marksmanship", "Survival", "Arcane", "Fire", "Frost", "Brewmaster", "Mistweaver", "Windwalker", "Holy", "Protection", "Retribution", "Discipline", "HolyPriest", "Shadow", "Assassination", "Outlaw", "Subtlety", "Elemental", "Enhancement", "RestorationShaman", "Affliction", "Arms", "Fury", "Protection", "none" };
+        private int npcCount, players;
+        private bool Nameplates = false;
+        private Color pixelColor = Color.FromArgb(0);
+        private double hastePct;
+        private char_data CharInfo = new char_data();
+        private bool AddonEmbeded = false;
+        private bool RangeLib = false;
+
+        private void PlayerStats()
         {
-            FinalVerdict = FinalVerdictBox.Checked;
-            ExecutionSentence = ExecutionSentenceBox.Checked;
-            Consecration = ConsecrationBox.Checked;
-            TheFireofJustice = TheFireofJusticeBox.Checked;
-            Zeal = ZealBox.Checked;
-            GreaterJudgment = GreaterJudgmentBox.Checked;
-            FistofJustice = FistofJusticeBox.Checked;
-            Repentance = RepentanceBox.Checked;
-            BlindingLight = BlindingLightBox.Checked;
-            VirtuesBlade = VirtuesBladeBox.Checked;
-            BladeofWrath = BladeofWrathBox.Checked;
-            DivineHammer = DivineHammerBox.Checked;
-            JusticarsVengeance = JusticarsVengeanceBox.Checked;
-            EyeforanEye = EyeforanEyeBox.Checked;
-            WordofGlory = WordofGloryBox.Checked;
-            DivineIntervention = DivineInterventionBox.Checked;
-            Cavalier = CavalierBox.Checked;
-            SealofLight = SealofLightBox.Checked;
-            DivinePurpose = DivinePurposeBox.Checked;
-            Crusade = CrusadeBox.Checked;
-            HolyWrath = HolyWrathBox.Checked;
-            MessageBox.Show("Settings saved", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            SettingsForm.Close();
+            // Playerstats start at row 1,  column 21
+            // t1 t2 t3
+            // t4 t5 t7
+            // t7 +-haste hastePCT
+            // Spec, Mana, Race
+            int postive = 0;
+            if ((Convert.ToDouble(pixelColor.R) == 255))
+                hastePct = 0f;
+            else
+                hastePct = (Convert.ToSingle(pixelColor.R) * 100f / 255f);
+            int spec, race;
+            pixelColor = WoW.GetBlockColor(1, 21);
+            CharInfo.T1 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
+            CharInfo.T2 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
+            CharInfo.T3 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) * 100 / 255));
+            pixelColor = WoW.GetBlockColor(2, 21);
+            CharInfo.T4 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
+            CharInfo.T5 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
+            CharInfo.T6 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) * 100 / 255));
+            pixelColor = WoW.GetBlockColor(3, 21);
+            CharInfo.T7 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
+            spec = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
+            race = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) * 100 / 255));
+            pixelColor = WoW.GetBlockColor(4, 21);
+            CharInfo.Mana = (Convert.ToSingle(pixelColor.B) * 100 / 255);
+            postive = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) / 255));
+            if ((Convert.ToDouble(pixelColor.B) == 255))
+                hastePct = 0f;
+            else
+                if (postive == 1)
+                    hastePct = (Convert.ToSingle(pixelColor.R) * 100f / 255f) * (-1);
+                else
+                    hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f);
+            if (race > 13)
+                race = 0;
+            if (spec > 34)
+                spec = 0;
+            //Log.Write ("Char Race :" + race + " Spec : " + spec);
+            CharInfo.Race = Race[race];
+            CharInfo.Spec = Spec[spec];
+            Log.Write(" T1 " + CharInfo.T1 + " T2 " + CharInfo.T2 + " T3 " + CharInfo.T3 + " T4 " + CharInfo.T4 + " T5 " + CharInfo.T5 + " T6 " + CharInfo.T6 + " T7 " + CharInfo.T7);
+            //Log.Write("Char Haste " + hastePct + " Mana :" + CharInfo.Mana + " Race : " +CharInfo.Race + " Spec : "  +CharInfo.Spec ) ;
+
         }
 
-        private void FinalVerdict_Click(object sender, EventArgs e)
+        private void AoEStuff()
         {
-            FinalVerdict = FinalVerdictBox.Checked;
+            Color pixelColor = Color.FromArgb(0);
+            pixelColor = WoW.GetBlockColor(11, 20);
+            npcCount = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
+            if (Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) / 255)) == 1)
+                Nameplates = true;
+            else
+                Nameplates = false;
         }
 
-        private void ExecutionSentence_Click(object sender, EventArgs e)
-        {
-            ExecutionSentence = ExecutionSentenceBox.Checked;
+        private void SelectRotation()
+        {  
+            if (Nameplates)
+            {
+                if (npcCount >= 3 && !WoW.TargetIsPlayer)
+                    combatRoutine.ChangeType(RotationType.AOE);
+              /*  if ((npcCount == 2 || npcCount == 3) && !WoW.TargetIsPlayer)
+                    combatRoutine.ChangeType(RotationType.SingleTargetCleave); */
+                if (npcCount <= 2)
+                    combatRoutine.ChangeType(RotationType.SingleTarget);
+            }
         }
 
-        private void Consecration_Click(object sender, EventArgs e)
+        private bool AddonEdited = false;
+        private static string AddonName = ConfigFile.ReadValue("PixelMagic", "AddonName");
+        private static string AddonEmbedName = "BossLib.xml";// Initialization variables		
+        private static string LuaAddon = "Shaman.lua";
+        public static string CustomLua
         {
-            Consecration = ConsecrationBox.Checked;
+            get
+            {
+                var customLua = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + LuaAddon);
+                return customLua;
+            }
+        }
+        public void RangeLibCopy()
+        {
+            try
+            {
+                string fileName = "text.txt";
+                string sourcePath = string.Concat(AppDomain.CurrentDomain.BaseDirectory + "LibSpellRange-1.0\\");
+                string sourcePathSub = string.Concat(AppDomain.CurrentDomain.BaseDirectory + "LibSpellRange-1.0\\lib\\LibStub\\");
+                string targetPath = string.Concat("" + WoW.AddonPath + "\\" + AddonName + "\\lib\\LibSpellRange-1.0\\");
+                string targetPathSub = string.Concat("" + WoW.AddonPath + "\\" + AddonName + "\\lib\\LibSpellRange-1.0\\lib\\LibStub\\");
+                string destFile = "text.txt";
+
+                // To copy a folder's contents to a new location:
+                // Create a new target folder, if necessary.
+                if (!Directory.Exists(targetPath))
+                {
+                    Directory.CreateDirectory(targetPath);
+                    Log.Write("Base target:" + targetPath);
+                }
+                if (!Directory.Exists(targetPathSub))
+                {
+                    Log.Write("Sub target:" + targetPathSub);
+                    Directory.CreateDirectory(targetPathSub);
+                }
+                if (!Directory.Exists(sourcePath))
+                    Log.Write("Dirctory doesn't exist:" + sourcePath);
+                if (!Directory.Exists(sourcePathSub))
+                    Log.Write("Dirctory doesn't exist:" + sourcePathSub);
+                if (Directory.Exists(sourcePath))
+                {
+                    string[] files = Directory.GetFiles(sourcePath);
+                    foreach (string s in files)
+                    {
+                        Log.Write("Generating file" + s);
+                        fileName = Path.GetFileName(s);
+                        destFile = Path.Combine(targetPath, fileName);
+                        File.Copy(s, destFile, true);
+                    }
+                }
+                if (Directory.Exists(sourcePathSub))
+                {
+                    string[] files = Directory.GetFiles(sourcePathSub);
+
+                    foreach (string s in files)
+                    {
+                        Log.Write("Generating Sub file" + s);
+                        fileName = Path.GetFileName(s);
+                        destFile = Path.Combine(targetPathSub, fileName);
+                        File.Copy(s, destFile, true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("" + ex, "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            Thread.Sleep(2000);
+            RangeLib = true;
         }
 
-        private void TheFireofJustice_Click(object sender, EventArgs e)
+        private void AddonEmbedEdit()
         {
-            TheFireofJustice = TheFireofJusticeBox.Checked;
+            try
+            {
+                string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonEmbedName);
+                Log.Write("Addon emedding Editing in progress");
+                addonlua = addonlua.Replace("</Ui>",
+                                            "<Script file=\"lib\\LibSpellRange-1.0\\LibSpellRange-1.0.lua\"/>"
+                                            + Environment.NewLine + "<Script file = \"lib\\LibSpellRange-1.0\\LibSpellRange-1.0.xml\" />"
+                                            + Environment.NewLine + "</Ui>");
+                File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonEmbedName, addonlua);
+                Log.Write("Addon Embedding complete");
+                Thread.Sleep(2000);
+                while (WoW.HealthPercent == 0 || WoW.HastePercent == 0)
+                {
+                    Thread.Sleep(2000);
+                }
+                AddonEmbeded = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("" + ex, "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
-        private void Zeal_Click(object sender, EventArgs e)
+        public void AddonCreationPulse()
         {
-            Zeal = ZealBox.Checked;
+
+            // Editing the addon
+            if (AddonEdited == false)
+            {
+                Log.Write("Editing Addon");
+                AddonEdit();
+                Log.Write("Editing Addon Complete");
+                Thread.Sleep(2000);
+
+            }
+            if (AddonEmbeded == false)
+            {
+                Log.Write("embedingin rangecheck");
+                AddonEmbedEdit();
+                Log.Write("embedingin RangeCheck Complete");
+                Thread.Sleep(2000);
+            }
+            if (RangeLib == false)
+            {
+                RangeLibCopy();
+                WoW.SendMacro("/reload");
+            }
+            Thread.Sleep(350);
+        }
+        private void AddonEdit()
+        {
+            try
+            {
+                string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
+                Log.Write("Addon Editing in progress");
+                addonlua = addonlua.Replace("local lastCombat = nil" + Environment.NewLine + "local alphaColor = 1", "local lastCombat = nil" + Environment.NewLine + "local alphaColor = 1" + Environment.NewLine + CustomLua);
+                addonlua = addonlua.Replace("InitializeOne()" + Environment.NewLine + "            InitializeTwo()", "InitializeOne()" + Environment.NewLine + "            InitializeTwo()" + Environment.NewLine + "            InitializeThree()");
+                File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
+                //WoW.SendMacro("/reload");
+                while (WoW.HealthPercent == 0 || WoW.HastePercent == 0)
+                {
+                    Thread.Sleep(25);
+                }
+                AddonEdited = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("" + ex, "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
         }
 
-        private void GreaterJudgment_Click(object sender, EventArgs e)
+        public override Form SettingsForm { get; set; }
+        public class DetectKeyPress
         {
-            GreaterJudgment = GreaterJudgmentBox.Checked;
-        }
+            public static int Num1 = 0x31;
+            public static int Num2 = 0x32;
+            public static int Num3 = 0x33;
+            public static int Num4 = 0x34;
+            public static int Num5 = 0x35;
+            public static int Num6 = 0x36;
+            public static int Numpad0 = 0x60;
+            public static int Numpad1 = 0x61;
+            public static int Numpad2 = 0x62;
+            public static int Numpad3 = 0x63;
+            public static int Numpad4 = 0x64;
+            public static int Numpad5 = 0x65;
+            public static int Numpad6 = 0x66;
+            public static int Numpad7 = 0x67;
+            public static int Numpad8 = 0x68;
+            public static int Numpad9 = 0x69;
+            public static int NumpadDot = 0x6E;
+            public static int NumpadADD = 0x6B;
 
-        private void FistofJustice_Click(object sender, EventArgs e)
-        {
-            FistofJustice = FistofJusticeBox.Checked;
-        }
+            public static int Shift = 0x10;
+            public static int Ctrl = 0x11;
+            public static int Alt = 0x12;
 
-        private void Repentance_Click(object sender, EventArgs e)
-        {
-            Repentance = RepentanceBox.Checked;
-        }
+            public static int Z = 0x5A;
+            public static int X = 0x58;
+            public static int C = 0x43;
+            public static int V = 0x56;
+            public static int Slash = 0xDC;
 
-        private void BlindingLight_Click(object sender, EventArgs e)
-        {
-            BlindingLight = BlindingLightBox.Checked;
-        }
-
-        private void VirtuesBlade_Click(object sender, EventArgs e)
-        {
-            VirtuesBlade = VirtuesBladeBox.Checked;
-        }
-
-        private void BladeofWrath_Click(object sender, EventArgs e)
-        {
-            BladeofWrath = BladeofWrathBox.Checked;
-        }
-
-        private void DivineHammer_Click(object sender, EventArgs e)
-        {
-            DivineHammer = DivineHammerBox.Checked;
-        }
-
-        private void JusticarsVengeance_Click(object sender, EventArgs e)
-        {
-            JusticarsVengeance = JusticarsVengeanceBox.Checked;
-        }
-
-        private void EyeforanEye_Click(object sender, EventArgs e)
-        {
-            EyeforanEye = EyeforanEyeBox.Checked;
-        }
-
-        private void WordofGlory_Click(object sender, EventArgs e)
-        {
-            WordofGlory = WordofGloryBox.Checked;
-        }
-
-        private void DivineIntervention_Click(object sender, EventArgs e)
-        {
-            DivineIntervention = DivineInterventionBox.Checked;
-        }
-
-        private void Cavalier_Click(object sender, EventArgs e)
-        {
-            Cavalier = CavalierBox.Checked;
-        }
-
-        private void SealofLight_Click(object sender, EventArgs e)
-        {
-            SealofLight = SealofLightBox.Checked;
-        }
-
-        private void DivinePurpose_Click(object sender, EventArgs e)
-        {
-            DivinePurpose = DivinePurposeBox.Checked;
-        }
-
-        private void Crusade_Click(object sender, EventArgs e)
-        {
-            Crusade = CrusadeBox.Checked;
-        }
-
-        private void HolyWrath_Click(object sender, EventArgs e)
-        {
-            HolyWrath = HolyWrathBox.Checked;
+            [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+            internal static extern short GetKeyState(int virtualKeyCode);
         }
     }
 }
@@ -847,13 +632,13 @@ namespace PixelMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Sorcerer
-AddonName=PixelMagic
+AddonName=Quartz
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,217020,Zeal,NumPad1
 Spell,215661,Justicars Vengeance,D8
 Spell,184662,Shield of Vengeance,NumPad0
-Spell,853,Hammer of Justice,Add
+Spell,853,Hammer of Justice,OemMinus
 Spell,213757,Execution Sentence,D9
 Spell,633,Lay on Hands,D6
 Spell,205273,Wake of Ashes,NumPad5
@@ -868,6 +653,9 @@ Spell,31884,Avenging Wrath,Subtract
 Spell,19750,Flash of Light,D1
 Spell,210220,Holy Wrath,D8
 Spell,205228,Consecration,D8
+Spell,5512,Healthstone,D1
+Spell,127834,Potion,D1
+Spell,190784,Divine Steed,D8
 Aura,20271,Judgement
 Aura,223819,Divine Purpose
 Aura,209785,The Fires of Justice
@@ -877,4 +665,7 @@ Aura,160452,Netherwinds
 Aura,230935,Drums of War
 Aura,127271,Mount
 Aura,25771,Forbearance
+Aura,190784,Divine Steed
+Item,5512,Healthstone
+Item,127834,Potion
 */
