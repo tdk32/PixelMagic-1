@@ -27,7 +27,7 @@ namespace PixelMagic.Rotation
     internal class MiestroShadow : CombatRoutine
     {
         //General constants
-        private const int HEALTH_PERCENT_FOR_SWD = 35;
+        private const int HEALTH_PERCENT_FOR_SWD = 20;
         private const int PANIC_INSANITY_VALUE = 45;
         private const int INTERRUPT_DELAY = 650;
 
@@ -46,6 +46,7 @@ namespace PixelMagic.Rotation
         private const string SHADOW_DEATH = "Shadow Word: Death";
         private const string SHADOWFORM = "Shadowform";
         private const string SILENCE = "Silence";
+        private const string SHADOW_FIEND = "Shadowfiend";
 
         //Aura Constants
         private const string VOIDFORM_AURA = "Voidform";
@@ -73,9 +74,8 @@ namespace PixelMagic.Rotation
         public override void Initialize()
         {
             Log.Write("Welcome to Miestro's Shadow rotation", Color.Orange);
-            Log.Write("Please make sure your specialization is as follows: http://us.battle.net/wow/en/tool/talent-calculator#Xba!0101102", Color.Orange);
-            Log.Write("Surrender to madness is not explicitly supported in this build yet, however it can be manually cast.", Color.Orange);
-            Log.Write("Note: legendaries are not supported either. If you need one supported or something fixed, please make note of it in the discord.", Color.Orange);
+            Log.Write("Please make sure your specialization is as follows: http://us.battle.net/wow/en/tool/talent-calculator#Xba!0100000", Color.Orange);
+            Log.Write("Note: legendaries are not supported. If you need one supported or something fixed, please make note of it in the discord.", Color.Orange);
         }
 
         public override void Stop()
@@ -119,6 +119,11 @@ namespace PixelMagic.Rotation
                     //Just so happens that the spell and debuff name are the same, this is not ALWAYS the case.
                     maintainDebuff(VAMPIRIC_TOUCH, VAMPIRIC_TOUCH, 5);
                     maintainDebuff(SHADOW_PAIN, SHADOW_PAIN, 2);
+                } 
+                else 
+                {
+                    maintainDebuff(VAMPIRIC_TOUCH, VAMPIRIC_TOUCH, WoW.SpellCooldownTimeRemaining(VOID_BOLT));
+                    maintainDebuff(SHADOW_PAIN, SHADOW_PAIN, WoW.SpellCooldownTimeRemaining(VOID_BOLT));
                 }
 
                 switch (combatRoutine.Type)
@@ -158,7 +163,7 @@ namespace PixelMagic.Rotation
         {
             bool ignoreMovement = WoW.PlayerHasBuff(SURRENDER_MADNESS);
 
-            if (WoW.Insanity >= 100 || WoW.PlayerHasBuff(VOIDFORM_AURA))
+            if (WoW.Insanity >= 70 || WoW.PlayerHasBuff(VOIDFORM_AURA))
             {
                 //Expend insanity in voidform.
                 if (WoW.HasTarget && !WoW.PlayerHasBuff(VOIDFORM_AURA))
@@ -167,12 +172,6 @@ namespace PixelMagic.Rotation
                 }
                 else
                 {
-                    /* Disabled, allow player to cast.
-                    if (WoW.PlayerBuffStacks(VOIDFORM_AURA)<5) {
-                        castWithRangeCheck(SHADOWFIEND);
-                    }
-                    */
-
                     //If we can, cast it.
                     castWithRangeCheck(VOID_BOLT);
 
@@ -183,7 +182,7 @@ namespace PixelMagic.Rotation
                         Thread.Sleep(4000); //Sleep while void torrent is casting.
                     }
 
-                    //If the boss health is at or below 35% cast SW:D
+                    //If the boss health is at or below our set threshold SW:D
                     if (WoW.TargetHealthPercent <= HEALTH_PERCENT_FOR_SWD)
                     {
                         if (WoW.PlayerSpellCharges(SHADOW_DEATH) == 2 && WoW.Insanity <= 70)
@@ -199,6 +198,11 @@ namespace PixelMagic.Rotation
                                 castWithRangeCheck(SHADOW_DEATH);
                             }
                         }
+                    }
+
+                    //Cast shadowfiend if we have more than 15 stacks of voidform aura.
+                    if(WoW.PlayerBuffStacks(VOIDFORM_AURA) >= 15) {
+                        castWithRangeCheck(SHADOW_FIEND);
                     }
 
                     //If we can, cast it.
@@ -232,14 +236,7 @@ namespace PixelMagic.Rotation
                     //If we don't have anything else to do, cast Mind flay.
                     if (!isPlayerBusy(ignoreChanneling: false))
                     {
-                        if (isSingleTarget)
-                        {
-                            castWithRangeCheck(MIND_FLAY);
-                        }
-                        else
-                        {
-                            castWithRangeCheck(MIND_SEAR);
-                        }
+                        castWithRangeCheck(MIND_FLAY);
                     }
                 }
             }
@@ -312,22 +309,21 @@ AddonAuthor=Miestro
 AddonName=PixelMagic
 WoWVersion=Legion - 70100
 [SpellBook.db]
-Spell,589,Shadow Word: Pain,E
-Spell,34914,Vampiric Touch,U
-Spell,205065,Void Torrent,B
-Spell,15407,Mind Flay,D2
-Spell,48045,Mind Sear,D5
-Spell,8092,Mind Blast,D1
-Spell,186263,Shadow Mend,A
-Spell,17,Power Word: Shield,S
-Spell,205448,Void Bolt,Z
-Spell,228260,Void Eruption,Z
+Spell,589,Shadow Word: Pain,Q
+Spell,34914,Vampiric Touch,E
+Spell,205065,Void Torrent,G
+Spell,15407,Mind Flay,D1
+Spell,8092,Mind Blast,D2
+Spell,186263,Shadow Mend,D3
+Spell,17,Power Word: Shield,D4
+Spell,205448,Void Bolt,D5
+Spell,228260,Void Eruption,D5
 Spell,193223,Surrender to Madness,F
+Spell,32379,Shadow Word: Death,D6
 Spell,34433,Shadowfiend,D7
-Spell,32379,Shadow Word: Death,D3
-Spell,232698,Shadowform,W
-Spell,15487,Silence,D0
-Spell,47585,Dispersion,K
+Spell,232698,Shadowform,D0
+Spell,15487,Silence,R
+Spell,47585,Dispersion,T
 Aura,232698,Shadowform
 Aura,34914,Vampiric Touch
 Aura,589,Shadow Word: Pain
