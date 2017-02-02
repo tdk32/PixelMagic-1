@@ -153,12 +153,13 @@ AddonAuthor=WiNiFiX
 AddonName=PixelMagic
 WoWVersion=Legion - 70100
 [SpellBook.db]
-Spell,203782,Shear,D1
-Spell,228477,Soul Cleave,D2
-Spell,207407,Soul Carver,D3
+Spell,203782,Shear,T
+Spell,235964,Sever,T
+Spell,228477,Soul Cleave,Y
+Spell,207407,Soul Carver,H
 Spell,212084,Fel Devastation,W
 Spell,178740,Immolation Aura,D5
-Spell,204596,Sigil of Flame,D6
+Spell,204513,Sigil of Flame,D6
 Spell,204157,Throw Glaive,D7
 Spell,207682,Sigal of Silence,D8
 Spell,202719,Arcane Torrent,D0
@@ -169,6 +170,9 @@ Aura,203819,Demon Spikes
 Aura,212818,Fiery Demise
 Aura,41252,Mount
 Aura,207472,Magnum Opus
+Aura,187827,Metamorphasis
+Aura,204598,Sigil of Flame
+Aura,203981,Soul Fragments
 Item,80610,Mana
 */
 

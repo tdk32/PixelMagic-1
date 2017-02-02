@@ -3,51 +3,41 @@
 // ReSharper disable ConvertPropertyToExpressionBody
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
+using System.IO;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Timers;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 using System.Windows.Forms;
 using PixelMagic.Helpers;
-using PixelMagic.GUI;
 
 namespace PixelMagic.Rotation
 {
-    public class RetributionPaladin : CombatRoutine
-    {
-        private readonly Stopwatch BeastCleave = new Stopwatch();
-
+    public class WarlockDemonology : CombatRoutine
+    {  
         public override string Name
         {
-            get { return "Retribution Paladin"; }
+            get { return "Demonology Warlock"; }
         }
 
         public override string Class
         {
-            get { return "Paladin"; }
+            get { return "Warlock"; }
         }
 
         public override void Initialize()
         {
-            Log.Write("Welcome to Retribution Paladin", Color.Green);
+            Log.Write("Welcome to the Demonology Warlock rotation", Color.Purple);
             Log.Write("IN ORDER FOR THIS ROTATION TO WORK YOU WILL NEED TO DOWNLOAD AND INSTALL THE ADDON.", Color.Red);
             Log.Write("https://github.com/winifix/PixelMagicCR/tree/master/Hunter", Color.Blue);
+            WoW.Speak("Welcome to PixelMagic Demonology Warlock");
         }
 
         public override void Stop()
         {
-        }
-
-        public override void Pulse()        // Updated for Legion (tested and working for single target)
+        }				
+		
+        public override void Pulse() // Updated for Legion (tested and working for single target)
         {
             AddonCreationPulse();
             PlayerStats();
@@ -57,286 +47,246 @@ namespace PixelMagic.Rotation
                 SelectRotation();
             }
 
-            //Healthstone - Potion
-            if ((WoW.CanCast("Healthstone") || WoW.CanCast("Potion"))
-                && (WoW.ItemCount("Healthstone") >= 1 || WoW.ItemCount("Potion") >= 1)
-                && (!WoW.ItemOnCooldown("Healthstone") || !WoW.ItemOnCooldown("Potion"))                
+            //Dark Pact
+            if (WoW.CanCast("Dark Pact")
+                && CharInfo.T5 == 3
                 && WoW.HealthPercent <= 30
                 && !WoW.PlayerHasBuff("Mount"))
             {
-                WoW.CastSpell("Healthstone");
-                WoW.CastSpell("Potion");
+                WoW.CastSpell("Dark Pact");
+                return;
+            }           
+
+            //Shadowfury
+            if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0
+                && CharInfo.T3 == 3
+                && !WoW.IsMoving
+                && WoW.CanCast("Shadowfury"))
+            {
+                WoW.CastSpell("Shadowfury");
                 return;
             }
 
-            //Shield of Vengeance
-            if (WoW.CanCast("Shield of Vengeance")
-                && WoW.HealthPercent <= 40
-                && !WoW.PlayerHasBuff("Mount"))
+            if (UseCooldowns)
             {
-                WoW.CastSpell("Shield of Vengeance");
-                return;
+                if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerIsChanneling && WoW.IsInCombat && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Mount"))
+                { 
+                    //Doomguard
+                    if (WoW.CanCast("Doomguard")
+                        && (CharInfo.T6 == 0 || CharInfo.T6 == 2 || CharInfo.T6 == 3)
+                        && WoW.CurrentSoulShards >= 1
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Doomguard");
+                        return;
+                    }
+
+                    //Grimoire of Service
+                    if (WoW.CanCast("Grimoire: Felguard")
+                        && CharInfo.T6 == 2
+                        && WoW.CurrentSoulShards >= 1
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Grimoire: Felguard");
+                        return;
+                    }
+
+                    //Soul Harvest
+                    if (WoW.CanCast("Soul Harvest")
+                        && CharInfo.T4 == 3
+                        && !WoW.IsMoving
+                        && WoW.IsSpellInRange("Doom")
+                        && (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War") || WoW.PlayerHasBuff("Heroism")))
+                    {
+                        WoW.CastSpell("Soul Harvest");
+                        return;
+                    }
+                }
             }
 
-            //Lay on Hands
-            if (WoW.CanCast("Lay on Hands")
-                && WoW.HealthPercent <= 20
-                && !WoW.PlayerHasBuff("Mount"))
+            if (combatRoutine.Type == RotationType.SingleTarget) // Do Single Target Stuff here
             {
-                WoW.CastSpell("Lay on Hands");
-                return;
+                if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerIsChanneling && WoW.IsInCombat && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Mount"))
+                {
+                    if ((!WoW.TargetHasDebuff("Doom") || WoW.TargetDebuffTimeRemaining("Doom") <= 1.5)                        
+                        && WoW.CanCast("Doom")
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Doom");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Darkglare")
+                        && CharInfo.T7 == 1
+                        && WoW.CurrentSoulShards >= 1
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Darkglare");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Call Dreadstalkers")
+                        && (WoW.CurrentSoulShards >= 2 || WoW.TargetHasDebuff("Demonic Calling"))
+                        && WoW.IsSpellInRange("Doom")
+                        && !WoW.IsMoving)
+                    {
+                        WoW.CastSpell("Call Dreadstalkers");
+                        return;
+                    }
+                   
+                    if (WoW.CanCast("Hand of Guldan")
+                        && WoW.CurrentSoulShards >= 4
+                        && WoW.IsSpellInRange("Doom")
+                        && !WoW.IsMoving)
+                    {
+                        WoW.CastSpell("Hand of Guldan");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Demonic Empowerment")
+                        && !WoW.IsMoving
+                        && !WoW.WasLastCasted("Demonic Empowerment")
+                        && (!WoW.PetHasBuff("Demonic Empowerment") || WoW.PetBuffTimeRemaining("Demonic Empowerment") <= 1.5
+                        || WoW.WasLastCasted("Call Dreadstalkers") || WoW.WasLastCasted("Grimoire: Felguard") || WoW.WasLastCasted("Doomguard") || WoW.WasLastCasted("Hand of Guldan")))
+                    {
+                        WoW.CastSpell("Demonic Empowerment");
+                        Thread.Sleep(1000);
+                        return;
+                    }
+
+                    if (WoW.CanCast("Talkiels Consumption")
+                        && WoW.PetHasBuff("Demonic Empowerment")
+                        && WoW.PetBuffTimeRemaining("Demonic Empowerment") >= 2
+                        && WoW.WildImpsCount >= 1
+                        && WoW.DreadstalkersCount >= 1
+                        && WoW.IsSpellInRange("Doom")
+                        && !WoW.IsMoving)
+                    {
+                        WoW.CastSpell("Talkiels Consumption");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Felstorm")
+                        && WoW.PetHasBuff("Demonic Empowerment") 
+                        && WoW.PetBuffTimeRemaining("Demonic Empowerment") >= 6
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Felstorm");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Shadowflame")
+                        && CharInfo.T1 == 2
+                        && !WoW.TargetHasDebuff("Shadowflame")
+                        && WoW.CanCast("Shadowflame")
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Shadowflame");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Life Tap")
+                        && WoW.Mana < 60
+                        && WoW.HealthPercent > 50)
+                    {
+                        WoW.CastSpell("Life Tap");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Demonwrath")
+                        && WoW.Mana > 60
+                        && WoW.IsMoving)
+                    {
+                        WoW.CastSpell("Demonwrath");
+                        return;
+                    }
+
+                    if ((WoW.CanCast("Shadow Bolt") || WoW.CanCast("Demonbolt"))                        
+                        && WoW.IsSpellInRange("Doom")
+                        && !WoW.IsMoving)
+                    {
+                        WoW.CastSpell("Shadow Bolt");
+                        WoW.CastSpell("Demonbolt");
+                        return;
+                    }                  
+                }
+            }
+            if (combatRoutine.Type == RotationType.AOE)
+            {
+                if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerIsChanneling && WoW.IsInCombat && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Mount"))
+                {
+                    if (WoW.CanCast("Hand of Guldan")
+                        && WoW.CurrentSoulShards >= 4
+                        && WoW.IsSpellInRange("Doom")
+                        && !WoW.IsMoving)
+                    {
+                        WoW.CastSpell("Hand of Guldan");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Implosion")
+                        && CharInfo.T2 == 3
+                        && WoW.WildImpsCount >= 1
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Implosion");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Darkglare")
+                        && CharInfo.T7 == 1
+                        && WoW.CurrentSoulShards >= 1
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Darkglare");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Demonic Empowerment")
+                       && WoW.CanCast("Felstorm")
+                       && !WoW.IsMoving
+                       && !WoW.WasLastCasted("Demonic Empowerment")
+                       && (!WoW.PetHasBuff("Demonic Empowerment") || WoW.PetBuffTimeRemaining("Demonic Empowerment") <= 6))
+                    {
+                        WoW.CastSpell("Demonic Empowerment");
+                        Thread.Sleep(2000);
+                        return;
+                    }
+
+                    if (WoW.CanCast("Felstorm")
+                        && WoW.PetHasBuff("Demonic Empowerment")
+                        && WoW.PetBuffTimeRemaining("Demonic Empowerment") >= 6
+                        && WoW.IsSpellInRange("Doom"))
+                    {
+                        WoW.CastSpell("Felstorm");
+                        return;
+                    }                    
+
+                    if (WoW.CanCast("Life Tap")
+                        && WoW.Mana < 60
+                        && WoW.HealthPercent > 50)
+                    {
+                        WoW.CastSpell("Life Tap");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Demonwrath")
+                        && WoW.Mana > 60)
+                    {
+                        WoW.CastSpell("Demonwrath");
+                        return;
+                    }
+
+                }
             }
 
-            //Divine Steed
-            if (DetectKeyPress.GetKeyState(DetectKeyPress.Num4) < 0
-                && WoW.CanCast("Divine Steed")
-                && !WoW.PlayerHasBuff("Divine Steed"))
+            if (combatRoutine.Type == RotationType.SingleTargetCleave)
             {
-                WoW.CastSpell("Divine Steed");
-                return;
-            }
-
-            if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !WoW.PlayerHasBuff("Mount") && !WoW.PlayerIsChanneling && !WoW.PlayerIsCasting && WoW.HealthPercent != 0)
-            {
-                //Crusade
-                if (WoW.CanCast("Crusade")
-                    && CharInfo.T7 == 2
-                    && WoW.CurrentHolyPower >= 3
-                    && WoW.IsSpellInRange("Templar Verdict")
-                    && (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War")))
-                {
-                    WoW.CastSpell("Crusade");
-                    return;
-                }
-
-                //Avenging Wrath
-                if (WoW.CanCast("Avenging Wrath")
-                    && WoW.CurrentHolyPower >= 3
-                    && WoW.IsSpellInRange("Templar Verdict")
-                    && (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War")))
-                {
-                    WoW.CastSpell("Avenging Wrath");
-                    return;
-                }
-
-                //Hammer of Justice
-                if (DetectKeyPress.GetKeyState(DetectKeyPress.NumpadADD) < 0
-                   && WoW.CanCast("Hammer of Justice")
-                    )
-                {
-                    WoW.CastSpell("Hammer of Justice");
-                    return;
-                }
-
-                //Holy Wrath
-                if (WoW.CanCast("Holy Wrath")
-                    && CharInfo.T7 == 3
-                    && WoW.HealthPercent <= 40
-                    && WoW.IsSpellInRange("Templar Verdict"))
-                {
-                    WoW.CastSpell("Holy Wrath");
-                    return;
-                }
-
-                //Single Target Rotation
-
-                //Execution Sentence
-                if (combatRoutine.Type == RotationType.SingleTarget
-                    && WoW.CanCast("Execution Sentence")                    
-                    && WoW.TargetHasDebuff("Judgement")
-                    && WoW.TargetDebuffTimeRemaining("Judgement") >= 6.5
-                    && CharInfo.T1 == 2)
-                {
-                    WoW.CastSpell("Execution Sentence");
-                    return;
-                }
-
-                //Justicar's Vengeance
-                if (combatRoutine.Type == RotationType.SingleTarget
-                    && WoW.CanCast("Justicars Vengeance")                    
-                    && WoW.PlayerHasBuff("Divine Purpose")
-                    && WoW.IsSpellInRange("Templar Verdict")
-                    && CharInfo.T5 == 1)
-                {
-                    WoW.CastSpell("Justicars Vengeance");
-                    return;
-                }
-
-                //Templar's Verdict
-                if (combatRoutine.Type == RotationType.SingleTarget
-                    && (WoW.CurrentHolyPower >= 3 || WoW.PlayerHasBuff("Divine Purpose") || (WoW.CurrentHolyPower >= 2 && WoW.PlayerHasBuff("The Fires of Justice")))
-                    && WoW.CanCast("Templar Verdict")
-                    && WoW.IsSpellInRange("Templar Verdict")
-                    && WoW.TargetHasDebuff("Judgement")
-                    && WoW.TargetDebuffTimeRemaining("Judgement") >= 0.5)
-                {
-                    WoW.CastSpell("Templar Verdict");
-                    return;
-                }
-
-                //Judgement
-                if (combatRoutine.Type == RotationType.SingleTarget
-                    && WoW.CanCast("Judgement")
-                    && WoW.CurrentHolyPower >= 3)
-                {
-                    WoW.CastSpell("Judgement");
-                    return;
-                }
-
-                //Wake of Ashes
-                if (combatRoutine.Type == RotationType.SingleTarget
-                    && WoW.CurrentHolyPower == 0
-                    && WoW.CanCast("Wake of Ashes")
-                    && WoW.IsSpellInRange("Templar Verdict"))
-                {
-                    WoW.CastSpell("Wake of Ashes");
-                    return;
-                }
-
-                //Blade of Justice
-                if (combatRoutine.Type == RotationType.SingleTarget
-                    && WoW.CanCast("Blade of Justice")                    
-                    && WoW.CurrentHolyPower <= 3
-                    && CharInfo.T4 != 3)
-                {
-                    WoW.CastSpell("Blade of Justice");
-                    return;
-                }
-
-                //Divine Hammer
-                if (combatRoutine.Type == RotationType.SingleTarget
-                    && WoW.CanCast("Divine Hammer")                    
-                    && WoW.CurrentHolyPower <= 3
-                    && CharInfo.T4 == 3)
-                {
-                    WoW.CastSpell("Divine Hammer");
-                    return;
-                }
-
-                //Crusader Strike
-                if (combatRoutine.Type == RotationType.SingleTarget
-                    && WoW.CurrentHolyPower < 5
-                    && WoW.PlayerSpellCharges("Crusader Strike") >= 1
-                    && WoW.CanCast("Crusader Strike")
-                    && CharInfo.T2 != 2)
-                {
-                    WoW.CastSpell("Crusader Strike");
-                    return;
-                }
-
-                //Zeal
-                if (combatRoutine.Type == RotationType.SingleTarget
-                    && WoW.CurrentHolyPower < 5
-                    && WoW.PlayerSpellCharges("Zeal") >= 1
-                    && WoW.CanCast("Zeal")
-                    && CharInfo.T2 == 2)
-                {
-                    WoW.CastSpell("Zeal");
-                    return;
-                }
-
-                //Consecration
-                if (combatRoutine.Type == RotationType.SingleTarget
-                    && WoW.CanCast("Consecration")
-                    && WoW.IsSpellInRange("Templar Verdict")
-                    && CharInfo.T1 == 3)
-                {
-                    WoW.CastSpell("Consecration");
-                    return;
-                }
-
-                //AoE Rotation = 3+ Targets
-
-                //Divine Storm
-                if (combatRoutine.Type == RotationType.AOE
-                    && (WoW.CurrentHolyPower >= 3 || WoW.PlayerHasBuff("Divine Purpose") || (WoW.CurrentHolyPower >= 2 && WoW.PlayerHasBuff("The Fires of Justice")))
-                    && WoW.CanCast("Divine Storm")
-                    && WoW.IsSpellInRange("Templar Verdict"))
-                {
-                    WoW.CastSpell("Divine Storm");
-                    return;
-                }
-
-                //Judgement
-                if (combatRoutine.Type == RotationType.AOE
-                    && WoW.CanCast("Judgement"))
-                {
-                    WoW.CastSpell("Judgement");
-                    return;
-                }
-
-                //Wake of Ashes
-                if (combatRoutine.Type == RotationType.AOE
-                    && WoW.CurrentHolyPower == 0
-                    && WoW.CanCast("Wake of Ashes")
-                    && WoW.IsSpellInRange("Templar Verdict"))
-                {
-                    WoW.CastSpell("Wake of Ashes");
-                    return;
-                }
-
-                //Consecration
-                if (combatRoutine.Type == RotationType.AOE
-                    && WoW.CanCast("Consecration")
-                    && WoW.IsSpellInRange("Templar Verdict")
-                    && CharInfo.T1 == 3)
-                {
-                    WoW.CastSpell("Consecration");
-                    return;
-                }
-
-                //Blade of Justice
-                if (combatRoutine.Type == RotationType.AOE
-                    && WoW.CanCast("Blade of Justice")                    
-                    && WoW.CurrentHolyPower <= 3
-                    && CharInfo.T4 != 3)
-                {
-                    WoW.CastSpell("Blade of Justice");
-                    return;
-                }
-
-                //Divine Hammer
-                if (combatRoutine.Type == RotationType.AOE
-                    && WoW.CanCast("Divine Hammer")
-                    && WoW.CurrentHolyPower <= 3
-                    && CharInfo.T4 == 3)
-                {
-                    WoW.CastSpell("Divine Hammer");
-                    return;
-                }
-
-                //Crusader Strike
-                if (combatRoutine.Type == RotationType.AOE
-                    && WoW.CurrentHolyPower < 5
-                    && WoW.PlayerSpellCharges("Crusader Strike") >= 1
-                    && WoW.CanCast("Crusader Strike")
-                    && CharInfo.T2 != 2)
-                {
-                    WoW.CastSpell("Crusader Strike");
-                    return;
-                }
-
-                //Zeal
-                if (combatRoutine.Type == RotationType.AOE
-                    && WoW.CurrentHolyPower < 5
-                    && WoW.PlayerSpellCharges("Zeal") >= 1
-                    && WoW.CanCast("Zeal")
-                    && CharInfo.T2 == 2)
-                {
-                    WoW.CastSpell("Zeal");
-                    return;
-                }
-
-
-                if (combatRoutine.Type == RotationType.SingleTargetCleave) //Cleave rotation = 2 targets
-                {
-                    // Do Single Target Cleave stuff here if applicable else ignore this one
-                }
-
-            }
+                // Do Single Target Cleave stuff here if applicable else ignore this one
+            }            
         }
 
-
+        #region Talents functions
         public struct char_data
         {
             public int T1;
@@ -437,11 +387,11 @@ namespace PixelMagic.Rotation
         {  
             if (Nameplates)
             {
-                if (npcCount >= 3 && !WoW.TargetIsPlayer)
+                if (npcCount >= 4 && !WoW.TargetIsPlayer)
                     combatRoutine.ChangeType(RotationType.AOE);
-              /*  if ((npcCount == 2 || npcCount == 3) && !WoW.TargetIsPlayer)
-                    combatRoutine.ChangeType(RotationType.SingleTargetCleave); */
-                if (npcCount <= 2)
+                if ((npcCount == 2 || npcCount == 3) && !WoW.TargetIsPlayer)
+                    combatRoutine.ChangeType(RotationType.SingleTargetCleave);
+                if (npcCount <= 1)
                     combatRoutine.ChangeType(RotationType.SingleTarget);
             }
         }
@@ -628,44 +578,39 @@ namespace PixelMagic.Rotation
         }
     }
 }
-
+        #endregion
 /*
 [AddonDetails.db]
 AddonAuthor=Sorcerer
 AddonName=Quartz
 WoWVersion=Legion - 70100
 [SpellBook.db]
-Spell,217020,Zeal,NumPad1
-Spell,215661,Justicars Vengeance,D8
-Spell,184662,Shield of Vengeance,NumPad0
-Spell,853,Hammer of Justice,OemMinus
-Spell,213757,Execution Sentence,D9
-Spell,633,Lay on Hands,D6
-Spell,205273,Wake of Ashes,NumPad5
-Spell,53385,Divine Storm,NumPad6
-Spell,184575,Blade of Justice,NumPad4
-Spell,198034,Divine Hammer,NumPad4
-Spell,35395,Crusader Strike,NumPad1
-Spell,85256,Templar Verdict,NumPad2
-Spell,20271,Judgement,NumPad3
-Spell,224668,Crusade,Subtract
-Spell,31884,Avenging Wrath,Subtract
-Spell,19750,Flash of Light,D1
-Spell,210220,Holy Wrath,D8
-Spell,205228,Consecration,D8
-Spell,5512,Healthstone,D1
-Spell,127834,Potion,D1
-Spell,190784,Divine Steed,D8
-Aura,20271,Judgement
-Aura,223819,Divine Purpose
-Aura,209785,The Fires of Justice
+Spell,686,Shadow Bolt,NumPad1
+Spell,157695,Demonbolt,NumPad1
+Spell,104316,Call Dreadstalkers,NumPad2
+Spell,105174,Hand of Guldan,NumPad3
+Spell,193396,Demonic Empowerment,NumPad4
+Spell,603,Doom,NumPad5
+Spell,193440,Demonwrath,NumPad6
+Spell,1454,Life Tap,NumPad7
+Spell,205180,Darkglare,NumPad8
+Spell,111897,Grimoire: Felguard,NumPad9
+Spell,211714,Talkiels Consumption,Add
+Spell,205181,Shadowflame,NumPad0
+Spell,18540,Doomguard,Decimal
+Spell,119914,Felstorm,D4
+Spell,196098,Soul Harvest,D0
+Spell,196277,Implosion,D7
+Spell,30283,Shadowfury,D3
+Spell,108416,Dark Pact,Multiply
 Aura,2825,Bloodlust
+Aura,32182,Heroism
 Aura,80353,Time Warp
 Aura,160452,Netherwinds
 Aura,230935,Drums of War
+Aura,603,Doom
+Aura,193396,Demonic Empowerment
+Aura,205146,Demonic Calling
+Aura,205181,Shadowflame
 Aura,127271,Mount
-Aura,25771,Forbearance
-Aura,190784,Divine Steed
-Item,5512,Healthstone
-Item,127834,Potion
 */
