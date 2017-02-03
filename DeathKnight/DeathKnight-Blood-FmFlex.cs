@@ -1,4 +1,4 @@
-ausing System.Drawing;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using PixelMagic.Helpers;
