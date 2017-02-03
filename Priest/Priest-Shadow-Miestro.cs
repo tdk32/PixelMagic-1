@@ -177,10 +177,6 @@ namespace PixelMagic.Rotation
 
                     //Cast it.
                     castWithRangeCheck(VOID_TORRENT, ignoreMovement);
-                    if (WoW.LastSpell.Equals(VOID_TORRENT))
-                    {
-                        Thread.Sleep(4000); //Sleep while void torrent is casting.
-                    }
 
                     //If the boss health is at or below our set threshold SW:D
                     if (WoW.TargetHealthPercent <= HEALTH_PERCENT_FOR_SWD)
@@ -259,7 +255,7 @@ namespace PixelMagic.Rotation
         /// <returns>True if we can not currently cast another spell.</returns>
         private bool isPlayerBusy(bool ignoreMovement = false, bool ignoreChanneling = true)
         {
-            var canCast = WoW.PlayerIsCasting || (WoW.PlayerIsChanneling && !ignoreChanneling) || (WoW.IsMoving && ignoreMovement);
+            var canCast = WoW.PlayerIsCasting || (WoW.PlayerIsChanneling && !(ignoreChanneling && !WoW.WasLastCasted(VOID_TORRENT))) || (WoW.IsMoving && ignoreMovement);
             return canCast;
         }
 
