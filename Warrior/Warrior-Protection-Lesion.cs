@@ -30,6 +30,8 @@ namespace PixelMagic.Rotation
 		private CheckBox BCint;
 		//Tick for HP Pots
 		private CheckBox HPint;
+		//Tick for M+ booming/Angermanagement
+		private CheckBox AMint;
 		
 		
         public override string Name => "Protection Warrior";
@@ -123,7 +125,16 @@ namespace PixelMagic.Rotation
             }
             set { ConfigFile.WriteValue("ProtectionLesion", "Pots", value.ToString()); }
         }
-	
+		private static bool AngerM
+        {
+            get
+            {
+                var AngerM = ConfigFile.ReadValue("ProtectionLesion", "AngerM").Trim();
+
+                return AngerM != "" && Convert.ToBoolean(AngerM);
+            }
+            set { ConfigFile.WriteValue("ProtectionLesion", "AngerM", value.ToString()); }
+        }
 	
 		private readonly Stopwatch swingwatch = new Stopwatch();
 
@@ -238,6 +249,18 @@ namespace PixelMagic.Rotation
 
             HPint = new CheckBox {Checked = BattleC, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 119};
             SettingsForm.Controls.Add(HPint);
+			
+			var lblAMText = new Label //12; 129 is first value, Top is second.
+            {
+                Text = "M+ AM/BV",
+                Size = new Size(95, 13), //95; 13
+                Left = 12,
+                Top = 134
+            };
+            SettingsForm.Controls.Add(lblAMText); //113; 114 
+
+            AMint = new CheckBox {Checked = BattleC, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 134};
+            SettingsForm.Controls.Add(AMint);
 			 
             var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 150, Size = new Size(120, 48)};
 
@@ -249,6 +272,7 @@ namespace PixelMagic.Rotation
 			IDint.Checked = Indomitable;
 			BCint.Checked = BattleC;
 			HPint.Checked = Pots;
+			AMint.Checked = AngerM;
             
 
             cmdSave.Click += CmdSave_Click;
@@ -260,6 +284,7 @@ namespace PixelMagic.Rotation
 			IDint.CheckedChanged += ID_Click;
 			BCint.CheckedChanged += BC_Click;
 			HPint.CheckedChanged += HP_Click;
+			AMint.CheckedChanged += AM_Click;
 
             SettingsForm.Controls.Add(cmdSave);
             lblGeneralInterruptsText.BringToFront();
@@ -270,6 +295,8 @@ namespace PixelMagic.Rotation
 			lblIndomitableText.BringToFront();
 			lblBattleCText.BringToFront();
 			lblHPText.BringToFront();
+			lblAMText.BringToFront();
+			
 			
 			
             
@@ -282,6 +309,7 @@ namespace PixelMagic.Rotation
 			Log.Write("Using Indomitable Talent = " + Indomitable, Color.Red);
 			Log.Write("Auto using Battle Cry = " + BattleC, Color.Red);
 			Log.Write("Use HP Pots = " + Pots, Color.Red);
+			Log.Write("Use Booming voice & Anger Management for M+/AoE..ish = " + AngerM, Color.Red);
 			
         }
 		private void CmdSave_Click(object sender, EventArgs e)
@@ -294,6 +322,7 @@ namespace PixelMagic.Rotation
 			Indomitable = IDint.Checked;
 			BattleC = BCint.Checked;
 			Pots = HPint.Checked;
+			AngerM = AMint.Checked;
 			
 			
             MessageBox.Show("Settings saved", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -337,6 +366,11 @@ namespace PixelMagic.Rotation
         {
             Pots = HPint.Checked;
         }
+		private void AM_Click(object sender, EventArgs e)
+        {
+            AngerM = AMint.Checked;
+        }
+		
 		
         public override void Stop()
         {
@@ -398,6 +432,10 @@ namespace PixelMagic.Rotation
 						WoW.CastSpell("Battle Cry");
 						return;
 						}
+				if (AngerM && !WoW.IsSpellOnCooldown("Demoralizing Shout") && (DetectKeyPress.GetKeyState(DetectKeyPress.Z) < 0))
+				{
+					WoW.CastSpell("Demoralizing Shout");
+				}
 				if (generalInterrupts)
 					{
 					if (WoW.TargetIsCasting &&WoW.TargetIsCastingAndSpellIsInterruptible)
@@ -549,11 +587,19 @@ if ( WoW.TargetCastingSpellID == 200248
 						}
 						
 						// Revenge Control
-                        if (WoW.CanCast("Revenge") && WoW.Rage >= 43 && !WoW.PlayerHasBuff("Vengeance Revenge"))
+                        if (!AngerM && WoW.CanCast("Revenge") && WoW.Rage >= 43 && !WoW.PlayerHasBuff("Vengeance Revenge"))
                         {
                             WoW.CastSpell("Revenge");
                         }
-						if (WoW.CanCast("Revenge") && WoW.IsSpellOverlayed("Revenge") && WoW.PlayerHasBuff("Vengeance Revenge"))
+						if (AngerM && WoW.CanCast("Revenge") && WoW.Rage >= 43)
+                        {
+                            WoW.CastSpell("Revenge");
+                        }
+						if (AngerM && WoW.CanCast("Revenge") && WoW.IsSpellOverlayed("Revenge"))
+						{
+							WoW.CastSpell("Revenge");
+						} 
+						if (!AngerM && WoW.CanCast("Revenge") && WoW.IsSpellOverlayed("Revenge") && WoW.PlayerHasBuff("Vengeance Revenge"))
 						{
 							WoW.CastSpell("Revenge");
 						}
@@ -657,6 +703,7 @@ Spell,46968,Shockwave,None
 Spell,202168,Impending Victory,D9
 Spell,871,Shield Wall,F6
 Spell,12975,Last Stand,F5
+Spell,1160,Demoralizing Shout,F1
 Spell,23920,SpellReflect,D0
 Spell,1719,Battle Cry,F2
 Spell,0,HealthPotion,D7
