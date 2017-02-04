@@ -77,7 +77,7 @@ namespace PixelMagic.Rotation
             }
 
             //Call pet
-            if (!WoW.HasPet 
+            if (!WoW.HasPet
                 && !WoW.PlayerHasBuff("Mount")
                 && !WoW.PlayerHasBuff("Feign Death"))
             {                
@@ -147,19 +147,19 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Aspect of the Wild");
                         return;
                     }                    
-                }                
+                }
+
+
+                //Legendary Trinket
+                if (WoW.CanCast("Kil'jaeden's Burning Wish")
+                    && (((WoW.SpellCooldownTimeRemaining("Bestial Wrath") > 15 && WoW.SpellCooldownTimeRemaining("Dire Beast") > 5)) || WoW.PlayerHasBuff("Bestial Wrath"))
+                    && !WoW.ItemOnCooldown("Kil'jaeden's Burning Wish")
+                    && WoW.IsSpellInRange("Cobra Shot"))
+                {
+                    WoW.CastSpell("Kil'jaeden's Burning Wish");
+                }
 
                 //SINGLE TARGET
-                                       
-                        //Legendary Trinket
-                        if (WoW.CanCast("Kil'jaeden's Burning Wish")
-                            && (((WoW.SpellCooldownTimeRemaining("Bestial Wrath") > 15 && WoW.SpellCooldownTimeRemaining("Dire Beast") > 5)) || WoW.PlayerHasBuff("Bestial Wrath"))
-                            && !WoW.ItemOnCooldown("Kil'jaeden's Burning Wish")
-                            && WoW.IsSpellInRange("Cobra Shot"))
-                        {
-                            WoW.CastSpell("Kil'jaeden's Burning Wish");
-                        }
-
                         //Titan's Thunder
                         if (combatRoutine.Type == RotationType.SingleTarget
                             && WoW.CanCast("Titan's Thunder")
@@ -611,18 +611,16 @@ namespace PixelMagic.Rotation
         {
             try
             {
-                string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonEmbedName);
+
                 Log.Write("Addon emedding Editing in progress");
-                addonlua = addonlua.Replace("</Ui>",
-                                            "<Script file=\"lib\\LibSpellRange-1.0\\LibSpellRange-1.0.lua\"/>"
-                                            + Environment.NewLine + "<Script file = \"lib\\LibSpellRange-1.0\\LibSpellRange-1.0.xml\" />"
-                                            + Environment.NewLine + "</Ui>");
-                File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonEmbedName, addonlua);
-                Log.Write("Addon Embedding complete");
-                Thread.Sleep(2000);
-                while (WoW.HealthPercent == 0 || WoW.HastePercent == 0)
+                if (!File.Exists(Path.Combine("" + WoW.AddonPath + "\\" + AddonName + "\\", AddonEmbedName)))
                 {
-                    Thread.Sleep(2000);
+                    string addonlua = " < Ui xmlns = \"http://www.blizzard.com/wow/ui/\" xmlns: xsi = \"http://www.w3.org/2001/XMLSchema-instance \" xsi: schemaLocation = \"http://www.blizzard.com/wow/ui/ ..\\FrameXML\\UI.xsd\" >" + Environment.NewLine
+                + "< Script file = \"lib\\LibSpellRange-1.0\\LibSpellRange-1.0.lua\" />" + Environment.NewLine
+                + "</ Ui >" + Environment.NewLine;
+                    File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonEmbedName, addonlua);
+                    Log.Write("Addon Embedding complete");
+
                 }
                 AddonEmbeded = true;
             }
@@ -662,23 +660,58 @@ namespace PixelMagic.Rotation
         {
             try
             {
-                string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
-                Log.Write("Addon Editing in progress");
-                addonlua = addonlua.Replace("local lastCombat = nil" + Environment.NewLine + "local alphaColor = 1", "local lastCombat = nil" + Environment.NewLine + "local alphaColor = 1" + Environment.NewLine + CustomLua);
-                addonlua = addonlua.Replace("InitializeOne()" + Environment.NewLine + "            InitializeTwo()", "InitializeOne()" + Environment.NewLine + "            InitializeTwo()" + Environment.NewLine + "            InitializeThree()");
-                File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
-                //WoW.SendMacro("/reload");
-                while (WoW.HealthPercent == 0 || WoW.HastePercent == 0)
+                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + LuaAddon))
                 {
-                    Thread.Sleep(25);
+                    string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
+                    Log.Write("Addon Editing in progress");
+                    addonlua = addonlua.Replace("if name == \"Wild Imps\"", "if (name == \"Wild Imps\" or name == \"Spirit Wolf\" or name == \"Totem Mastery\")");
+                    addonlua = addonlua.Replace("and(startTime + duration - GetTime() > 1.6) ", "and(startTime + duration - GetTime() > (1.5 / (1 + (GetHaste() / 100) ))) ");
+                    addonlua = addonlua.Replace("end" + Environment.NewLine + Environment.NewLine + "local function InitializeTwo()", Environment.NewLine);
+                    addonlua = addonlua.Replace("	--print (\"Initialising Spell Charges Frames\")", "end" + Environment.NewLine + "local function InitializeTwo()" + Environment.NewLine + "	--print (\"Initialising Spell Charges Frames\")" + Environment.NewLine);
+                    addonlua = addonlua.Replace("IsSpellInRange(name, \"target\")", "LibStub(\"SpellRange-1.0\").IsSpellInRange(name, \"target\")");
+                    addonlua = addonlua.Replace("local function InitializeOne()", Environment.NewLine + CustomLua + Environment.NewLine + "local function InitializeOne()");
+                    addonlua = addonlua.Replace("InitializeOne()" + Environment.NewLine + "            InitializeTwo()", "InitializeOne()" + Environment.NewLine + "            InitializeTwo()" + Environment.NewLine + "            InitializeThree()");
+                    addonlua = addonlua.Replace("healthFrame:SetScript(\"OnUpdate\", updateHealth)", "");
+                    addonlua = addonlua.Replace("powerFrame: SetScript(\"OnUpdate\", updatePower)", "");
+                    addonlua = addonlua.Replace("	targetHealthFrame: SetScript(\"OnUpdate\", updateTargetHealth) ", "");
+                    addonlua = addonlua.Replace("unitCombatFrame: SetScript(\"OnUpdate\", updateCombat)", "");
+                    addonlua = addonlua.Replace("unitPowerFrame:SetScript(\"OnUpdate\", updateUnitPower)", "");
+                    addonlua = addonlua.Replace("isTargetFriendlyFrame: SetScript(\"OnUpdate\", updateIsFriendly)", "");
+                    addonlua = addonlua.Replace("playerIsCastingFrame: SetScript(\"OnUpdate\", updatePlayerIsCasting)", "");
+                    addonlua = addonlua.Replace("hasTargetFrame: SetScript(\"OnUpdate\", hasTarget)", "");
+                    addonlua = addonlua.Replace("targetIsCastingFrame: SetScript(\"OnUpdate\", updateTargetIsCasting)", "");
+                    addonlua = addonlua.Replace("hasteFrame: SetScript(\"OnUpdate\", updateHaste)", "");
+                    addonlua = addonlua.Replace("unitIsVisibleFrame: SetScript(\"OnUpdate\", updateUnitIsVisible)", "");
+                    addonlua = addonlua.Replace("petHealthFrame: SetScript(\"OnUpdate\", updatePetHealth)", "");
+                    addonlua = addonlua.Replace("wildPetsFrame: SetScript(\"OnUpdate\", updateWildPetsFrame)", "");
+                    addonlua = addonlua.Replace("cooldownframes[spellId]:SetScript(\"OnUpdate\", updateSpellCooldowns)", "");
+                    addonlua = addonlua.Replace("spellInRangeFrames[spellId]:SetScript(\"OnUpdate\", updateSpellInRangeFrames)", "");
+                    addonlua = addonlua.Replace("targetDebuffFrames[debuffId]:SetScript(\"OnUpdate\", updateTargetDebuffs)", "");
+                    addonlua = addonlua.Replace("updateSpellChargesFrame[spellId]:SetScript(\"OnUpdate\", updateSpellCharges)", "");
+                    addonlua = addonlua.Replace("TargetBuffs[buffId]:SetScript(\"OnUpdate\", updateTargetBuffs)", "");
+                    addonlua = addonlua.Replace("PlayerMovingFrame: SetScript(\"OnUpdate\", PlayerNotMove)", "");
+                    addonlua = addonlua.Replace("AutoAtackingFrame: SetScript(\"OnUpdate\", AutoAtacking)", "");
+                    addonlua = addonlua.Replace("targetIsPlayerFrame: SetScript(\"OnUpdate\", updateIsPlayer)", "");
+                    addonlua = addonlua.Replace("flagFrame: SetScript(\"OnUpdate\", updateFlag)", "");
+                    addonlua = addonlua.Replace("targetLastSpellFrame[i]:SetScript(\"OnUpdate\", updateTargetCurrentSpell)", "");
+                    addonlua = addonlua.Replace("targetArena1Frame[i]:SetScript(\"OnUpdate\", updateArena1Spell)", "");
+                    addonlua = addonlua.Replace("targetArena2Frame[i]:SetScript(\"OnUpdate\", updateArena2Spell)", "");
+                    addonlua = addonlua.Replace("targetArena3Frame[i]:SetScript(\"OnUpdate\", updateArena3Spell)", "");
+                    addonlua = addonlua.Replace("buffFrames[buffId]:SetScript(\"OnUpdate\", updateMyBuffs)", "");
+                    addonlua = addonlua.Replace("itemframes[itemId]:SetScript(\"OnUpdate\", updateItemCooldowns)", "");
+                    addonlua = addonlua.Replace("spellOverlayedFrames[spellId]:SetScript(\"OnUpdate\", updateIsSpellOverlayedFrames)", "");
+                    addonlua = addonlua.Replace("playerDebuffFrames[debuffId]:SetScript(\"OnUpdate\", updatePlayerDebuffs)", "");
+                    File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
+                    AddonEdited = true;
                 }
-                AddonEdited = true;
+                else
+                    Log.Write("Adddon failed to load, Pleaes check " + LuaAddon + " Is in PM.EXE directory,Rotation will not function with out it");
             }
             catch (Exception ex)
             {
                 MessageBox.Show("" + ex, "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
+            Log.Write("Editing Addon Complete");
         }
 
         public override Form SettingsForm { get; set; }
@@ -722,7 +755,7 @@ namespace PixelMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Sorcerer
-AddonName=
+AddonName=Quartz
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,136,Mend Pet,D8
