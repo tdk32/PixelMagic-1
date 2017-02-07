@@ -1,0 +1,288 @@
+﻿// winifix@gmail.com
+// ReSharper disable UnusedMember.Global
+
+
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+using PixelMagic.Helpers;
+
+namespace PixelMagic.Rotation
+{
+    public class DemonHunterHavoc : CombatRoutine
+    {
+        private NumericUpDown nudBlurPercentValue;
+
+        public override string Name => "Havoc dual by Jedix";
+
+        public override string Class => "Demon Hunter";
+
+        public override Form SettingsForm { get; set; }
+
+        public override void Initialize()
+        {
+            WoW.Speak("Welcome to PixelMagic Havoc by Jedix");
+
+            if (ConfigFile.ReadValue("DemonHunter", "Blur Usage Percent") == "")
+            {
+                ConfigFile.WriteValue("Demonhunter", "Blur Usage Percent", "45");
+            }
+            Log.Write("Welcome to Havoc dual by Jedix", Color.Green);
+            Log.Write("Suggested builds:single target - 3223311, aoe/cleave(good in myth+) - 1223112", Color.Green);
+			Log.Write("IMPORTANT!", Color.Red);
+			Log.Write("When you want to use single target build, use only single target rotation, when u want to use aoe build - use aoe/cleave rotations", Color.Black);
+			Log.Write("When use aoe/cleave rotation, use your jump and rush manually, to not fail (same for Meta burst)", Color.Black);
+
+            SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 800, Height = 490, ShowIcon = false};
+            var lblBlurPercent = new Label {Text = "Blur Health %", Left = 12, Top = 150};
+            SettingsForm.Controls.Add(lblBlurPercent);
+
+            nudBlurPercentValue = new NumericUpDown {Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("Demonhunter", "Blur Usage Percent"), Left = 108, Top = 145};
+            SettingsForm.Controls.Add(nudBlurPercentValue);
+
+            var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 662, Top = 408, Size = new Size(108, 31)};
+            cmdSave.Click += CmdSave_Click;
+
+            SettingsForm.Controls.Add(cmdSave);
+            nudBlurPercentValue.BringToFront();
+        }
+
+        private void CmdSave_Click(object sender, EventArgs e)
+        {
+            ConfigFile.WriteValue("Demonhunter", "Blur Usage Percent", nudBlurPercentValue.Value.ToString());
+        }
+
+        public override void Stop()
+        {
+        }
+
+        public override void Pulse()
+        {
+            if (combatRoutine.Type == RotationType.SingleTarget) // Do Single Target Stuff here
+            {
+                if (WoW.HasTarget && !WoW.PlayerIsChanneling && WoW.TargetIsEnemy && WoW.IsInCombat)
+                {
+                    if (WoW.PlayerHasBuff("Metamorphosis"))
+                    {
+						if (WoW.CanCast("Nemesis") && WoW.IsSpellInRange("Chaos Strike"))
+                        {
+                            WoW.CastSpell("Nemesis");
+                            return;
+                        }
+                        if (WoW.CanCast("Chaos Blades") && WoW.IsSpellInRange("Chaos Strike"))
+                        {
+                            WoW.CastSpell("Chaos Blades");
+                            return;
+                        }
+                        if (WoW.CanCast("FOTI") && WoW.IsSpellInRange("Chaos Strike"))
+                        {
+                            WoW.CastSpell("FOTI");
+                            return;
+                        }												
+						if (WoW.CanCast("Death Sweep") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury >= 15)
+                        {
+                            WoW.CastSpell("Death Sweep");
+                            return;
+                        }
+						if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.IsSpellInRange("Chaos Strike"))
+                        {
+                            WoW.CastSpell("Eye Beam");
+                            return;
+                        }
+                        if (WoW.CanCast("Annihilation") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury >= 70)
+                        {
+                            WoW.CastSpell("Annihilation");
+                            return;
+                        }
+                        //if (WoW.CanCast("Demons Bite") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury <= 70)  // Fury Generator
+                        //{
+                        //    WoW.CastSpell("Demons Bite");
+                        //    return;
+                        //}
+						if (WoW.CanCast("Throw Glaive") && WoW.IsSpellInRange("Throw Glaive"))
+                        {
+                            WoW.CastSpell("Throw Glaive");
+                            return;
+                        }
+                    }
+					if (WoW.CanCast("Nemesis") && WoW.IsSpellInRange("Nemesis"))
+                    {
+                        WoW.CastSpell("Nemesis");
+                        return;
+                    }
+                    if (WoW.CanCast("Chaos Blades") && WoW.IsSpellInRange("Chaos Strike"))
+                    {
+                        WoW.CastSpell("Chaos Blades");
+                        return;
+                    }
+
+                    if (WoW.CanCast("FOTI") && WoW.IsSpellInRange("Chaos Strike"))
+                    {
+                        WoW.CastSpell("FOTI");
+                        return;
+                    }
+					if (WoW.CanCast("Blade Dance") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury >= 15)
+                    {
+                        WoW.CastSpell("Blade Dance");
+                        return;
+                    }
+					if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.IsSpellInRange("Chaos Strike"))
+                    {
+                        WoW.CastSpell("Eye Beam");
+                        return;
+                    }
+                    if (WoW.CanCast("Chaos Strike") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury >= 70) // Fury Spender
+                    {
+                        WoW.CastSpell("Chaos Strike");
+                        return;
+                    }
+                    if (WoW.CanCast("Blur") && WoW.IsInCombat && WoW.HealthPercent <= (ConfigFile.ReadValue<int>("Demonhunter", "Blur Usage Percent")))
+                    {
+                        WoW.CastSpell("Blur");
+                        return;
+                    }
+                    //if (WoW.CanCast("Demons Bite") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury <= 70)  // Fury Generator
+                    //{
+                    //    WoW.CastSpell("Demons Bite");
+                     //   return;
+                    //}
+					if (WoW.CanCast("Throw Glaive") && WoW.IsSpellInRange("Throw Glaive"))
+                    {
+                        WoW.CastSpell("Throw Glaive");
+                        return;
+                    }
+                }
+            }
+            if (combatRoutine.Type == RotationType.AOE || combatRoutine.Type == RotationType.SingleTargetCleave)
+            {
+                // Do AOE Stuff here
+                if (WoW.HasTarget && !WoW.PlayerIsChanneling && WoW.TargetIsEnemy && WoW.IsInCombat)
+                {
+                    if (WoW.PlayerHasBuff("Metamorphosis"))
+                    {
+                        //if (WoW.CanCast("Chaos Blades") && !WoW.IsSpellOnCooldown("Chaos Blades") && WoW.HasBossTarget)
+                        //{
+                        //    WoW.CastSpell("Chaos Blades");
+                        //    return;
+                        //}
+                        if (WoW.CanCast("FOTI") && WoW.PlayerHasBuff("Momentum") && WoW.IsSpellInRange("Chaos Strike"))
+                        {
+                            WoW.CastSpell("FOTI");
+                            return;
+                        }
+						if (WoW.CanCast("Fel Barrage") && WoW.PlayerSpellCharges("Fel Barrage") == 5 && WoW.PlayerHasBuff("Momentum") && (WoW.PlayerBuffTimeRemaining("Momentum") >= 1) && WoW.IsSpellInRange("Fel Barrage"))
+                        {
+                            WoW.CastSpell("Fel Barrage");
+                            return;
+                        }						
+						if (WoW.CanCast("Death Sweep") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury >= 15)
+                        {
+                            WoW.CastSpell("Death Sweep");
+                            return;
+                        }
+						if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.PlayerHasBuff("Momentum") && (WoW.PlayerBuffTimeRemaining("Momentum") >= 1.5) && WoW.IsSpellInRange("Chaos Strike"))
+                        {
+                            WoW.CastSpell("Eye Beam");
+                            return;
+                        }
+                        if (WoW.CanCast("Annihilation") && WoW.IsSpellInRange("Chaos Strike") && (WoW.Fury >= 40 && WoW.PlayerHasBuff("Momentum") || WoW.Fury >= 70))
+                        {
+                            WoW.CastSpell("Annihilation");
+                            return;
+                        }
+						if (WoW.CanCast("Fel Barrage") && WoW.PlayerSpellCharges("Fel Barrage") >= 4 && WoW.PlayerHasBuff("Momentum") && (WoW.PlayerBuffTimeRemaining("Momentum") >= 1) && WoW.IsSpellInRange("Fel Barrage"))
+                        {
+                            WoW.CastSpell("Fel Barrage");
+                            return;
+                        }
+                        //if (WoW.CanCast("Demons Bite") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury <= 70)  // Fury Generator
+                        //{
+                        //    WoW.CastSpell("Demons Bite");
+                        //    return;
+                        //}
+						if (WoW.CanCast("Throw Glaive") && WoW.IsSpellInRange("Throw Glaive") && WoW.PlayerHasBuff("Momentum"))
+                        {
+                            WoW.CastSpell("Throw Glaive");
+                            return;
+                        }
+                    }
+                    //if (WoW.CanCast("Chaos Blades") && WoW.IsSpellInRange("Chaos Strike") && !WoW.IsSpellOnCooldown("Chaos Blades") && WoW.HasBossTarget)
+                    //{
+                    //    WoW.CastSpell("Chaos Blades");
+                    //    return;
+                    //}
+
+                    if (WoW.CanCast("FOTI") && WoW.PlayerHasBuff("Momentum") && WoW.IsSpellInRange("Chaos Strike"))
+                    {
+                        WoW.CastSpell("FOTI");
+                        return;
+                    }
+					if (WoW.CanCast("Fel Barrage") && WoW.PlayerSpellCharges("Fel Barrage") == 5 && WoW.PlayerHasBuff("Momentum") && (WoW.PlayerBuffTimeRemaining("Momentum") >= 1) && WoW.IsSpellInRange("Fel Barrage"))
+                    {
+                        WoW.CastSpell("Fel Barrage");
+                        return;
+                    }
+					if (WoW.CanCast("Blade Dance") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury >= 15)
+                    {
+                        WoW.CastSpell("Blade Dance");
+                        return;
+                    }
+					if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.PlayerHasBuff("Momentum") && (WoW.PlayerBuffTimeRemaining("Momentum") >= 1.5) && WoW.IsSpellInRange("Chaos Strike"))
+                    {
+                        WoW.CastSpell("Eye Beam");
+                        return;
+                    }
+                    if (WoW.CanCast("Chaos Strike") && WoW.IsSpellInRange("Chaos Strike") && (WoW.Fury >= 40 && WoW.PlayerHasBuff("Momentum") || WoW.Fury >= 70)) // Fury Spender
+                    {
+                        WoW.CastSpell("Chaos Strike");
+                        return;
+                    }
+					if (WoW.CanCast("Fel Barrage") && WoW.PlayerSpellCharges("Fel Barrage") >= 4 && WoW.PlayerHasBuff("Momentum") && (WoW.PlayerBuffTimeRemaining("Momentum") >= 1) && WoW.IsSpellInRange("Fel Barrage"))
+                    {
+                        WoW.CastSpell("Fel Barrage");
+                        return;
+                    }
+                    if (WoW.CanCast("Blur") && WoW.IsInCombat && WoW.HealthPercent <= (ConfigFile.ReadValue<int>("Demonhunter", "Blur Usage Percent")))
+                    {
+                        WoW.CastSpell("Blur");
+                        return;
+                    }
+                    //if (WoW.CanCast("Demons Bite") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury <= 70)  // Fury Generator
+                    //{
+                    //    WoW.CastSpell("Demons Bite");
+                     //   return;
+                    //}
+					if (WoW.CanCast("Throw Glaive") && WoW.IsSpellInRange("Throw Glaive") && WoW.PlayerHasBuff("Momentum"))
+                    {
+                        WoW.CastSpell("Throw Glaive");
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/*
+[AddonDetails.db]
+AddonAuthor=Jedix
+AddonName=Pawn
+WoWVersion=Legion - 70100
+[SpellBook.db]
+Spell,198013,Eye Beam,D2
+Spell,195072,Fel Rush,MButton
+Spell,206491,Nemesis,G
+Spell,162794,Chaos Strike,E
+Spell,185123,Throw Glaive,D3
+Spell,188499,Blade Dance,Q
+Spell,198793,Vengeful Retreat,D1
+Spell,201427,Annihilation,E
+Spell,210152,Death Sweep,Q
+Spell,191427,Metamorphosis,NumPad6
+Spell,198589,Blur,D4
+Spell,211053,Fel Barrage,NumPad1
+Spell,201467,FOTI,NumPad5
+Spell,211048,Chaos Blades,NumPad2
+Aura,162264,Metamorphosis
+Aura,208628,Momentum
+*/
