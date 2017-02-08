@@ -40,6 +40,10 @@ namespace PixelMagic.Rotation
 		private NumericUpDown SWHPPercentValue;
 		//HS HP Percent Selection
 		private NumericUpDown HSHPPercentValue;
+		//ImpendingVictory HP Percent Selection
+		private NumericUpDown IVHPPercentValue;
+		//
+		
 		
         public override string Name => "Protection Warrior";
 
@@ -153,9 +157,8 @@ namespace PixelMagic.Rotation
 			
             Log.Write("Welcome to Protection Warrior", Color.Red);
             Log.Write("Suggested build: 1213112", Color.Red);
-			Log.Write("Version 4.0", Color.Red);
-			Log.Write("Last Edited by Lesion 07/02 - Added Ability to edit some values to rotation settings.", Color.Blue);
-            WoW.Speak("Welcome to PixelMagic Protection Warrior by Lesion");
+			Log.Write("Version 4.1", Color.Red);
+			Log.Write("Last Edited by Lesion 08/02 - Added more abilities to edit.", Color.Blue);
 			
 			SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 350, Height = 250, ShowIcon = false};
 
@@ -271,34 +274,41 @@ namespace PixelMagic.Rotation
             SettingsForm.Controls.Add(AMint);
 			//
 			
-			var lblSBHPercent = new Label {Text = "SB HP %",Size = new Size(50, 13), Left = 145, Top = 14};
+			var lblSBHPercent = new Label {Text = "SB HP %",Size = new Size(80, 13), Left = 130, Top = 14};
             SettingsForm.Controls.Add(lblSBHPercent);
 
             SBHPPercentValue = new NumericUpDown {Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("ProtectionLesion", "SB HP Percent"), Left = 210, Top = 12};
             SettingsForm.Controls.Add(SBHPPercentValue);
 			//
 			
-			var lblLSHPercent = new Label {Text = "LS HP %",Size = new Size(50, 13), Left = 145, Top = 34};
+			var lblLSHPercent = new Label {Text = "LS HP %",Size = new Size(80, 13), Left = 130, Top = 34};
             SettingsForm.Controls.Add(lblLSHPercent);
 
             LSHPPercentValue = new NumericUpDown {Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("ProtectionLesion", "LS HP Percent"), Left = 210, Top = 32};
             SettingsForm.Controls.Add(LSHPPercentValue);
 			//
 			
-			var lblSWHPercent = new Label {Text = "SW HP %",Size = new Size(50, 13), Left = 145, Top = 54};
+			var lblSWHPercent = new Label {Text = "SW HP %",Size = new Size(80, 13), Left = 130, Top = 54};
             SettingsForm.Controls.Add(lblSWHPercent);
 
             SWHPPercentValue = new NumericUpDown {Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("ProtectionLesion", "SW HP Percent"), Left = 210, Top = 52};
             SettingsForm.Controls.Add(SWHPPercentValue);
 			//
 			
-			var lblHSHPercent = new Label {Text = "HP Stones or Pots HP %",Size = new Size(50, 13), Left = 145, Top = 74};
+			var lblHSHPercent = new Label {Text = "HP Stones or Pots HP %",Size = new Size(80, 13), Left = 130, Top = 74};
             SettingsForm.Controls.Add(lblHSHPercent);
 
             HSHPPercentValue = new NumericUpDown {Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("ProtectionLesion", "HS HP Percent"), Left = 210, Top = 72};
             SettingsForm.Controls.Add(HSHPPercentValue);
+			//
 			
+			var lblIVHPercent = new Label {Text = "ImpV or VR %",Size = new Size(80, 13), Left = 130, Top = 94};
+            SettingsForm.Controls.Add(lblIVHPercent);
+
+            IVHPPercentValue = new NumericUpDown {Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("ProtectionLesion", "IV HP Percent"), Left = 210, Top = 92};
+            SettingsForm.Controls.Add(IVHPPercentValue);
 			
+				
             var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 150, Size = new Size(120, 48)};
 
             generalint.Checked = generalInterrupts;
@@ -338,7 +348,7 @@ namespace PixelMagic.Rotation
 			LSHPPercentValue.BringToFront();
 			SWHPPercentValue.BringToFront();
 			HSHPPercentValue.BringToFront();
-			
+			IVHPPercentValue.BringToFront();
             
 			Log.Write("---------------------------------------------------------", Color.Blue);
             Log.Write("Interupt all 				= " + generalInterrupts, Color.Red);
@@ -354,6 +364,7 @@ namespace PixelMagic.Rotation
 			Log.Write("Last Stand being used 			@ " + LSHPPercentValue.Value + "%", Color.Red);
 			Log.Write("Shield Wall being used 			@ " + SWHPPercentValue.Value + "%", Color.Red);
 			Log.Write("Health Pots being used 			@ " + HSHPPercentValue.Value + "%", Color.Red);
+			Log.Write("ImpendingVic & Victory Rush used 	@ " + IVHPPercentValue.Value + "%", Color.Red);
 			Log.Write("---------------------------------------------------------", Color.Blue);
 			
 			
@@ -375,6 +386,7 @@ namespace PixelMagic.Rotation
 			ConfigFile.WriteValue("ProtectionLesion", "LS HP Percent", LSHPPercentValue.Value.ToString());
 			ConfigFile.WriteValue("ProtectionLesion", "SW HP Percent", SWHPPercentValue.Value.ToString());
 			ConfigFile.WriteValue("ProtectionLesion", "HS HP Percent", HSHPPercentValue.Value.ToString());
+			ConfigFile.WriteValue("ProtectionLesion", "IV HP Percent", IVHPPercentValue.Value.ToString());
 			
             MessageBox.Show("Settings saved", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SettingsForm.Close();
@@ -443,12 +455,12 @@ namespace PixelMagic.Rotation
             }
             if (WoW.HealthPercent < ConfigFile.ReadValue<int>("ProtectionLesion", "SW HP Percent") && WoW.CanCast("Shield Wall") && !WoW.IsSpellOnCooldown("Shield Wall"))
             {
-                WoW.CastSpell("Shield Wall");
+                WoW.CastSpell("Shield Wall") 	;
                 return;
             }
 			}
 			
-			if (Pots && WoW.IsInCombat && WoW.HealthPercent < 30)
+			if (Pots && WoW.IsInCombat && WoW.HealthPercent < ConfigFile.ReadValue<int>("ProtectionLesion", "HS HP Percent"))
 			{
 				if(WoW.ItemCount("Healthstone") >= 1 && !WoW.ItemOnCooldown("Healthstone") &&WoW.ItemCount("HealthPotion") == 0)
 				{
@@ -707,12 +719,12 @@ if ( WoW.TargetCastingSpellID == 200248
                             return;
                         }
                         					
-							if (ImpendingVic &&WoW.Rage >= 10&&!WoW.IsSpellOnCooldown("Impending Victory") && WoW.HealthPercent <= 80)
+							if (ImpendingVic &&WoW.Rage >= 10&&!WoW.IsSpellOnCooldown("Impending Victory") && WoW.HealthPercent <= ConfigFile.ReadValue<int>("ProtectionLesion", "IV HP Percent"))
 							{
 							WoW.CastSpell("Impending Victory");
 							return;
 							}
-							if (!ImpendingVic &&WoW.IsSpellOverlayed("Victory Rush") && WoW.HealthPercent <= 70)
+							if (!ImpendingVic &&WoW.IsSpellOverlayed("Victory Rush") && WoW.HealthPercent <= ConfigFile.ReadValue<int>("ProtectionLesion", "IV HP Percent"))
 							{
 							WoW.CastSpell("Victory Rush");
 							return;
