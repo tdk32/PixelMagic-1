@@ -641,22 +641,24 @@ if ( WoW.TargetCastingSpellID == 200248
 						
 						
                         // IP Control
-						if (WoW.CanCast("Ignore Pain") && (WoW.Rage >= 30) && !WoW.PlayerHasBuff("Vengeance Ignore Pain"))
+						if (WoW.CanCast("Ignore Pain") && (WoW.Rage >= 60) && !WoW.PlayerHasBuff("Vengeance Ignore Pain"))
                         {
                             WoW.CastSpell("Ignore Pain");
                             return;
                         }
-                        if (WoW.CanCast("Ignore Pain") && (WoW.Rage >= 13) && WoW.PlayerHasBuff("Vengeance Ignore Pain"))
+                        if (WoW.CanCast("Ignore Pain") && (WoW.Rage >= 39) && WoW.PlayerHasBuff("Vengeance Ignore Pain"))
                         {
                             WoW.CastSpell("Ignore Pain");
 						}
 						
 						// Revenge Control
-                        if (!AngerM && WoW.CanCast("Revenge") && WoW.Rage >= 43 && !WoW.PlayerHasBuff("Vengeance Revenge"))
+                        if (Indomitable)
+						{
+						if (!AngerM && WoW.CanCast("Revenge") && WoW.Rage >= 30 && !WoW.PlayerHasBuff("Vengeance Revenge"))
                         {
                             WoW.CastSpell("Revenge");
                         }
-						if (AngerM && WoW.CanCast("Revenge") && WoW.Rage >= 43)
+						if (AngerM && WoW.CanCast("Revenge") && WoW.Rage >= 30)
                         {
                             WoW.CastSpell("Revenge");
                         }
@@ -668,6 +670,59 @@ if ( WoW.TargetCastingSpellID == 200248
 						{
 							WoW.CastSpell("Revenge");
 						}
+						if (WoW.CanCast("Thunder Clap") && !WoW.IsSpellOnCooldown("Thunder Clap"))
+                        {
+                            WoW.CastSpell("Thunder Clap");
+                            return;
+                        }
+						}
+						
+						if (!Indomitable && swingwatch.ElapsedMilliseconds > 2700)
+						{
+						if (!AngerM && WoW.CanCast("Revenge") && WoW.Rage >= 30 && !WoW.PlayerHasBuff("Vengeance Revenge"))
+                        {
+                            WoW.CastSpell("Revenge");
+							swingwatch.Reset();
+							swingwatch.Start();
+							return;
+                        }
+						if (AngerM && WoW.CanCast("Revenge") && WoW.Rage >= 30)
+                        {
+                            WoW.CastSpell("Revenge");
+							swingwatch.Reset();
+							swingwatch.Start();
+							return;
+                        }
+						if (AngerM && WoW.CanCast("Revenge") && WoW.IsSpellOverlayed("Revenge"))
+						{
+							WoW.CastSpell("Revenge");
+							swingwatch.Reset();
+							swingwatch.Start();
+							return;
+						} 
+						if (!AngerM && WoW.CanCast("Revenge") && WoW.IsSpellOverlayed("Revenge") && WoW.PlayerHasBuff("Vengeance Revenge"))
+						{
+							WoW.CastSpell("Revenge");
+							swingwatch.Reset();
+							swingwatch.Start();
+							return;
+						}
+						if (!AngerM && WoW.CanCast("Revenge") && WoW.Rage >= 19 && !WoW.IsSpellOnCooldown("Revenge") && WoW.PlayerHasBuff("Vengeance Revenge"))
+						{
+							WoW.CastSpell("Revenge");
+							swingwatch.Reset();
+							swingwatch.Start();
+							return;
+						}
+						if (WoW.CanCast("Thunder Clap") && !WoW.IsSpellOnCooldown("Thunder Clap"))
+                        {
+                            WoW.CastSpell("Thunder Clap");
+                            swingwatch.Reset();
+							swingwatch.Start();
+							return;
+							
+                        }						
+						}
 						//Re-add the lines below if you are swimmming in rage
 						//
 						//if (WoW.CanCast("Revenge") && WoW.Rage >= 34 && WoW.PlayerHasBuff("Vengeance Revenge") &&!WoW.IsSpellOnCooldown("Revenge"))
@@ -676,29 +731,19 @@ if ( WoW.TargetCastingSpellID == 200248
 						//}
 						
 						//Rotational shiz
-						//It will wait 2.7 seconds for a devastate too proc shield slam. (bastardized swing timer)
-						if (!Indomitable &&!WoW.IsSpellOnCooldown("Shield Slam") &&swingwatch.ElapsedMilliseconds > 2700)
-					{
-						if (!WoW.IsSpellOverlayed("Shield Slam"))
+						
+						if (!Indomitable && (!WoW.IsSpellOnCooldown("Shield Slam") || WoW.IsSpellOverlayed("Shield Slam")) && !AngerM && WoW.PlayerHasBuff("Shield Block") && WoW.SpellCooldownTimeRemaining("Shield Block") > 2)
 						{
 							WoW.CastSpell("Shield Slam");
-							swingwatch.Reset();
-							swingwatch.Start();
 							return;
 										
-						}		
-					}
+						}
 						
-						if (Indomitable &&!WoW.IsSpellOnCooldown("Shield Slam"))
+						
+						if ((AngerM  || Indomitable) && (!WoW.IsSpellOnCooldown("Shield Slam") || WoW.IsSpellOverlayed("Shield Slam")))
 						{
 							WoW.CastSpell("Shield Slam");
 						}
-						
-						//if (Indomitable &&!WoW.IsSpellOverlayed("Shield Slam"))
-						//{
-						//	WoW.CastSpell("Shield Slam");
-						//	return;
-						//}		
 					//will cast SS when proc's
 						if (WoW.CanCast("Shield Slam") && WoW.IsSpellOverlayed("Shield Slam"))
                         {
@@ -712,12 +757,7 @@ if ( WoW.TargetCastingSpellID == 200248
                            WoW.CastSpell("Devastate");
                             return;
                         }
-					
-                        if (WoW.CanCast("Thunder Clap") && !WoW.IsSpellOnCooldown("Thunder Clap"))
-                        {
-                            WoW.CastSpell("Thunder Clap");
-                            return;
-                        }
+						
                         					
 							if (ImpendingVic &&WoW.Rage >= 10&&!WoW.IsSpellOnCooldown("Impending Victory") && WoW.HealthPercent <= ConfigFile.ReadValue<int>("ProtectionLesion", "IV HP Percent"))
 							{
@@ -772,6 +812,8 @@ Spell,1160,Demoralizing Shout,F1
 Spell,23920,SpellReflect,D0
 Spell,1719,Battle Cry,F2
 Spell,0,HealthPotion,D7
+Spell,1,Healthstone,D8
+Item,5512,Healthstone,D8
 Item,127834,HealthPotion,D7
 Aura,2565,Shield Block
 Aura,132168,ShockWavestun
