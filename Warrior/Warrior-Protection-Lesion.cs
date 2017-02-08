@@ -33,6 +33,7 @@ namespace PixelMagic.Rotation
 		//Tick for M+ booming/Angermanagement
 		private CheckBox AMint;
 		//SB HP Percent selection
+		private CheckBox RTDint;
 		private NumericUpDown SBHPPercentValue;
 		//LS HP Percent Selection
 		private NumericUpDown LSHPPercentValue;
@@ -146,6 +147,16 @@ namespace PixelMagic.Rotation
             }
             set { ConfigFile.WriteValue("ProtectionLesion", "AngerM", value.ToString()); }
         }
+		private static bool RetToDef
+        {
+            get
+            {
+                var RetToDef = ConfigFile.ReadValue("ProtectionLesion", "RetToDef").Trim();
+
+                return RetToDef != "" && Convert.ToBoolean(RetToDef);
+            }
+            set { ConfigFile.WriteValue("ProtectionLesion", "RetToDef", value.ToString()); }
+        }
 			
 		private readonly Stopwatch swingwatch = new Stopwatch();
 
@@ -153,6 +164,29 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
+			if (!RetToDef)
+			{
+			 if (ConfigFile.ReadValue("ProtectionLesion", "SB HP Percent") == "")
+            {
+                ConfigFile.WriteValue("ProtectionLesion", "SB HP Percent", "90");
+            }
+			 if (ConfigFile.ReadValue("ProtectionLesion", "LS HP Percent") == "")
+            {
+                ConfigFile.WriteValue("ProtectionLesion", "LS HP Percent", "35");
+            }
+			 if (ConfigFile.ReadValue("ProtectionLesion", "SW HP Percent") == "")
+            {
+                ConfigFile.WriteValue("ProtectionLesion", "SW HP Percent", "20");
+            }
+			 if (ConfigFile.ReadValue("ProtectionLesion", "HS HP Percent") == "")
+            {
+                ConfigFile.WriteValue("ProtectionLesion", "HS HP Percent", "30");
+            }
+			if (ConfigFile.ReadValue("ProtectionLesion", "IV HP Percent") == "")
+            {
+                ConfigFile.WriteValue("ProtectionLesion", "IV HP Percent", "80");
+            }
+			}
 			
 			
             Log.Write("Welcome to Protection Warrior", Color.Red);
@@ -248,7 +282,7 @@ namespace PixelMagic.Rotation
 
             BCint = new CheckBox {Checked = BattleC, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 104};
             SettingsForm.Controls.Add(BCint);
-			
+			//
 			var lblHPText = new Label //12; 129 is first value, Top is second.
             {
                 Text = "Use HP Pot",
@@ -258,9 +292,9 @@ namespace PixelMagic.Rotation
             };
             SettingsForm.Controls.Add(lblHPText); //113; 114 
 
-            HPint = new CheckBox {Checked = BattleC, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 119};
+            HPint = new CheckBox {Checked = Pots, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 119};
             SettingsForm.Controls.Add(HPint);
-			
+			//						
 			var lblAMText = new Label //12; 129 is first value, Top is second.
             {
                 Text = "M+ AM/BV",
@@ -270,8 +304,20 @@ namespace PixelMagic.Rotation
             };
             SettingsForm.Controls.Add(lblAMText); //113; 114 
 
-            AMint = new CheckBox {Checked = BattleC, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 134};
+            AMint = new CheckBox {Checked = AngerM, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 134};
             SettingsForm.Controls.Add(AMint);
+			//
+			var lblRTDText = new Label //12; 129 is first value, Top is second.
+            {
+                Text = "Custom %",
+                Size = new Size(70, 13), //95; 13
+                Left = 160,
+                Top = 120
+            };
+            SettingsForm.Controls.Add(lblRTDText); //113; 114 
+
+            RTDint = new CheckBox {Checked = RetToDef, TabIndex = 7, Size = new Size(15, 14), Left = 240, Top = 120};
+            SettingsForm.Controls.Add(RTDint);
 			//
 			
 			var lblSBHPercent = new Label {Text = "SB HP %",Size = new Size(80, 13), Left = 130, Top = 14};
@@ -320,6 +366,7 @@ namespace PixelMagic.Rotation
 			BCint.Checked = BattleC;
 			HPint.Checked = Pots;
 			AMint.Checked = AngerM;
+			RTDint.Checked = RetToDef;
 			
 
             cmdSave.Click += CmdSave_Click;
@@ -332,6 +379,7 @@ namespace PixelMagic.Rotation
 			BCint.CheckedChanged += BC_Click;
 			HPint.CheckedChanged += HP_Click;
 			AMint.CheckedChanged += AM_Click;
+			RTDint.CheckedChanged += RTD_Click;
 			
 
             SettingsForm.Controls.Add(cmdSave);
@@ -344,6 +392,7 @@ namespace PixelMagic.Rotation
 			lblBattleCText.BringToFront();
 			lblHPText.BringToFront();
 			lblAMText.BringToFront();
+			lblRTDText.BringToFront();
 			SBHPPercentValue.BringToFront();
 			LSHPPercentValue.BringToFront();
 			SWHPPercentValue.BringToFront();
@@ -380,6 +429,7 @@ namespace PixelMagic.Rotation
 			BattleC = BCint.Checked;
 			Pots = HPint.Checked;
 			AngerM = AMint.Checked;
+			RetToDef = RTDint.Checked;
 			
 			
 			ConfigFile.WriteValue("ProtectionLesion", "SB HP Percent", SBHPPercentValue.Value.ToString());
@@ -435,6 +485,10 @@ namespace PixelMagic.Rotation
         {
             AngerM = AMint.Checked;
         }
+		private void RTD_Click(object sender, EventArgs e)
+		{
+			RetToDef = RTDint.Checked;
+		}
 		
 		
         public override void Stop()
