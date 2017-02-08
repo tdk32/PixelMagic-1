@@ -31,8 +31,8 @@ namespace PixelMagic.Rotation
         public override void Initialize()
         {
 
-            Log.Write("Welcome to Hunter Beastmastery by Vectarius & ES", Color.Green);
-            WoW.Speak("Welcome to Pixelmagic Beastmastery Rotation & ES");
+            Log.Write("Welcome to Hunter Beastmastery by Goat", Color.Green);
+            WoW.Speak("Welcome to Pixelmagic Beastmastery Rotation by Goat");
 
             SettingsForm = new Form
             {
