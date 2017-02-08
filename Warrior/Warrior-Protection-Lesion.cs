@@ -32,7 +32,14 @@ namespace PixelMagic.Rotation
 		private CheckBox HPint;
 		//Tick for M+ booming/Angermanagement
 		private CheckBox AMint;
-		
+		//SB HP Percent selection
+		private NumericUpDown SBHPPercentValue;
+		//LS HP Percent Selection
+		private NumericUpDown LSHPPercentValue;
+		//SW HP Percent Selection
+		private NumericUpDown SWHPPercentValue;
+		//HS HP Percent Selection
+		private NumericUpDown HSHPPercentValue;
 		
         public override string Name => "Protection Warrior";
 
@@ -135,21 +142,22 @@ namespace PixelMagic.Rotation
             }
             set { ConfigFile.WriteValue("ProtectionLesion", "AngerM", value.ToString()); }
         }
-	
+			
 		private readonly Stopwatch swingwatch = new Stopwatch();
 
         public override Form SettingsForm { get; set; }
 
         public override void Initialize()
         {
-		
+			
+			
             Log.Write("Welcome to Protection Warrior", Color.Red);
             Log.Write("Suggested build: 1213112", Color.Red);
-			Log.Write("3.21", Color.Red);
-			Log.Write("Last Edited by Lesion 25/01/17 - added rage limit for impending victory ", Color.Blue);
+			Log.Write("Version 4.0", Color.Red);
+			Log.Write("Last Edited by Lesion 07/02 - Added Ability to edit some values to rotation settings.", Color.Blue);
             WoW.Speak("Welcome to PixelMagic Protection Warrior by Lesion");
 			
-			SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 160, Height = 250, ShowIcon = false};
+			SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 350, Height = 250, ShowIcon = false};
 
             //var picBox = new PictureBox {Left = 0, Top = 0, Width = 800, Height = 100, Image = TopLogo};
             //SettingsForm.Controls.Add(picBox);
@@ -261,7 +269,36 @@ namespace PixelMagic.Rotation
 
             AMint = new CheckBox {Checked = BattleC, TabIndex = 7, Size = new Size(15, 14), Left = 115, Top = 134};
             SettingsForm.Controls.Add(AMint);
-			 
+			//
+			
+			var lblSBHPercent = new Label {Text = "SB HP %",Size = new Size(50, 13), Left = 145, Top = 14};
+            SettingsForm.Controls.Add(lblSBHPercent);
+
+            SBHPPercentValue = new NumericUpDown {Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("ProtectionLesion", "SB HP Percent"), Left = 210, Top = 12};
+            SettingsForm.Controls.Add(SBHPPercentValue);
+			//
+			
+			var lblLSHPercent = new Label {Text = "LS HP %",Size = new Size(50, 13), Left = 145, Top = 34};
+            SettingsForm.Controls.Add(lblLSHPercent);
+
+            LSHPPercentValue = new NumericUpDown {Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("ProtectionLesion", "LS HP Percent"), Left = 210, Top = 32};
+            SettingsForm.Controls.Add(LSHPPercentValue);
+			//
+			
+			var lblSWHPercent = new Label {Text = "SW HP %",Size = new Size(50, 13), Left = 145, Top = 54};
+            SettingsForm.Controls.Add(lblSWHPercent);
+
+            SWHPPercentValue = new NumericUpDown {Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("ProtectionLesion", "SW HP Percent"), Left = 210, Top = 52};
+            SettingsForm.Controls.Add(SWHPPercentValue);
+			//
+			
+			var lblHSHPercent = new Label {Text = "HP Stones or Pots HP %",Size = new Size(50, 13), Left = 145, Top = 74};
+            SettingsForm.Controls.Add(lblHSHPercent);
+
+            HSHPPercentValue = new NumericUpDown {Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("ProtectionLesion", "HS HP Percent"), Left = 210, Top = 72};
+            SettingsForm.Controls.Add(HSHPPercentValue);
+			
+			
             var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 150, Size = new Size(120, 48)};
 
             generalint.Checked = generalInterrupts;
@@ -273,7 +310,7 @@ namespace PixelMagic.Rotation
 			BCint.Checked = BattleC;
 			HPint.Checked = Pots;
 			AMint.Checked = AngerM;
-            
+			
 
             cmdSave.Click += CmdSave_Click;
             generalint.CheckedChanged += GI_Click;
@@ -285,6 +322,7 @@ namespace PixelMagic.Rotation
 			BCint.CheckedChanged += BC_Click;
 			HPint.CheckedChanged += HP_Click;
 			AMint.CheckedChanged += AM_Click;
+			
 
             SettingsForm.Controls.Add(cmdSave);
             lblGeneralInterruptsText.BringToFront();
@@ -296,20 +334,28 @@ namespace PixelMagic.Rotation
 			lblBattleCText.BringToFront();
 			lblHPText.BringToFront();
 			lblAMText.BringToFront();
-			
-			
+			SBHPPercentValue.BringToFront();
+			LSHPPercentValue.BringToFront();
+			SWHPPercentValue.BringToFront();
+			HSHPPercentValue.BringToFront();
 			
             
-
-            Log.Write("Interupt all = " + generalInterrupts, Color.Red);
-            Log.Write("Mythic Plus = " + mythicplusinterrupts, Color.Red);
-			Log.Write("Def-cooldowns being used = " + defcooldowns, Color.Red);
-			Log.Write("Spell Reflect = " + spellref, Color.Red);
-			Log.Write("Using Impending Victory = " + ImpendingVic, Color.Red);
-			Log.Write("Using Indomitable Talent = " + Indomitable, Color.Red);
-			Log.Write("Auto using Battle Cry = " + BattleC, Color.Red);
-			Log.Write("Use HP Pots = " + Pots, Color.Red);
-			Log.Write("Use Booming voice & Anger Management for M+/AoE..ish = " + AngerM, Color.Red);
+			Log.Write("---------------------------------------------------------", Color.Blue);
+            Log.Write("Interupt all 				= " + generalInterrupts, Color.Red);
+            Log.Write("Mythic Plus				= " + mythicplusinterrupts, Color.Red);
+			Log.Write("Def-cooldowns being used 		= " + defcooldowns, Color.Red);
+			Log.Write("Spell Reflect 				= " + spellref, Color.Red);
+			Log.Write("Using Impending Victory 			= " + ImpendingVic, Color.Red);
+			Log.Write("Using Indomitable Talent 			= " + Indomitable, Color.Red);
+			Log.Write("Auto using Battle Cry 			= " + BattleC, Color.Red);
+			Log.Write("Use HP Pots 				= " + Pots, Color.Red);
+			Log.Write("Use Bv & AM for M+&Magic 		= " + AngerM, Color.Red);
+			Log.Write("Shield Block being used 			@ " + SBHPPercentValue.Value + "%", Color.Red);
+			Log.Write("Last Stand being used 			@ " + LSHPPercentValue.Value + "%", Color.Red);
+			Log.Write("Shield Wall being used 			@ " + SWHPPercentValue.Value + "%", Color.Red);
+			Log.Write("Health Pots being used 			@ " + HSHPPercentValue.Value + "%", Color.Red);
+			Log.Write("---------------------------------------------------------", Color.Blue);
+			
 			
         }
 		private void CmdSave_Click(object sender, EventArgs e)
@@ -325,10 +371,17 @@ namespace PixelMagic.Rotation
 			AngerM = AMint.Checked;
 			
 			
+			ConfigFile.WriteValue("ProtectionLesion", "SB HP Percent", SBHPPercentValue.Value.ToString());
+			ConfigFile.WriteValue("ProtectionLesion", "LS HP Percent", LSHPPercentValue.Value.ToString());
+			ConfigFile.WriteValue("ProtectionLesion", "SW HP Percent", SWHPPercentValue.Value.ToString());
+			ConfigFile.WriteValue("ProtectionLesion", "HS HP Percent", HSHPPercentValue.Value.ToString());
+			
             MessageBox.Show("Settings saved", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SettingsForm.Close();
         }
-
+		
+		
+							
         private void GI_Click(object sender, EventArgs e)
         {
             generalInterrupts = generalint.Checked;
@@ -383,12 +436,12 @@ namespace PixelMagic.Rotation
 			
 			if (defcooldowns && WoW.IsInCombat)
 			{
-			if (WoW.HealthPercent < 35 && WoW.CanCast("Last Stand") && !WoW.IsSpellOnCooldown("Last Stand"))
+			if (WoW.HealthPercent < ConfigFile.ReadValue<int>("ProtectionLesion", "LS HP Percent") && WoW.CanCast("Last Stand") && !WoW.IsSpellOnCooldown("Last Stand"))
             {
                 WoW.CastSpell("Last Stand");
                 return;
             }
-            if (WoW.HealthPercent < 20 && WoW.CanCast("Shield Wall") && !WoW.IsSpellOnCooldown("Shield Wall"))
+            if (WoW.HealthPercent < ConfigFile.ReadValue<int>("ProtectionLesion", "SW HP Percent") && WoW.CanCast("Shield Wall") && !WoW.IsSpellOnCooldown("Shield Wall"))
             {
                 WoW.CastSpell("Shield Wall");
                 return;
@@ -562,7 +615,7 @@ if ( WoW.TargetCastingSpellID == 200248
 							}
 					}
 																
-						if (WoW.CanCast("Shield Block") &&WoW.HealthPercent <= 90 && WoW.Rage >= 15 && !WoW.IsSpellOnCooldown("Shield Block") &&!WoW.PlayerHasBuff("Shield Block"))
+						if (WoW.CanCast("Shield Block") &&WoW.HealthPercent <= ConfigFile.ReadValue<int>("ProtectionLesion", "SB HP Percent") && WoW.Rage >= 15 && !WoW.IsSpellOnCooldown("Shield Block") &&!WoW.PlayerHasBuff("Shield Block"))
                         {
                             WoW.CastSpell("Shield Block");
                             return;
