@@ -198,9 +198,9 @@ namespace PixelMagic.Rotation
 		
         public override void Initialize()
         {
-            Log.Write("CreepyFireMage Rotation V2.7. Please report any issues #mage with @Creepyjoker tag, on PM Discord channel.", Color.Green);
+            Log.Write("CreepyFireMage Rotation V2.8. Please report any issues #mage with @Creepyjoker tag, on PM Discord channel.", Color.Green);
 			Log.Write("Supported talents - Check rotation settings.", Color.Green);
-			Log.Write("Make sure you created the macro /cast [@cursor] Flamestrike ; /cast [@cursor] Ring of Frost and /cast [@cursor] Meteor and it's also set on your keybind.", Color.Red);
+			Log.Write("Make sure you created the macro /stopcasting /cast Phoenix's Flames ; /cast [@cursor] Flamestrike ; /cast [@cursor] Ring of Frost and /cast [@cursor] Meteor and it's also set on your keybind.", Color.Red);
 			Log.Write("Check README from Rotation Settings for further informations.", Color.Red);
             WoW.Speak("Welcome to CreepyFireMage rotation. Donators Version.");
 			//
@@ -677,7 +677,7 @@ namespace PixelMagic.Rotation
 				}
 				if (WoW.PlayerIsCasting && UseCooldowns && WoW.PlayerHasBuff("Heating Up") && Combustion && WoW.PlayerSpellCharges("Phoenix's Flames") == 3 && !WoW.IsSpellOnCooldown("Combustion"))
 				{
-					WoW.SendMacro("/stopcasting");
+					WoW.CastSpell("Phoenix's Flames");
 					return;
 				}
 				if (WoW.CanCast("Phoenix's Flames") && !WoW.PlayerHasBuff("Hot Streak!") && WoW.PlayerHasBuff("Heating Up") && WoW.LastSpell != ("Fire Blast") && WoW.LastSpell != ("Phoenix's Flames") && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 1.1 && !UseCooldowns && Combustion && WoW.PlayerSpellCharges("Phoenix's Flames") >= 2 && !WoW.IsSpellOnCooldown("Combustion"))
@@ -854,7 +854,7 @@ namespace PixelMagic.Rotation
 				}
 				if (WoW.PlayerIsCasting && UseCooldowns && WoW.PlayerHasBuff("Heating Up") && Combustion && WoW.PlayerSpellCharges("Phoenix's Flames") == 3 && !WoW.IsSpellOnCooldown("Combustion"))
 				{
-					WoW.SendMacro("/stopcasting");
+					WoW.CastSpell("Phoenix's Flames");
 					return;
 				}
 				if (WoW.CanCast("Phoenix's Flames") && !WoW.PlayerHasBuff("Hot Streak!") && WoW.PlayerHasBuff("Heating Up") && WoW.LastSpell != ("Fire Blast") && WoW.LastSpell != ("Phoenix's Flames") && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 1.1 && !UseCooldowns && Combustion && WoW.PlayerSpellCharges("Phoenix's Flames") >= 2 && !WoW.IsSpellOnCooldown("Combustion"))
