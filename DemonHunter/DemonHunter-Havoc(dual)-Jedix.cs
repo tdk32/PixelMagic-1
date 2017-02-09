@@ -112,7 +112,7 @@ namespace PixelMagic.Rotation
                             return;
                         }
                     }
-					if (WoW.CanCast("Nemesis") && WoW.IsSpellInRange("Nemesis"))
+					if (WoW.CanCast("Nemesis") && WoW.IsSpellInRange("Chaos Strike"))
                     {
                         WoW.CastSpell("Nemesis");
                         return;
