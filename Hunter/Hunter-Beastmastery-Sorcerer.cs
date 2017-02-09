@@ -116,7 +116,7 @@ namespace PixelMagic.Rotation
                     return;
                 }
 
-                //Intimidation
+                //Intimidation //Binding Shot
                 if (DetectKeyPress.GetKeyState(DetectKeyPress.Ctrl) < 0                    
                     && ((WoW.CanCast("Intimidation") && CharInfo.T5 == 3) || (WoW.CanCast("Binding Shot") && CharInfo.T5 == 1)))
                 {
@@ -149,7 +149,6 @@ namespace PixelMagic.Rotation
                     }                    
                 }
 
-
                 //Legendary Trinket
                 if (WoW.CanCast("Kil'jaeden's Burning Wish")
                     && (((WoW.SpellCooldownTimeRemaining("Bestial Wrath") > 15 && WoW.SpellCooldownTimeRemaining("Dire Beast") > 5)) || WoW.PlayerHasBuff("Bestial Wrath"))
@@ -163,7 +162,7 @@ namespace PixelMagic.Rotation
                         //Titan's Thunder
                         if (combatRoutine.Type == RotationType.SingleTarget
                             && WoW.CanCast("Titan's Thunder")
-                            && (WoW.PlayerBuffTimeRemaining("Dire Beast") >= 7)
+                            && (WoW.PlayerBuffTimeRemaining("Dire Beast") >= 6)
                             && (WoW.PlayerHasBuff("Dire Beast") || CharInfo.T2 == 2))
                         {
                             WoW.CastSpell("Titan's Thunder");
@@ -252,7 +251,7 @@ namespace PixelMagic.Rotation
                     //Titan's Thunder
                     if (combatRoutine.Type == RotationType.AOE
                         && WoW.CanCast("Titan's Thunder")
-                        && (WoW.PlayerBuffTimeRemaining("Dire Beast") >= 7)
+                        && (WoW.PlayerBuffTimeRemaining("Dire Beast") >= 6)
                         && (WoW.PlayerHasBuff("Dire Beast") || CharInfo.T2 == 2))
                     {
                         WoW.CastSpell("Titan's Thunder");
@@ -318,7 +317,7 @@ namespace PixelMagic.Rotation
                     //Titan's Thunder
                     if (combatRoutine.Type == RotationType.SingleTargetCleave
                         && WoW.CanCast("Titan's Thunder")
-                        && (WoW.PlayerBuffTimeRemaining("Dire Beast") >= 7)
+                        && (WoW.PlayerBuffTimeRemaining("Dire Beast") >= 6)
                         && (WoW.PlayerHasBuff("Dire Beast") || CharInfo.T2 == 2))
                     {
                         WoW.CastSpell("Titan's Thunder");
