@@ -13,7 +13,8 @@ namespace PixelMagic.Rotation
 {
     public class ProtectionLesion : CombatRoutine
     {	
-
+		
+		private static float AttackspeedMS = Convert.ToSingle((2.6f / (1 + (WoW.HastePercent / 100f))) * 1000f);
 	    //will interrupt anything it can
 		private CheckBox generalint;
 		//will check a list of spells and interrupt ones deemed important by wowhead guides
@@ -164,6 +165,8 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
+			
+						
 			if (!RetToDef)
 			{
 			 if (ConfigFile.ReadValue("ProtectionLesion", "SB HP Percent") == "")
@@ -731,7 +734,11 @@ if ( WoW.TargetCastingSpellID == 200248
                         }
 						}
 						
-						if (!Indomitable && swingwatch.ElapsedMilliseconds > 2700)
+						// Maths
+						// 
+						
+						
+						if (!Indomitable && swingwatch.ElapsedMilliseconds > AttackspeedMS)
 						{
 						if (!AngerM && WoW.CanCast("Revenge") && WoW.Rage >= 30 && !WoW.PlayerHasBuff("Vengeance Revenge"))
                         {
@@ -840,6 +847,9 @@ if ( WoW.TargetCastingSpellID == 200248
                 // Do AOE Stuff here
             }
         }
+		
+		
+			
     }
 }
 
