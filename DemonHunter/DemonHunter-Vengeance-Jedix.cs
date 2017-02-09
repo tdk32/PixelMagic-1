@@ -1,5 +1,6 @@
-﻿// winifix@gmail.com
+// winifix@gmail.com
 // ReSharper disable UnusedMember.Global
+// Todo: right range of Throw Glaive spell 204157
 
 
 using System.Diagnostics;
@@ -48,7 +49,7 @@ namespace PixelMagic.Rotation
 
             if (combatRoutine.Type == RotationType.SingleTarget)  // Do Single Target Stuff here
             {
-                if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerIsChanneling)
+                if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerIsChanneling && WoW.IsInCombat)  //Pull need to do by yourself - to prevent a mess
                 {
                     if (WoW.HealthPercent < 30 && !WoW.IsSpellOnCooldown("Metamorphasis"))
                     {
@@ -57,7 +58,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Metamorphasis"); // Off the GCD no return needed
                     }
 
-                    if (!WoW.IsSpellInRange("Soul Carver") && !WoW.IsSpellOnCooldown("Throw Glaive") && WoW.IsSpellInRange("Throw Glaive"))
+                    if (WoW.CanCast("Throw Glaive") && !WoW.IsSpellInRange("Soul Carver") && WoW.IsSpellInRange("Fel Eruption")) //Need to implement range 30y for Throw Glaive spell 204157
                     {
                         WoW.CastSpell("Throw Glaive");
                         return; 
@@ -87,7 +88,7 @@ namespace PixelMagic.Rotation
                         }
                     }
 
-                    if (!WoW.TargetHasDebuff("Fiery Demise") && !WoW.IsSpellOnCooldown("Fiery Brand"))
+                    if (WoW.CanCast("Fiery Brand") && !WoW.TargetHasDebuff("Fiery Demise"))
                     {
                         WoW.CastSpell("Fiery Brand");
                     }
@@ -126,6 +127,12 @@ namespace PixelMagic.Rotation
                     if (WoW.CanCast("Demon Spikes") && !WoW.PlayerHasBuff("Demon Spikes") && (WoW.Pain == 100 || WoW.HealthPercent < 80 && WoW.Pain >= 20 )) // to not waste cd and pain
                     {
                         WoW.CastSpell("Demon Spikes");
+                    }
+					
+					if (WoW.CanCast("Soul Cleave") && WoW.Pain >= 30 && WoW.HealthPercent < 25) // Extra save, when we are on too low hp
+                    {
+                        WoW.CastSpell("Soul Cleave");
+                        return;
                     }
 					
 					if (WoW.CanCast("Soul Cleave") && WoW.Pain >= 80 && WoW.HealthPercent < 50 && !WoW.CanCast("Demon Spikes"))
@@ -186,7 +193,7 @@ namespace PixelMagic.Rotation
             }
 			if (combatRoutine.Type == RotationType.SingleTargetCleave)
 			{
-				if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerIsChanneling)
+				if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerIsChanneling && WoW.IsInCombat)  //Pull need to do by yourself - to prevent a mess
                 {
                     if (WoW.HealthPercent < 30 && !WoW.IsSpellOnCooldown("Metamorphasis"))
                     {
@@ -195,7 +202,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Metamorphasis"); // Off the GCD no return needed
                     }
 
-                    if (!WoW.IsSpellInRange("Soul Carver") && !WoW.IsSpellOnCooldown("Throw Glaive") && WoW.IsSpellInRange("Throw Glaive"))
+                    if (!WoW.IsSpellInRange("Soul Carver") && !WoW.IsSpellOnCooldown("Throw Glaive") && WoW.IsSpellInRange("Fel Eruption")) //Need to implement range 30y for Throw Glaive spell 204157
                     {
                         WoW.CastSpell("Throw Glaive");
                         return; 
@@ -225,7 +232,7 @@ namespace PixelMagic.Rotation
                         }
                     }
 
-                    if (!WoW.TargetHasDebuff("Fiery Demise") && !WoW.IsSpellOnCooldown("Fiery Brand"))
+                    if (WoW.CanCast("Fiery Brand") && !WoW.TargetHasDebuff("Fiery Demise"))
                     {
                         WoW.CastSpell("Fiery Brand");
                     }
@@ -265,7 +272,13 @@ namespace PixelMagic.Rotation
                     {
                         WoW.CastSpell("Demon Spikes");
                     }
-
+					
+					if (WoW.CanCast("Soul Cleave") && WoW.Pain >= 30 && WoW.HealthPercent < 25) // Extra save, when we are on too low hp
+                    {
+                        WoW.CastSpell("Soul Cleave");
+                        return;
+                    }
+					
 					if (WoW.CanCast("Soul Cleave") && WoW.Pain >= 60 && WoW.PlayerHasBuff("Demon Spikes"))
                     {
                         WoW.CastSpell("Soul Cleave");
@@ -312,7 +325,7 @@ namespace PixelMagic.Rotation
 			}
             if (combatRoutine.Type == RotationType.AOE)
             {
-                if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerIsChanneling)
+                if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerIsChanneling && WoW.IsInCombat)  //Pull need to do by yourself - to prevent a mess
                 {
                     if (WoW.HealthPercent < 30 && !WoW.IsSpellOnCooldown("Metamorphasis"))
                     {
@@ -321,7 +334,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Metamorphasis"); // Off the GCD no return needed
                     }
 
-                    if (!WoW.IsSpellInRange("Soul Carver") && !WoW.IsSpellOnCooldown("Throw Glaive") && WoW.IsSpellInRange("Throw Glaive"))
+                    if (!WoW.IsSpellInRange("Soul Carver") && !WoW.IsSpellOnCooldown("Throw Glaive") && WoW.IsSpellInRange("Fel Eruption")) //Need to implement range 30y for Throw Glaive spell 204157
                     {
                         WoW.CastSpell("Throw Glaive");
                         return; 
@@ -351,7 +364,7 @@ namespace PixelMagic.Rotation
                         }
                     }
 
-                    if (!WoW.TargetHasDebuff("Fiery Demise") && !WoW.IsSpellOnCooldown("Fiery Brand"))
+                    if (WoW.CanCast("Fiery Brand") && !WoW.TargetHasDebuff("Fiery Demise"))
                     {
                         WoW.CastSpell("Fiery Brand");
                     }
@@ -390,6 +403,12 @@ namespace PixelMagic.Rotation
                     if (WoW.CanCast("Demon Spikes") && !WoW.PlayerHasBuff("Demon Spikes") && (WoW.Pain == 100 || WoW.HealthPercent < 80 && WoW.Pain >= 20 )) // to not waste cd and pain
                     {
                         WoW.CastSpell("Demon Spikes");
+                    }
+					
+					if (WoW.CanCast("Soul Cleave") && WoW.Pain >= 30 && WoW.HealthPercent < 25) // Extra save, when we are on too low hp
+                    {
+                        WoW.CastSpell("Soul Cleave");
+                        return;
                     }
 					
 					if (WoW.CanCast("Soul Cleave") && WoW.Pain >= 60 && WoW.PlayerHasBuff("Demon Spikes"))
@@ -477,4 +496,3 @@ Aura,41252,Mount
 Aura,207472,Magnum Opus
 Item,80610,Mana
 */
-
