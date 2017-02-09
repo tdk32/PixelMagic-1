@@ -376,7 +376,7 @@ public override void Pulse()
 						//WoW.CastSpell("Potion Power");
 						//return;
 					//}
-					if (WoW.CanCast("Kill Command") && WoW.Focus >= 100 && WoW.IsSpellInRange("Kill Command") && !(WoW.SpellCooldownTimeRemaining("Bestial Wrath") <= 2))
+					if (WoW.CanCast("Kill Command") && WoW.Focus >= 100 && WoW.IsSpellInRange("Kill Command"))
                     {
                         WoW.CastSpell("Kill Command");
                         return;
@@ -390,7 +390,7 @@ public override void Pulse()
                         return;
 						}
                     }
-                    if (WoW.CanCast("Kill Command") && WoW.Focus >= 30 && WoW.IsSpellInRange("Kill Command") && !(WoW.SpellCooldownTimeRemaining("Bestial Wrath") <= 2))
+                    if (WoW.CanCast("Kill Command") && WoW.Focus >= 30 && WoW.IsSpellInRange("Kill Command"))
                     {
                         WoW.CastSpell("Kill Command");
                         return;
