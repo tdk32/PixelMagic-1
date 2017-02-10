@@ -400,12 +400,12 @@ public override void Pulse()
                         WoW.CastSpell("Cobra Shot");
                         return;
                     }					
-					if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 110) && WoW.IsSpellInRange("Cobra Shot") && ((WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 1) || (WoW.SpellCooldownTimeRemaining("Kill Command") >= 1) || (WoW.SpellCooldownTimeRemaining("Dire Beast") >= 1) || (WoW.SpellCooldownTimeRemaining("A Murder of Crows") >= 1)))
+					if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 110) && WoW.IsSpellInRange("Cobra Shot") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 1) && (WoW.SpellCooldownTimeRemaining("Kill Command") >= 1) && (WoW.SpellCooldownTimeRemaining("A Murder of Crows") >= 1))
                     {
                         WoW.CastSpell("Cobra Shot");
                         return;
                     }
-					if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 120) && WoW.IsSpellInRange("Cobra Shot"))
+					if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 119) && WoW.IsSpellInRange("Cobra Shot") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 1))
                     {
                         WoW.CastSpell("Cobra Shot");
                         return;
