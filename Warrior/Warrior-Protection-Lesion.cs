@@ -707,7 +707,10 @@ if ( WoW.TargetCastingSpellID == 200248
                         {
                             WoW.CastSpell("Ignore Pain");
 						}
-						
+						 if (WoW.CanCast("Ignore Pain") && (WoW.Rage >= 13) && WoW.PlayerHasBuff("Vengeance Ignore Pain") && WoW.IsSpellOverlayed("Revenge"))
+                        {
+                            WoW.CastSpell("Ignore Pain");
+                        }
 						// Revenge Control
                         if (Indomitable)
 						{
@@ -733,11 +736,7 @@ if ( WoW.TargetCastingSpellID == 200248
                             return;
                         }
 						}
-						
-						// Maths
-						// 
-						
-						
+																
 						if (!Indomitable && swingwatch.ElapsedMilliseconds > AttackspeedMS)
 						{
 						if (!AngerM && WoW.CanCast("Revenge") && WoW.Rage >= 30 && !WoW.PlayerHasBuff("Vengeance Revenge"))
