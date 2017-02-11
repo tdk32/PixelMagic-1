@@ -6,11 +6,16 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using PixelMagic.Helpers;
+using System.Threading;
 
 namespace PixelMagic.Rotation
 {
     public class DKFrostMGFmflex : CombatRoutine
     {
+
+        private string gcdTime = "1.3";
+        private bool AddonEdited = false;
+
         private static readonly Stopwatch coolDownStopWatch = new Stopwatch();
         private int currentRunes;
         private bool hasBreath;
@@ -342,21 +347,21 @@ namespace PixelMagic.Rotation
             SettingsFormDFF.btnHotkeysFrostOffensiveCooldowns.Text = "Hotkey : ";
             if (e.Shift)
             {
-                cooldownModifier = (int) Keys.ShiftKey;
+                cooldownModifier = (int)Keys.ShiftKey;
                 SettingsFormDFF.btnHotkeysFrostOffensiveCooldowns.Text += Keys.Shift + " + ";
             }
             else if (e.Alt)
             {
-                cooldownModifier = (int) Keys.Menu;
+                cooldownModifier = (int)Keys.Menu;
                 SettingsFormDFF.btnHotkeysFrostOffensiveCooldowns.Text += Keys.Alt + " + ";
             }
             else if (e.Control)
             {
-                cooldownModifier = (int) Keys.ControlKey;
+                cooldownModifier = (int)Keys.ControlKey;
                 SettingsFormDFF.btnHotkeysFrostOffensiveCooldowns.Text += Keys.Control + " + ";
             }
             else cooldownModifier = -1;
-            cooldownKey = (int) e.KeyCode;
+            cooldownKey = (int)e.KeyCode;
             SettingsFormDFF.btnHotkeysFrostOffensiveCooldowns.Text += e.KeyCode;
             cooldownHotKeyString = SettingsFormDFF.btnHotkeysFrostOffensiveCooldowns.Text;
             SettingsFormDFF.checkHotkeysFrostIFPercentLabel.Focus();
@@ -438,6 +443,34 @@ namespace PixelMagic.Rotation
         public override void Stop()
         {
         }
+        private void AddonEdit()
+        {
+            string AddonName = ConfigFile.ReadValue("PixelMagic", "AddonName");
+            try
+            {
+                string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
+                string modif = "if remainingTime > " + gcdTime + " then";
+
+                addonlua = addonlua.Replace("if remainingTime ~= 0 then", modif);
+
+
+                File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
+                Log.Write("Addon Editing in progress");
+                WoW.SendMacro("/reload");
+
+                while (WoW.HealthPercent == 0)
+                {
+                    Thread.Sleep(25);
+                }
+                AddonEdited = true;
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("" + ex, "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+        }
 
         public static bool CanCastInRange(string spell)
         {
@@ -451,6 +484,8 @@ namespace PixelMagic.Rotation
 
         public override void Pulse()
         {
+            if (!AddonEdited)
+                AddonEdit();
             if (!coolDownStopWatch.IsRunning || coolDownStopWatch.ElapsedMilliseconds > 60000)
                 coolDownStopWatch.Restart();
             if (DetectKeyPress.GetKeyState(cooldownKey) < 0 && (cooldownModifier == -1 || cooldownModifier != -1 && DetectKeyPress.GetKeyState(cooldownModifier) < 0))
@@ -505,130 +540,67 @@ namespace PixelMagic.Rotation
             {
                 WoW.CastSpell("HEmpower Rune");
             }
-            if (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave) // Do Single Target Stuff here
+            if (combatRoutine.UseCooldowns && isMelee && currentRunes >= 2 && runicPower >= 70 && CanCastNoRange("Breath"))
             {
-                if (combatRoutine.UseCooldowns && isMelee && currentRunes >= 2 && runicPower >= 70 && CanCastNoRange("Breath"))
-                {
-                    WoW.CastSpell("Breath");
-                    return;
-                }
-                if (combatRoutine.UseCooldowns && isMelee && runicPower >= 70 && CanCastNoRange("Breath"))
-                {
-                    return;
-                }
-                if (!WoW.TargetHasDebuff("Frost Fever") && currentRunes >= 1 && !hasBreath && CanCastInRange("Howling Blast") && !WoW.IsSpellOnCooldown("Howling Blast"))
-                {
-                    WoW.CastSpell("Howling Blast");
-                    return;
-                }
-                if (runicPower >= 70 && !hasBreath && CanCastInRange("Frost Strike"))
-                {
-                    WoW.CastSpell("Frost Strike");
-                    return;
-                }
-                if (((runicPower > 60 && hasBreath) || !hasBreath) && CanCastInRange("Howling Blast") && WoW.PlayerHasBuff("Rime"))
-                {
-                    WoW.CastSpell("Howling Blast");
-                    return;
-                }
-                if (isMelee && currentRunes >= 1 && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 12)) &&
-                    CanCastNoRange("Remorseless Winter"))
-                {
-                    WoW.CastSpell("Remorseless Winter");
-                    return;
-                }
-                if (isTalentFrostscythe && isMelee && currentRunes >= 1 && WoW.PlayerHasBuff("Killing Machine") && !hasBreath)
-                {
-                    WoW.CastSpell("Frostscythe");
-                    return;
-                }
-
-                if (isMelee && currentRunes >= 2 && (!hasBreath || (hasBreath && (runicPower <= 70 || hasBreath && currentRunes > 3))))
-                {
-                    WoW.CastSpell("Obliterate");
-                    return;
-                }
-                if (runicPower >= 25 && CanCastInRange("Frost Strike") && !hasBreath &&
-                    (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 12)))
-                {
-                    WoW.CastSpell("Frost Strike");
-                    return;
-                }
-                if (isTalentHornofWinter && currentRunes <= 4 && runicPower <= 70 && CanCastNoRange("Horn") && !WoW.PlayerHasBuff("HEmpower Rune") &&
-                    (hasBreath || (!hasBreath && WoW.SpellCooldownTimeRemaining("Breath") >= 30)))
-                {
-                    WoW.CastSpell("Horn");
-                }
-                if (isMelee && WoW.PlayerHasBuff("Free DeathStrike") && !hasBreath)
-                {
-                    WoW.CastSpell("Death Strike");
-                    return;
-                }
+                WoW.CastSpell("Breath");
+                return;
             }
-            if (combatRoutine.Type == RotationType.AOE)
+            if (combatRoutine.UseCooldowns && isMelee && runicPower >= 70 && CanCastNoRange("Breath"))
             {
-                if (combatRoutine.UseCooldowns && isMelee && currentRunes >= 2 && runicPower >= 70 && CanCastNoRange("Breath"))
-                {
-                    WoW.CastSpell("Breath");
-                    return;
-                }
-                if (isMelee && runicPower >= 70 && combatRoutine.UseCooldowns && CanCastNoRange("Breath") && isMelee && runicPower >= 70)
-                {
-                    return;
-                }
-                if (currentRunes >= 1 && !hasBreath && CanCastInRange("Howling Blast") && !WoW.IsSpellOnCooldown("Howling Blast") && !WoW.TargetHasDebuff("Frost Fever"))
-                {
-                    WoW.CastSpell("Howling Blast");
-                    return;
-                }
-                if (runicPower >= 70 && !hasBreath && CanCastInRange("Frost Strike"))
-                {
-                    WoW.CastSpell("Frost Strike");
-                    return;
-                }
-                if (((runicPower >= 60 && hasBreath) || !hasBreath) && CanCastInRange("Howling Blast") && WoW.PlayerHasBuff("Rime"))
-                {
-                    WoW.CastSpell("Howling Blast");
-                    return;
-                }
-                if (isTalentFrostscythe && isMelee && currentRunes >= 1 && WoW.PlayerHasBuff("Killing Machine") && !hasBreath)
-                {
-                    WoW.CastSpell("Frostscythe");
-                    return;
-                }
-                if (isMelee && currentRunes >= 1 && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 12)) &&
-                    CanCastNoRange("Remorseless Winter"))
-                {
-                    WoW.CastSpell("Remorseless Winter");
-                    return;
-                }
-                if (isMelee && currentRunes >= 2 && (!hasBreath && !isTalentFrostscythe || (hasBreath && (runicPower <= 70 || hasBreath && currentRunes > 3))))
-                {
-                    WoW.CastSpell("Obliterate");
-                    return;
-                }
-                if (isTalentFrostscythe && isMelee && currentRunes >= 1)
-                {
-                    WoW.CastSpell("Frostscythe");
-                    return;
-                }
-                if (runicPower >= 25 && !hasBreath && CanCastInRange("Frost Strike") && WoW.SpellCooldownTimeRemaining("Breath") >= 12 &&
-                    (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 12)))
-                {
-                    WoW.CastSpell("Frost Strike");
-                    return;
-                }
-                if (isTalentHornofWinter && isMelee && hasBreath && currentRunes <= 4 && runicPower <= 70 && !WoW.IsSpellOnCooldown("Horn") && !WoW.PlayerHasBuff("HEmpower Rune"))
-                {
-                    WoW.CastSpell("Horn");
-                }
-                if (isMelee && !hasBreath && WoW.PlayerHasBuff("Free DeathStrike"))
-                {
-                    WoW.CastSpell("Death Strike");
-                }
+                return;
+            }
+            if (!WoW.TargetHasDebuff("Frost Fever") && currentRunes >= 1 && !hasBreath
+            && CanCastInRange("Howling Blast") && !WoW.IsSpellOnCooldown("Howling Blast"))
+            {
+                WoW.CastSpell("Howling Blast");
+                return;
+            }
+            if (isMelee && currentRunes >= 1 && ((runicPower >= 48 && hasBreath) || !hasBreath) && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 15)) && CanCastNoRange("Remorseless Winter"))
+            {
+                WoW.CastSpell("Remorseless Winter");
+                return;
+            }
+            if (((runicPower >= 46 && hasBreath) || !hasBreath) && CanCastInRange("Howling Blast") && WoW.PlayerHasBuff("Rime"))
+            {
+                WoW.CastSpell("Howling Blast");
+                return;
+            }
+            if (!isTalentFrostscythe && isMelee && currentRunes >= 2 && !hasBreath && WoW.PlayerHasBuff("Gathering Storm"))
+            {
+                WoW.CastSpell("Obliterate");
+                return;
+            }
+            if (runicPower >= 70 && !hasBreath && CanCastInRange("Frost Strike"))
+            {
+                WoW.CastSpell("Frost Strike");
+                return;
+            }
+            if (isTalentFrostscythe && CanCastInRange("Frost Strike") && currentRunes >= 1 && WoW.PlayerHasBuff("Killing Machine") && !hasBreath)
+            {
+                WoW.CastSpell("Frostscythe");
+                return;
+            }
+
+            if (isMelee && currentRunes >= 2 && (!hasBreath || (hasBreath && (runicPower <= 70 || hasBreath && currentRunes > 3))))
+            {
+                WoW.CastSpell("Obliterate");
+                return;
+            }
+            if (runicPower >= 25 && CanCastInRange("Frost Strike") && !hasBreath && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 15)))
+            {
+                WoW.CastSpell("Frost Strike");
+                return;
+            }
+            if (isTalentHornofWinter && currentRunes <= 4 && runicPower <= 70 && CanCastNoRange("Horn") && !WoW.PlayerHasBuff("HEmpower Rune") && (hasBreath || (!hasBreath && WoW.SpellCooldownTimeRemaining("Breath") >= 15)))
+            {
+                WoW.CastSpell("Horn");
+            }
+            if (isMelee && WoW.PlayerHasBuff("Free DeathStrike") && !hasBreath)
+            {
+                WoW.CastSpell("Death Strike");
+                return;
             }
         }
-
         public void MGRotation()
         {
             if (isCheckHotkeysFrostOffensivePillarofFrost && isMelee && combatRoutine.UseCooldowns && !WoW.IsSpellOnCooldown("PillarofFrost"))
