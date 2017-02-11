@@ -376,7 +376,7 @@ public override void Pulse()
 						//WoW.CastSpell("Potion Power");
 						//return;
 					//}
-					if (WoW.CanCast("Kill Command") && WoW.Focus >= 100 && WoW.IsSpellInRange("Kill Command"))
+					if (WoW.CanCast("Kill Command") && WoW.Focus >= 100 && WoW.IsSpellInRange("Kill Command") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 1))
                     {
                         WoW.CastSpell("Kill Command");
                         return;
@@ -390,7 +390,7 @@ public override void Pulse()
                         return;
 						}
                     }
-                    if (WoW.CanCast("Kill Command") && WoW.Focus >= 30 && WoW.IsSpellInRange("Kill Command"))
+                    if (WoW.CanCast("Kill Command") && WoW.Focus >= 30 && WoW.IsSpellInRange("Kill Command") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 1))
                     {
                         WoW.CastSpell("Kill Command");
                         return;
@@ -400,12 +400,12 @@ public override void Pulse()
                         WoW.CastSpell("Cobra Shot");
                         return;
                     }					
-					if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 110) && WoW.IsSpellInRange("Cobra Shot") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 1) && (WoW.SpellCooldownTimeRemaining("Kill Command") >= 1) && (WoW.SpellCooldownTimeRemaining("A Murder of Crows") >= 1))
+					if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 93) && WoW.IsSpellInRange("Cobra Shot") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 1) && (WoW.SpellCooldownTimeRemaining("Kill Command") >= 1) && (WoW.SpellCooldownTimeRemaining("A Murder of Crows") >= 1))
                     {
                         WoW.CastSpell("Cobra Shot");
                         return;
                     }
-					if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 119) && WoW.IsSpellInRange("Cobra Shot") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 1))
+					if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 119) && WoW.IsSpellInRange("Cobra Shot"))
                     {
                         WoW.CastSpell("Cobra Shot");
                         return;
