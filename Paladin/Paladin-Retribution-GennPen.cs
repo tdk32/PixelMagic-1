@@ -1,4 +1,5 @@
 ﻿// ReSharper disable RedundantUsingDirective
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,29 +17,24 @@ using System.Xml.Serialization;
 using System.Windows.Forms;
 using PixelMagic.Helpers;
 using PixelMagic.GUI;
+
 // ReSharper disable CheckNamespace
 // ReSharper disable NotAccessedField.Local
 // ReSharper disable ArrangeThisQualifier
 
 namespace PixelMagic.Rotation
 {
-    public class RetributionPaladin : CombatRoutine
+    public class RetributionPaladinGP : CombatRoutine
     {
-        public override string Name => "Retribution Paladin";
-        public override string Class => "Paladin";
-        public override void Stop()
-        {
-        }
-
         public static int PulseTick;
-
-        private int CooldownWithHaste(int cooldown) => (int)(cooldown / (1 + (double)WoW.HastePercent / 100));
+        private bool BloodLustUp;
         private int Gcd;
-        private int BattleTime => 9999;
 
         private int HolyPower;
         private bool InMeleeRange;
-        private bool BloodLustUp;
+        public override string Name => "Retribution Paladin";
+        public override string Class => "Paladin";
+        private int BattleTime => 9999;
         private bool CanCastFinisher3hp => HolyPower >= (TheFiresOfJustice.PlayerBuff ? 2 : 3) || DivinePurpose.PlayerBuff;
 
         private int TargetsDivineStorm
@@ -62,7 +58,7 @@ namespace PixelMagic.Rotation
         //////////// TALENTS (tested on 1112112) ////////////////////
         //15
         private bool TalentFinalVerdict => true;
-        private bool TalentExecutionSentence => false;      // bugged, low dps
+        private bool TalentExecutionSentence => false; // bugged, low dps
         private bool TalentConsecration => false;
         //30
         private bool TalentTheFiresOfJustice => true;
@@ -85,7 +81,7 @@ namespace PixelMagic.Rotation
         private bool TalentCavalier => false;
         private bool TalentJudgmentOfLight => false;
         //100
-        private bool TalentDivinePurpose => false;          // bugged
+        private bool TalentDivinePurpose => false; // bugged
         private bool TalentCrusade => true;
         private bool TalentHolyWrath => false;
         ///////////////////////////////////////////////////////
@@ -96,23 +92,31 @@ namespace PixelMagic.Rotation
         private ClassSpell HammerOfJustice { get; } = new ClassSpell("Hammer of Justice");
         private ClassSpell ExecutionSentence { get; } = new ClassSpell("Execution Sentence");
         private ClassSpell LayOnHands { get; } = new ClassSpell("Lay on Hands");
-        private ClassSpell WakeOfAshes { get; } = new ClassSpell("Wake of Ashes");                      // SpellCooldownRemaining
+        private ClassSpell WakeOfAshes { get; } = new ClassSpell("Wake of Ashes"); // SpellCooldownRemaining
         private ClassSpell DivineStorm { get; } = new ClassSpell("Divine Storm");
-        private ClassSpell BladeOfJustice { get; } = new ClassSpell("Blade of Justice");                // SpellCooldownRemaining
-        private ClassSpell DivineHammer { get; } = new ClassSpell("Divine Hammer");                     // SpellCooldownRemaining
-        private ClassSpell CrusaderStrike { get; } = new ClassSpell("Crusader Strike");                 // SpellCooldownRemaining
+        private ClassSpell BladeOfJustice { get; } = new ClassSpell("Blade of Justice"); // SpellCooldownRemaining
+        private ClassSpell DivineHammer { get; } = new ClassSpell("Divine Hammer"); // SpellCooldownRemaining
+        private ClassSpell CrusaderStrike { get; } = new ClassSpell("Crusader Strike"); // SpellCooldownRemaining
         private ClassSpell TemplarVerdict { get; } = new ClassSpell("Templar Verdict");
-        private ClassSpell Judgement { get; } = new ClassSpell("Judgement");                            // SpellCooldownRemaining
-        private ClassSpell JudgementDebuff { get; } = new ClassSpell("Judgement Debuff");               // TargetDebuffRemaining
-        private ClassSpell Crusade { get; } = new ClassSpell("Crusade");                                // SpellCooldownRemaining
+        private ClassSpell Judgement { get; } = new ClassSpell("Judgement"); // SpellCooldownRemaining
+        private ClassSpell JudgementDebuff { get; } = new ClassSpell("Judgement Debuff"); // TargetDebuffRemaining
+        private ClassSpell Crusade { get; } = new ClassSpell("Crusade"); // SpellCooldownRemaining
         private ClassSpell AvengingWrath { get; } = new ClassSpell("Avenging Wrath");
         private ClassSpell FlashOfLight { get; } = new ClassSpell("Flash of Light");
         private ClassSpell HolyWrath { get; } = new ClassSpell("Holy Wrath");
         private ClassSpell Consecration { get; } = new ClassSpell("Consecration");
-        private ClassSpell DivinePurpose { get; } = new ClassSpell("Divine Purpose");                   // PlayerBuffRemaining
+        private ClassSpell DivinePurpose { get; } = new ClassSpell("Divine Purpose"); // PlayerBuffRemaining
         private ClassSpell TheFiresOfJustice { get; } = new ClassSpell("The Fires of Justice");
         private ClassSpell Forbearance { get; } = new ClassSpell("Forbearance");
         private ClassSpell WhisperOfTheNathrezim { get; } = new ClassSpell("Whisper of the Nathrezim"); // PlayerBuffRemaining
+
+        public override Form SettingsForm { get; set; }
+
+        public override void Stop()
+        {
+        }
+
+        private int CooldownWithHaste(int cooldown) => (int) (cooldown/(1 + (double) WoW.HastePercent/100));
 
         public override void Pulse()
         {
@@ -122,8 +126,8 @@ namespace PixelMagic.Rotation
             Gcd = CooldownWithHaste(1500);
             HolyPower = WoW.CurrentHolyPower;
             InMeleeRange = WoW.CanCast("Templar Verdict", false, false, true, false, true);
-            BloodLustUp = (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War"));
-            
+            BloodLustUp = WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War");
+
 
             //Log.Write("11 " + BladeOfJustice.SpellCanCast);
 
@@ -139,16 +143,12 @@ namespace PixelMagic.Rotation
                     //sw.Stop();
                     //Log.Write("## " + sw.ElapsedMilliseconds);
                 }
-                else
-                {
-                    PulseRotattion();
-                }
+                PulseRotattion();
             }
         }
 
         private void PulseUpdateSpells()
         {
-
             WakeOfAshes.PulseSpellCooldownRemaining();
             BladeOfJustice.PulseSpellCooldownRemaining();
             DivineHammer.PulseSpellCooldownRemaining();
@@ -161,7 +161,6 @@ namespace PixelMagic.Rotation
 
             DivinePurpose.PulsePlayerBuffRemaining();
             WhisperOfTheNathrezim.PulsePlayerBuffRemaining();
-
         }
 
         private void PulseRotattion()
@@ -185,7 +184,8 @@ namespace PixelMagic.Rotation
             //actions+=/execution_sentence,if=spell_targets.divine_storm<=3&(cooldown.judgment.remains<gcd*4.5|debuff.judgment.remains>gcd*4.67)&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*2)
             if (TalentExecutionSentence && CanCastFinisher3hp)
             {
-                if (TargetsDivineStorm <= 3 && (Judgement.SpellCooldownRemaining < Gcd * 4.5 || JudgementDebuff.TargetDebuffRemaining > Gcd * 4.67) && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd * 2))
+                if (TargetsDivineStorm <= 3 && (Judgement.SpellCooldownRemaining < Gcd*4.5 || JudgementDebuff.TargetDebuffRemaining > Gcd*4.67) &&
+                    (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd*2))
                 {
                     if (ExecutionSentence.SpellCanCast && InMeleeRange)
                     {
@@ -199,7 +199,7 @@ namespace PixelMagic.Rotation
             //actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2
             if (CanCastFinisher3hp)
             {
-                if (JudgementDebuff.TargetDebuff && TargetsDivineStorm >= 2 && DivinePurpose.PlayerBuff && DivinePurpose.PlayerBuffRemaining < Gcd * 2)
+                if (JudgementDebuff.TargetDebuff && TargetsDivineStorm >= 2 && DivinePurpose.PlayerBuff && DivinePurpose.PlayerBuffRemaining < Gcd*2)
                 {
                     if (DivineStorm.SpellCanCastBlind && InMeleeRange)
                     {
@@ -238,7 +238,7 @@ namespace PixelMagic.Rotation
             //actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=5&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)
             if (CanCastFinisher3hp)
             {
-                if (JudgementDebuff.TargetDebuff && TargetsDivineStorm >= 2 && HolyPower >= 5 && (!TalentCrusade || Crusade.PlayerBuffRemaining > Gcd * 3))
+                if (JudgementDebuff.TargetDebuff && TargetsDivineStorm >= 2 && HolyPower >= 5 && (!TalentCrusade || Crusade.PlayerBuffRemaining > Gcd*3))
                 {
                     if (DivineStorm.SpellCanCastBlind && InMeleeRange)
                     {
@@ -251,7 +251,7 @@ namespace PixelMagic.Rotation
             //actions+=/templars_verdict,if=debuff.judgment.up&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2
             if (CanCastFinisher3hp)
             {
-                if (JudgementDebuff.TargetDebuff && DivinePurpose.PlayerBuff && DivinePurpose.PlayerBuffRemaining < Gcd * 2)
+                if (JudgementDebuff.TargetDebuff && DivinePurpose.PlayerBuff && DivinePurpose.PlayerBuffRemaining < Gcd*2)
                 {
                     if (TemplarVerdict.SpellCanCast && InMeleeRange)
                     {
@@ -290,7 +290,7 @@ namespace PixelMagic.Rotation
             //actions+=/templars_verdict,if=debuff.judgment.up&holy_power>=5&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)
             if (CanCastFinisher3hp)
             {
-                if (JudgementDebuff.TargetDebuff && HolyPower >= 5 && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd * 3))
+                if (JudgementDebuff.TargetDebuff && HolyPower >= 5 && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd*3))
                 {
                     if (TemplarVerdict.SpellCanCast && InMeleeRange)
                     {
@@ -303,7 +303,9 @@ namespace PixelMagic.Rotation
             //actions+=/divine_storm,if=debuff.judgment.up&holy_power>=3&spell_targets.divine_storm>=2&(cooldown.wake_of_ashes.remains<gcd*2&artifact.wake_of_ashes.enabled|buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains<gcd)&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*4)
             if (CanCastFinisher3hp)
             {
-                if (JudgementDebuff.TargetDebuff && HolyPower >= 3 && TargetsDivineStorm >= 2 && (WakeOfAshes.SpellCooldownRemaining < Gcd * 2 /*&& true*/ || WhisperOfTheNathrezim.PlayerBuff && WhisperOfTheNathrezim.PlayerBuffRemaining < Gcd) && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd * 4))
+                if (JudgementDebuff.TargetDebuff && HolyPower >= 3 && TargetsDivineStorm >= 2 &&
+                    (WakeOfAshes.SpellCooldownRemaining < Gcd*2 /*&& true*/|| WhisperOfTheNathrezim.PlayerBuff && WhisperOfTheNathrezim.PlayerBuffRemaining < Gcd) &&
+                    (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd*4))
                 {
                     if (DivineStorm.SpellCanCastBlind && InMeleeRange)
                     {
@@ -316,7 +318,9 @@ namespace PixelMagic.Rotation
             //actions+=/templars_verdict,if=debuff.judgment.up&holy_power>=3&(cooldown.wake_of_ashes.remains<gcd*2&artifact.wake_of_ashes.enabled|buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains<gcd)&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*4)
             if (CanCastFinisher3hp)
             {
-                if (JudgementDebuff.TargetDebuff && HolyPower >= 3 && (WakeOfAshes.SpellCooldownRemaining < Gcd * 2 /*&& true*/ || WhisperOfTheNathrezim.PlayerBuff && WhisperOfTheNathrezim.PlayerBuffRemaining < Gcd) && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd * 4))
+                if (JudgementDebuff.TargetDebuff && HolyPower >= 3 &&
+                    (WakeOfAshes.SpellCooldownRemaining < Gcd*2 /*&& true*/|| WhisperOfTheNathrezim.PlayerBuff && WhisperOfTheNathrezim.PlayerBuffRemaining < Gcd) &&
+                    (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd*4))
                 {
                     if (TemplarVerdict.SpellCanCast && InMeleeRange)
                     {
@@ -327,7 +331,8 @@ namespace PixelMagic.Rotation
             }
 
             //actions+=/wake_of_ashes,if=holy_power=0|holy_power=1&(cooldown.blade_of_justice.remains>gcd|cooldown.divine_hammer.remains>gcd)|holy_power=2&(cooldown.zeal.charges_fractional<=0.65|cooldown.crusader_strike.charges_fractional<=0.65)
-            if (HolyPower <= 1 && (BladeOfJustice.SpellCooldownRemaining > Gcd || DivineHammer.SpellCooldownRemaining > Gcd) || HolyPower == 2 && (Zeal.SpellChargesFractional <= 0.65 || CrusaderStrike.SpellChargesFractional <= 0.65))
+            if (HolyPower <= 1 && (BladeOfJustice.SpellCooldownRemaining > Gcd || DivineHammer.SpellCooldownRemaining > Gcd) ||
+                HolyPower == 2 && (Zeal.SpellChargesFractional <= 0.65 || CrusaderStrike.SpellChargesFractional <= 0.65))
             {
                 if (WakeOfAshes.SpellCanCastBlind && InMeleeRange)
                 {
@@ -339,7 +344,8 @@ namespace PixelMagic.Rotation
             //actions+=/blade_of_justice,if=holy_power<=3&buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains>gcd&buff.whisper_of_the_nathrezim.remains<gcd*3&debuff.judgment.up&debuff.judgment.remains>gcd*2
             if (!TalentDivineHammer)
             {
-                if (HolyPower <= 3 && WhisperOfTheNathrezim.PlayerBuff && WhisperOfTheNathrezim.PlayerBuffRemaining > Gcd && WhisperOfTheNathrezim.PlayerBuffRemaining < Gcd * 3 && JudgementDebuff.TargetDebuff && JudgementDebuff.TargetDebuffRemaining > Gcd * 2)
+                if (HolyPower <= 3 && WhisperOfTheNathrezim.PlayerBuff && WhisperOfTheNathrezim.PlayerBuffRemaining > Gcd && WhisperOfTheNathrezim.PlayerBuffRemaining < Gcd*3 &&
+                    JudgementDebuff.TargetDebuff && JudgementDebuff.TargetDebuffRemaining > Gcd*2)
                 {
                     if (BladeOfJustice.SpellCanCast)
                     {
@@ -352,7 +358,8 @@ namespace PixelMagic.Rotation
             //actions+=/divine_hammer,if=holy_power<=3&buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains>gcd&buff.whisper_of_the_nathrezim.remains<gcd*3&debuff.judgment.up&debuff.judgment.remains>gcd*2
             if (TalentDivineHammer)
             {
-                if (HolyPower <= 3 && WhisperOfTheNathrezim.PlayerBuff && WhisperOfTheNathrezim.PlayerBuffRemaining > Gcd && WhisperOfTheNathrezim.PlayerBuffRemaining < Gcd * 3 && JudgementDebuff.TargetDebuff && JudgementDebuff.TargetDebuffRemaining > Gcd * 2)
+                if (HolyPower <= 3 && WhisperOfTheNathrezim.PlayerBuff && WhisperOfTheNathrezim.PlayerBuffRemaining > Gcd && WhisperOfTheNathrezim.PlayerBuffRemaining < Gcd*3 &&
+                    JudgementDebuff.TargetDebuff && JudgementDebuff.TargetDebuffRemaining > Gcd*2)
                 {
                     if (DivineHammer.SpellCanCastBlind && InMeleeRange)
                     {
@@ -428,7 +435,9 @@ namespace PixelMagic.Rotation
             }
 
             //actions+=/judgment,if=holy_power>=3|((cooldown.zeal.charges_fractional<=1.67|cooldown.crusader_strike.charges_fractional<=1.67)&(cooldown.divine_hammer.remains>gcd|cooldown.blade_of_justice.remains>gcd))|(talent.greater_judgment.enabled&target.health.pct>50)
-            if (HolyPower >= 3 || ((Zeal.SpellChargesFractional <= 1.67 || CrusaderStrike.SpellChargesFractional <= 1.67) && (DivineHammer.SpellCooldownRemaining > Gcd || BladeOfJustice.SpellCooldownRemaining > Gcd)) || (TalentGreaterJudgment && WoW.TargetHealthPercent > 50))
+            if (HolyPower >= 3 ||
+                ((Zeal.SpellChargesFractional <= 1.67 || CrusaderStrike.SpellChargesFractional <= 1.67) &&
+                 (DivineHammer.SpellCooldownRemaining > Gcd || BladeOfJustice.SpellCooldownRemaining > Gcd)) || (TalentGreaterJudgment && WoW.TargetHealthPercent > 50))
             {
                 if (Judgement.SpellCanCast && InMeleeRange)
                 {
@@ -466,7 +475,7 @@ namespace PixelMagic.Rotation
             //actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.the_fires_of_justice.react&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)
             if (CanCastFinisher3hp)
             {
-                if (JudgementDebuff.TargetDebuff && TargetsDivineStorm >= 2 && TheFiresOfJustice.PlayerBuff && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd * 3))
+                if (JudgementDebuff.TargetDebuff && TargetsDivineStorm >= 2 && TheFiresOfJustice.PlayerBuff && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd*3))
                 {
                     if (DivineStorm.SpellCanCastBlind && InMeleeRange)
                     {
@@ -479,7 +488,10 @@ namespace PixelMagic.Rotation
             //actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&(holy_power>=4|((cooldown.zeal.charges_fractional<=1.34|cooldown.crusader_strike.charges_fractional<=1.34)&(cooldown.divine_hammer.remains>gcd|cooldown.blade_of_justice.remains>gcd)))&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*4)
             if (CanCastFinisher3hp)
             {
-                if (JudgementDebuff.TargetDebuff && TargetsDivineStorm >= 2 && (HolyPower >= 4 || ((Zeal.SpellChargesFractional <= 1.34 || CrusaderStrike.SpellChargesFractional <= 1.34) && (DivineHammer.SpellCooldownRemaining > Gcd || BladeOfJustice.SpellCooldownRemaining > Gcd))) && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd * 4))
+                if (JudgementDebuff.TargetDebuff && TargetsDivineStorm >= 2 &&
+                    (HolyPower >= 4 ||
+                     ((Zeal.SpellChargesFractional <= 1.34 || CrusaderStrike.SpellChargesFractional <= 1.34) &&
+                      (DivineHammer.SpellCooldownRemaining > Gcd || BladeOfJustice.SpellCooldownRemaining > Gcd))) && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd*4))
                 {
                     if (DivineStorm.SpellCanCastBlind && InMeleeRange)
                     {
@@ -505,7 +517,7 @@ namespace PixelMagic.Rotation
             //actions+=/templars_verdict,if=debuff.judgment.up&buff.the_fires_of_justice.react&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)
             if (CanCastFinisher3hp)
             {
-                if (JudgementDebuff.TargetDebuff && TheFiresOfJustice.PlayerBuff && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd * 3))
+                if (JudgementDebuff.TargetDebuff && TheFiresOfJustice.PlayerBuff && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd*3))
                 {
                     if (TemplarVerdict.SpellCanCast && InMeleeRange)
                     {
@@ -518,7 +530,10 @@ namespace PixelMagic.Rotation
             //actions+=/templars_verdict,if=debuff.judgment.up&(holy_power>=4|((cooldown.zeal.charges_fractional<=1.34|cooldown.crusader_strike.charges_fractional<=1.34)&(cooldown.divine_hammer.remains>gcd|cooldown.blade_of_justice.remains>gcd)))&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*4)
             if (CanCastFinisher3hp)
             {
-                if (JudgementDebuff.TargetDebuff && (HolyPower >= 4 || ((Zeal.SpellChargesFractional <= 1.34 || CrusaderStrike.SpellChargesFractional <= 1.34) && (DivineHammer.SpellCooldownRemaining > Gcd || BladeOfJustice.SpellCooldownRemaining > Gcd))) && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd * 4))
+                if (JudgementDebuff.TargetDebuff &&
+                    (HolyPower >= 4 ||
+                     ((Zeal.SpellChargesFractional <= 1.34 || CrusaderStrike.SpellChargesFractional <= 1.34) &&
+                      (DivineHammer.SpellCooldownRemaining > Gcd || BladeOfJustice.SpellCooldownRemaining > Gcd))) && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd*4))
                 {
                     if (TemplarVerdict.SpellCanCast && InMeleeRange)
                     {
@@ -559,7 +574,7 @@ namespace PixelMagic.Rotation
             //actions+=/divine_storm,if=debuff.judgment.up&holy_power>=3&spell_targets.divine_storm>=2&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*5)
             if (CanCastFinisher3hp)
             {
-                if (JudgementDebuff.TargetDebuff && HolyPower >= 3 && TargetsDivineStorm >= 2 && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd * 5))
+                if (JudgementDebuff.TargetDebuff && HolyPower >= 3 && TargetsDivineStorm >= 2 && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd*5))
                 {
                     if (DivineStorm.SpellCanCastBlind && InMeleeRange)
                     {
@@ -572,19 +587,15 @@ namespace PixelMagic.Rotation
             //actions+=/templars_verdict,if=debuff.judgment.up&holy_power>=3&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*5)
             if (CanCastFinisher3hp)
             {
-                if (JudgementDebuff.TargetDebuff && HolyPower >= 3 && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd * 5))
+                if (JudgementDebuff.TargetDebuff && HolyPower >= 3 && (!TalentCrusade || Crusade.SpellCooldownRemaining > Gcd*5))
                 {
                     if (TemplarVerdict.SpellCanCast && InMeleeRange)
                     {
                         TemplarVerdict.Cast();
-                        return;
                     }
                 }
             }
-
         }
-
-        public override Form SettingsForm { get; set; }
 
         public override void Initialize()
         {
@@ -599,86 +610,115 @@ namespace PixelMagic.Rotation
     public class ClassSpell
     {
         private readonly string _name;
+
+        private readonly ClassCachedVariable<bool> _cachePlayerBuff = new ClassCachedVariable<bool>();
+
+        private readonly ClassCachedVariable<int> _cachePlayerBuffRemaining = new ClassCachedVariable<int>();
+
+        private readonly ClassCachedVariable<int> _cachePlayerBuffStacks = new ClassCachedVariable<int>();
+
+        private readonly ClassCachedVariable<bool> _cachePlayerDebuff = new ClassCachedVariable<bool>();
+
+        private readonly ClassCachedVariable<bool> _cacheSpellCanCast = new ClassCachedVariable<bool>();
+
+        private readonly ClassCachedVariable<bool> _cacheSpellCanCastBlind = new ClassCachedVariable<bool>();
+
+        private ClassCachedVariable<int> _cacheSpellCharges = new ClassCachedVariable<int>();
+
+        private readonly ClassCachedVariable<float> _cacheSpellChargesFractional = new ClassCachedVariable<float>();
+
+        private readonly ClassCachedVariable<int> _cacheSpellCooldownRemaining = new ClassCachedVariable<int>();
+
+        private readonly ClassCachedVariable<bool> _cacheSpellInRange = new ClassCachedVariable<bool>();
+
+        private readonly ClassCachedVariable<bool> _cacheTargetDebuff = new ClassCachedVariable<bool>();
+
+        private readonly ClassCachedVariable<int> _cacheTargetDebuffRemaining = new ClassCachedVariable<int>();
+
+        private readonly ClassCachedVariable<int> _cacheTargetDebuffStacks = new ClassCachedVariable<int>();
+        private int _endPlayerBuffRemaining;
+        private int _endSpellCooldownRemaining;
+        private int _endTargetDebuffRemaining;
+
+        private int _lastPlayerBuffRemaining;
+
+
+        private int _lastSpellCooldownRemaining;
+
+        private int _lastTargetDebuffRemaining;
+
         public ClassSpell(string name)
         {
             _name = name;
         }
 
-        public void Cast() { WoW.CastSpell(this._name); }
-
-        private ClassCachedVariable<bool> _cacheSpellCanCastBlind = new ClassCachedVariable<bool>();
         public bool SpellCanCastBlind
         {
             get
             {
-                if (_cacheSpellCanCastBlind.TimeStamp != RetributionPaladin.PulseTick)
+                if (_cacheSpellCanCastBlind.TimeStamp != RetributionPaladinGP.PulseTick)
                 {
-                    _cacheSpellCanCastBlind.TimeStamp = RetributionPaladin.PulseTick;
+                    _cacheSpellCanCastBlind.TimeStamp = RetributionPaladinGP.PulseTick;
                     _cacheSpellCanCastBlind.Variable = WoW.CanCast(this._name);
                 }
                 return _cacheSpellCanCastBlind.Variable;
             }
         }
 
-        private ClassCachedVariable<bool> _cacheSpellCanCast = new ClassCachedVariable<bool>();
         public bool SpellCanCast
         {
             get
             {
-                if (_cacheSpellCanCast.TimeStamp != RetributionPaladin.PulseTick)
+                if (_cacheSpellCanCast.TimeStamp != RetributionPaladinGP.PulseTick)
                 {
-                    _cacheSpellCanCast.TimeStamp = RetributionPaladin.PulseTick;
+                    _cacheSpellCanCast.TimeStamp = RetributionPaladinGP.PulseTick;
                     _cacheSpellCanCast.Variable = WoW.CanCast(this._name, true, true, true, true, true);
                 }
                 return _cacheSpellCanCast.Variable;
             }
         }
 
-        private ClassCachedVariable<bool> _cacheSpellInRange = new ClassCachedVariable<bool>();
         public bool SpellInRange
         {
             get
             {
-                if (_cacheSpellInRange.TimeStamp != RetributionPaladin.PulseTick)
+                if (_cacheSpellInRange.TimeStamp != RetributionPaladinGP.PulseTick)
                 {
-                    _cacheSpellInRange.TimeStamp = RetributionPaladin.PulseTick;
+                    _cacheSpellInRange.TimeStamp = RetributionPaladinGP.PulseTick;
                     _cacheSpellInRange.Variable = WoW.IsSpellInRange(this._name);
                 }
                 return _cacheSpellInRange.Variable;
             }
         }
 
-        private ClassCachedVariable<int> _cacheSpellCharges = new ClassCachedVariable<int>();
         public int SpellCharges => WoW.PlayerSpellCharges(this._name);
 
-        private ClassCachedVariable<float> _cacheSpellChargesFractional = new ClassCachedVariable<float>();
         public float SpellChargesFractional
         {
             get
             {
-                if (_cacheSpellChargesFractional.TimeStamp != RetributionPaladin.PulseTick)
+                if (_cacheSpellChargesFractional.TimeStamp != RetributionPaladinGP.PulseTick)
                 {
-                    _cacheSpellChargesFractional.TimeStamp = RetributionPaladin.PulseTick;
+                    _cacheSpellChargesFractional.TimeStamp = RetributionPaladinGP.PulseTick;
                     _cacheSpellChargesFractional.Variable = WoW.PlayerSpellCharges(this._name);
                 }
                 return _cacheSpellChargesFractional.Variable;
             }
         }
 
-        private ClassCachedVariable<int> _cacheSpellCooldownRemaining = new ClassCachedVariable<int>();
         public int SpellCooldownRemaining
         {
             get
             {
                 if (this._name == "Crusade") return 100000; // temp disable Crusade burst
 
-                if (_cacheSpellCooldownRemaining.TimeStamp != RetributionPaladin.PulseTick)
+                if (_cacheSpellCooldownRemaining.TimeStamp != RetributionPaladinGP.PulseTick)
                 {
-                    _cacheSpellCooldownRemaining.TimeStamp = RetributionPaladin.PulseTick;
+                    _cacheSpellCooldownRemaining.TimeStamp = RetributionPaladinGP.PulseTick;
 
                     if (_endSpellCooldownRemaining < Environment.TickCount)
                     {
-                        _cacheSpellCooldownRemaining.Variable = WoW.SpellCooldownTimeRemaining(this._name) * 1000;
+                        _cacheSpellCooldownRemaining.Variable = WoW.SpellCooldownTimeRemaining(this._name)*1000;
                     }
                     else
                     {
@@ -690,34 +730,32 @@ namespace PixelMagic.Rotation
             }
         }
 
-        private ClassCachedVariable<bool> _cacheTargetDebuff = new ClassCachedVariable<bool>();
         public bool TargetDebuff
         {
             get
             {
                 if (this._name == "Judgement Debuff" && !WoW.TargetHasDebuff("Judgement Debuff") && WoW.SpellCooldownTimeRemaining("Judgement") >= 5) return true;
 
-                if (_cacheTargetDebuff.TimeStamp != RetributionPaladin.PulseTick)
+                if (_cacheTargetDebuff.TimeStamp != RetributionPaladinGP.PulseTick)
                 {
-                    _cacheTargetDebuff.TimeStamp = RetributionPaladin.PulseTick;
+                    _cacheTargetDebuff.TimeStamp = RetributionPaladinGP.PulseTick;
                     _cacheTargetDebuff.Variable = WoW.TargetHasDebuff(this._name);
                 }
                 return _cacheTargetDebuff.Variable;
             }
         }
 
-        private ClassCachedVariable<int> _cacheTargetDebuffRemaining = new ClassCachedVariable<int>();
         public int TargetDebuffRemaining
         {
             get
             {
-                if (_cacheTargetDebuffRemaining.TimeStamp != RetributionPaladin.PulseTick)
+                if (_cacheTargetDebuffRemaining.TimeStamp != RetributionPaladinGP.PulseTick)
                 {
-                    _cacheTargetDebuffRemaining.TimeStamp = RetributionPaladin.PulseTick;
+                    _cacheTargetDebuffRemaining.TimeStamp = RetributionPaladinGP.PulseTick;
 
                     if (_endTargetDebuffRemaining < Environment.TickCount)
                     {
-                        _cacheTargetDebuffRemaining.Variable = WoW.TargetDebuffTimeRemaining(this._name) * 1000;
+                        _cacheTargetDebuffRemaining.Variable = WoW.TargetDebuffTimeRemaining(this._name)*1000;
                     }
                     else
                     {
@@ -728,74 +766,69 @@ namespace PixelMagic.Rotation
             }
         }
 
-        private ClassCachedVariable<int> _cacheTargetDebuffStacks = new ClassCachedVariable<int>();
         public int TargetDebuffStacks
         {
             get
             {
-                if (_cacheTargetDebuffStacks.TimeStamp != RetributionPaladin.PulseTick)
+                if (_cacheTargetDebuffStacks.TimeStamp != RetributionPaladinGP.PulseTick)
                 {
-                    _cacheTargetDebuffStacks.TimeStamp = RetributionPaladin.PulseTick;
+                    _cacheTargetDebuffStacks.TimeStamp = RetributionPaladinGP.PulseTick;
                     _cacheTargetDebuffStacks.Variable = WoW.TargetDebuffStacks(this._name);
                 }
                 return _cacheTargetDebuffStacks.Variable;
             }
         }
 
-        private ClassCachedVariable<bool> _cachePlayerDebuff = new ClassCachedVariable<bool>();
         public bool PlayerDebuff
         {
             get
             {
-                if (_cachePlayerDebuff.TimeStamp != RetributionPaladin.PulseTick)
+                if (_cachePlayerDebuff.TimeStamp != RetributionPaladinGP.PulseTick)
                 {
-                    _cachePlayerDebuff.TimeStamp = RetributionPaladin.PulseTick;
+                    _cachePlayerDebuff.TimeStamp = RetributionPaladinGP.PulseTick;
                     _cachePlayerDebuff.Variable = WoW.PlayerHasDebuff(this._name);
                 }
                 return _cachePlayerDebuff.Variable;
             }
         }
 
-        private ClassCachedVariable<bool> _cachePlayerBuff = new ClassCachedVariable<bool>();
         public bool PlayerBuff
         {
             get
             {
-                if (_cachePlayerBuff.TimeStamp != RetributionPaladin.PulseTick)
+                if (_cachePlayerBuff.TimeStamp != RetributionPaladinGP.PulseTick)
                 {
-                    _cachePlayerBuff.TimeStamp = RetributionPaladin.PulseTick;
+                    _cachePlayerBuff.TimeStamp = RetributionPaladinGP.PulseTick;
                     _cachePlayerBuff.Variable = WoW.PlayerHasBuff(this._name);
                 }
                 return _cachePlayerBuff.Variable;
             }
         }
 
-        private ClassCachedVariable<int> _cachePlayerBuffStacks = new ClassCachedVariable<int>();
         public int PlayerBuffStacks
         {
             get
             {
-                if (_cachePlayerBuffStacks.TimeStamp != RetributionPaladin.PulseTick)
+                if (_cachePlayerBuffStacks.TimeStamp != RetributionPaladinGP.PulseTick)
                 {
-                    _cachePlayerBuffStacks.TimeStamp = RetributionPaladin.PulseTick;
+                    _cachePlayerBuffStacks.TimeStamp = RetributionPaladinGP.PulseTick;
                     _cachePlayerBuffStacks.Variable = WoW.PlayerBuffStacks(this._name);
                 }
                 return _cachePlayerBuffStacks.Variable;
             }
         }
 
-        private ClassCachedVariable<int> _cachePlayerBuffRemaining = new ClassCachedVariable<int>();
         public int PlayerBuffRemaining
         {
             get
             {
-                if (_cachePlayerBuffRemaining.TimeStamp != RetributionPaladin.PulseTick)
+                if (_cachePlayerBuffRemaining.TimeStamp != RetributionPaladinGP.PulseTick)
                 {
-                    _cachePlayerBuffRemaining.TimeStamp = RetributionPaladin.PulseTick;
+                    _cachePlayerBuffRemaining.TimeStamp = RetributionPaladinGP.PulseTick;
 
                     if (_endPlayerBuffRemaining < Environment.TickCount)
                     {
-                        _cachePlayerBuffRemaining.Variable = WoW.PlayerBuffTimeRemaining(this._name) * 1000;
+                        _cachePlayerBuffRemaining.Variable = WoW.PlayerBuffTimeRemaining(this._name)*1000;
                     }
                     else
                     {
@@ -807,55 +840,51 @@ namespace PixelMagic.Rotation
             }
         }
 
+        public void Cast()
+        {
+            WoW.CastSpell(this._name);
+        }
 
-        private int _lastSpellCooldownRemaining = 0;
-        private int _endSpellCooldownRemaining = 0;
         public void PulseSpellCooldownRemaining()
         {
-            int remaining = WoW.SpellCooldownTimeRemaining(this._name);
+            var remaining = WoW.SpellCooldownTimeRemaining(this._name);
 
             if (_lastSpellCooldownRemaining - remaining == 1)
             {
-                _endSpellCooldownRemaining = Environment.TickCount + (1000 * _lastSpellCooldownRemaining);
+                _endSpellCooldownRemaining = Environment.TickCount + 1000*_lastSpellCooldownRemaining;
             }
             _lastSpellCooldownRemaining = remaining;
         }
 
-        private int _lastTargetDebuffRemaining = 0;
-        private int _endTargetDebuffRemaining = 0;
         public void PulseTargetDebuffRemaining()
         {
-            int remaining = WoW.TargetDebuffTimeRemaining(this._name);
+            var remaining = WoW.TargetDebuffTimeRemaining(this._name);
 
             if (_lastTargetDebuffRemaining - remaining == 1)
             {
-                _endTargetDebuffRemaining = Environment.TickCount + (1000 * _lastTargetDebuffRemaining);
+                _endTargetDebuffRemaining = Environment.TickCount + 1000*_lastTargetDebuffRemaining;
             }
             _lastTargetDebuffRemaining = remaining;
         }
 
-        private int _lastPlayerBuffRemaining = 0;
-        private int _endPlayerBuffRemaining = 0;
         public void PulsePlayerBuffRemaining()
         {
-            int remaining = WoW.PlayerBuffTimeRemaining(this._name);
+            var remaining = WoW.PlayerBuffTimeRemaining(this._name);
 
             if (_lastPlayerBuffRemaining - remaining == 1)
             {
-                _endPlayerBuffRemaining = Environment.TickCount + (1000 * _lastPlayerBuffRemaining);
+                _endPlayerBuffRemaining = Environment.TickCount + 1000*_lastPlayerBuffRemaining;
             }
             _lastPlayerBuffRemaining = remaining;
         }
-
     }
 
     public class ClassCachedVariable<Type>
     {
+        public int TimeStamp;
         public Type Variable;
-        public int TimeStamp = 0;
     }
 }
-
 
 /*
 [AddonDetails.db]

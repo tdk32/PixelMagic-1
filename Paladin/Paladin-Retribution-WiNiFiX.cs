@@ -2,12 +2,10 @@
 // ReSharper disable UnusedMember.Global
 
 
-using System.Diagnostics;
-using PixelMagic.Helpers;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
-using PixelMagic.GUI;
-using System;
+using PixelMagic.Helpers;
 
 namespace PixelMagic.Rotation
 {
@@ -19,15 +17,9 @@ namespace PixelMagic.Rotation
 
         public override Form SettingsForm
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { throw new NotImplementedException(); }
 
-            set
-            {
-                throw new NotImplementedException();
-            }
+            set { throw new NotImplementedException(); }
         }
 
 
@@ -47,13 +39,15 @@ namespace PixelMagic.Rotation
             if (!WoW.HasTarget || WoW.TargetIsFriend)
             {
                 if (!WoW.PlayerHasBuff("Greater Blessing of Kings"))
-                    if (WoW.CanCast("Greater Blessing of Kings")) {
+                    if (WoW.CanCast("Greater Blessing of Kings"))
+                    {
                         WoW.CastSpell("Greater Blessing of Kings");
                         return;
                     }
 
                 if (!WoW.PlayerHasBuff("Greater Blessing of Wisdom"))
-                    if (WoW.CanCast("Greater Blessing of Wisdom")) {
+                    if (WoW.CanCast("Greater Blessing of Wisdom"))
+                    {
                         WoW.CastSpell("Greater Blessing of Wisdom");
                         return;
                     }
@@ -61,7 +55,8 @@ namespace PixelMagic.Rotation
 
             if (!WoW.HasTarget || !WoW.TargetIsEnemy) return;
 
-            if (WoW.CanCast("Judgment") && WoW.UnitPower >= 5) {
+            if (WoW.CanCast("Judgment") && WoW.UnitPower >= 5)
+            {
                 WoW.CastSpell("Judgment");
                 return;
             }
@@ -72,7 +67,8 @@ namespace PixelMagic.Rotation
                 return;
             }
 
-            if (WoW.CanCast("Crusade") && WoW.UnitPower >= 5 && WoW.TargetHasDebuff("Judgment")) {
+            if (WoW.CanCast("Crusade") && WoW.UnitPower >= 5 && WoW.TargetHasDebuff("Judgment"))
+            {
                 WoW.CastSpell("Crusade");
                 return;
             }
@@ -82,31 +78,31 @@ namespace PixelMagic.Rotation
             //    return;
             //}
 
-            if (WoW.CanCast("Execution Sentence") && WoW.UnitPower >= 3 && WoW.TargetHasDebuff("Judgment") && !WoW.TargetHasDebuff("Execution Sentence")) {
+            if (WoW.CanCast("Execution Sentence") && WoW.UnitPower >= 3 && WoW.TargetHasDebuff("Judgment") && !WoW.TargetHasDebuff("Execution Sentence"))
+            {
                 WoW.CastSpell("Execution Sentence");
                 return;
             }
 
-            if (WoW.CanCast("Templars Verdict") && WoW.UnitPower >= 3 && WoW.TargetHasDebuff("Judgment")) {
+            if (WoW.CanCast("Templars Verdict") && WoW.UnitPower >= 3 && WoW.TargetHasDebuff("Judgment"))
+            {
                 WoW.CastSpell("Templars Verdict");
                 return;
             }
-            
+
             if (WoW.CanCast("Blade of Justice") && WoW.UnitPower <= 3) // Higher Priority because it can generate 2 holy power in 1 go
             {
                 WoW.CastSpell("Blade of Justice");
                 return;
             }
 
-            if (WoW.CanCast("Crusader Strike") && WoW.UnitPower < 5 && WoW.PlayerSpellCharges("Crusader Strike") >= 1) 
+            if (WoW.CanCast("Crusader Strike") && WoW.UnitPower < 5 && WoW.PlayerSpellCharges("Crusader Strike") >= 1)
             {
                 WoW.CastSpell("Crusader Strike");
-                return;
             }
         }
     }
 }
-
 
 /*
 [AddonDetails.db]
@@ -129,4 +125,3 @@ Aura,213757,Execution Sentence
 Aura,203538,Greater Blessing of Kings
 Aura,203539,Greater Blessing of Wisdom
 */
-

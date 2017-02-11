@@ -89,6 +89,7 @@ using System.Windows.Forms;
 using System.Text;
 using System.Runtime.InteropServices;
 using PixelMagic.Helpers;
+#pragma warning disable 1998
 
 
 namespace PixelMagic.Rotation
@@ -2421,10 +2422,10 @@ namespace PixelMagic.Rotation
 			
         }
 		
-        private void DisplayInfo_Click(object sender, EventArgs e)
+        public void DisplayInfo_Click(object sender, EventArgs e)
         {
 			DisplayText = "Overlay Activated";
-			DisplayInfoForm frm = new DisplayInfoForm();
+            DisplayInfoFormRDI frm = new DisplayInfoFormRDI();
 			frm.Show();
         }
 
@@ -2980,9 +2981,9 @@ namespace PixelMagic.Rotation
 
                         // Casts Mighty Bash if we have the talent and the target is not a boss (and hence not CCable)
 
-                        if (WoW.IsSpellInRange("Mighty Bash") && WoW.CanCast("Mighty Bash") && !WoW.HasBossTarget)
+                        if (WoW.IsSpellInRange("Mighty Bash") && WoW.CanCast("Mighty Bash"))
                         {
-                            WoW.CastSpell("Moonfire");
+                            WoW.CastSpell("Mighty Bash");
                             return;
                         }
 
@@ -3408,7 +3409,7 @@ namespace PixelMagic.Rotation
 			set {}
 		}
 		
-		public static IntPtr WindowHandle = p.MainWindowHandle;
+		private static IntPtr WindowHandle = p.MainWindowHandle;
 		
 		private static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
 		private const UInt32 SWP_NOSIZE = 0x0001;
@@ -3475,7 +3476,7 @@ namespace PixelMagic.Rotation
             OverlayDisplayTimer.Interval = 100;
         }
 		
-		public DisplayInfoForm()
+		private DisplayInfoForm()
 		{
 		
 			DisplayLabel = new Label();
