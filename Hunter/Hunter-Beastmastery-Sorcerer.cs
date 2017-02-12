@@ -36,7 +36,7 @@ namespace PixelMagic.Rotation
         {
             Log.Write("Welcome to Beastmastery Hunter", Color.Green);
             Log.Write("IN ORDER FOR THIS ROTATION TO WORK YOU WILL NEED TO DOWNLOAD AND INSTALL THE ADDON.", Color.Red);
-            Log.Write("https://github.com/winifix/PixelMagicCR/tree/master/Hunter", Color.Blue);
+            Log.Write("Poke me on DISCORD for the addon", Color.Blue);
         }
 
         public override void Stop()
@@ -442,7 +442,7 @@ namespace PixelMagic.Rotation
             }
         }
 
-
+        #region Talents functions
         public struct char_data
         {
             public int T1;
@@ -668,7 +668,7 @@ namespace PixelMagic.Rotation
             if (RangeLib == false)
             {
                 RangeLibCopy();
-                //WoW.SendMacro("/reload");
+                WoW.Reload();
             }
             Thread.Sleep(350);
         }
@@ -767,6 +767,7 @@ namespace PixelMagic.Rotation
         }
     }
 }
+        #endregion
 
 /*
 [AddonDetails.db]
