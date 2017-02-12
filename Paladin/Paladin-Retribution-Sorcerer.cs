@@ -3,40 +3,28 @@
 // ReSharper disable ConvertPropertyToExpressionBody
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Timers;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
 using System.Windows.Forms;
 using PixelMagic.Helpers;
+using PixelMagic.GUI;
 
 namespace PixelMagic.Rotation
 {
     public class RetributionPaladin : CombatRoutine
     {
-        private static readonly string AddonName = ConfigFile.ReadValue("PixelMagic", "AddonName");
-        private static readonly string AddonEmbedName = "BossLib.xml"; // Initialization variables		
-        private static readonly string LuaAddon = "Shaman.lua";
         private readonly Stopwatch BeastCleave = new Stopwatch();
-
-        private bool AddonEdited;
-        private bool AddonEmbeded;
-        private char_data CharInfo;
-        private double hastePct;
-        private bool Nameplates;
-        private int npcCount, players;
-        private Color pixelColor = Color.FromArgb(0);
-
-        public string[] Race = {"None", "Human", "Dwarf", "NightElf", "Gnome", "Dreanei", "Pandaren", "Orc", "Undead", "Tauren", "Troll", "BloodElf", "Goblin", "none"};
-        private bool RangeLib;
-
-        public string[] Spec =
-        {
-            "None", "Blood", "Frost", "Unholy", "Havoc", "Vengeance", "Balance", "Feral", "Guardian", "Restoration", "Beast Mastery", "Marksmanship", "Survival", "Arcane",
-            "Fire", "Frost", "Brewmaster", "Mistweaver", "Windwalker", "Holy", "Protection", "Retribution", "Discipline", "HolyPriest", "Shadow", "Assassination", "Outlaw", "Subtlety",
-            "Elemental", "Enhancement", "RestorationShaman", "Affliction", "Arms", "Fury", "Protection", "none"
-        };
 
         public override string Name
         {
@@ -48,29 +36,18 @@ namespace PixelMagic.Rotation
             get { return "Paladin"; }
         }
 
-        public static string CustomLua
-        {
-            get
-            {
-                var customLua = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + LuaAddon);
-                return customLua;
-            }
-        }
-
-        public override Form SettingsForm { get; set; }
-
         public override void Initialize()
         {
             Log.Write("Welcome to Retribution Paladin", Color.Green);
             Log.Write("IN ORDER FOR THIS ROTATION TO WORK YOU WILL NEED TO DOWNLOAD AND INSTALL THE ADDON.", Color.Red);
-            Log.Write("https://github.com/winifix/PixelMagicCR/tree/master/Hunter", Color.Blue);
+            Log.Write("Poke me on DISCORD for the addon", Color.Blue);
         }
 
         public override void Stop()
         {
         }
 
-        public override void Pulse() // Updated for Legion (tested and working for single target)
+        public override void Pulse()        // Updated for Legion (tested and working for single target)
         {
             AddonCreationPulse();
             PlayerStats();
@@ -81,8 +58,11 @@ namespace PixelMagic.Rotation
             }
 
             //Healthstone - Potion
-            if ((WoW.CanCast("Healthstone") || WoW.CanCast("Potion")) && (WoW.ItemCount("Healthstone") >= 1 || WoW.ItemCount("Potion") >= 1) &&
-                (!WoW.ItemOnCooldown("Healthstone") || !WoW.ItemOnCooldown("Potion")) && WoW.HealthPercent <= 30 && !WoW.PlayerHasBuff("Mount"))
+            if ((WoW.CanCast("Healthstone") || WoW.CanCast("Potion"))
+                && (WoW.ItemCount("Healthstone") >= 1 || WoW.ItemCount("Potion") >= 1)
+                && (!WoW.ItemOnCooldown("Healthstone") || !WoW.ItemOnCooldown("Potion"))                
+                && WoW.HealthPercent <= 30
+                && !WoW.PlayerHasBuff("Mount"))
             {
                 WoW.CastSpell("Healthstone");
                 WoW.CastSpell("Potion");
@@ -90,21 +70,27 @@ namespace PixelMagic.Rotation
             }
 
             //Shield of Vengeance
-            if (WoW.CanCast("Shield of Vengeance") && WoW.HealthPercent <= 40 && !WoW.PlayerHasBuff("Mount"))
+            if (WoW.CanCast("Shield of Vengeance")
+                && WoW.HealthPercent <= 40
+                && !WoW.PlayerHasBuff("Mount"))
             {
                 WoW.CastSpell("Shield of Vengeance");
                 return;
             }
 
             //Lay on Hands
-            if (WoW.CanCast("Lay on Hands") && WoW.HealthPercent <= 20 && !WoW.PlayerHasBuff("Mount"))
+            if (WoW.CanCast("Lay on Hands")
+                && WoW.HealthPercent <= 20
+                && !WoW.PlayerHasBuff("Mount"))
             {
                 WoW.CastSpell("Lay on Hands");
                 return;
             }
 
             //Divine Steed
-            if (DetectKeyPress.GetKeyState(DetectKeyPress.Num4) < 0 && WoW.CanCast("Divine Steed") && !WoW.PlayerHasBuff("Divine Steed"))
+            if (DetectKeyPress.GetKeyState(DetectKeyPress.Num4) < 0
+                && WoW.CanCast("Divine Steed")
+                && !WoW.PlayerHasBuff("Divine Steed"))
             {
                 WoW.CastSpell("Divine Steed");
                 return;
@@ -113,30 +99,40 @@ namespace PixelMagic.Rotation
             if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !WoW.PlayerHasBuff("Mount") && !WoW.PlayerIsChanneling && !WoW.PlayerIsCasting && WoW.HealthPercent != 0)
             {
                 //Crusade
-                if (WoW.CanCast("Crusade") && CharInfo.T7 == 2 && WoW.CurrentHolyPower >= 3 && WoW.IsSpellInRange("Templar Verdict") &&
-                    (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War")))
+                if (WoW.CanCast("Crusade")
+                    && CharInfo.T7 == 2
+                    && WoW.CurrentHolyPower >= 3
+                    && WoW.IsSpellInRange("Templar Verdict")
+                    && (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War")))
                 {
                     WoW.CastSpell("Crusade");
                     return;
                 }
 
                 //Avenging Wrath
-                if (WoW.CanCast("Avenging Wrath") && WoW.CurrentHolyPower >= 3 && WoW.IsSpellInRange("Templar Verdict") &&
-                    (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War")))
+                if (WoW.CanCast("Avenging Wrath")
+                    && WoW.CurrentHolyPower >= 3
+                    && WoW.IsSpellInRange("Templar Verdict")
+                    && (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Time Warp") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums of War")))
                 {
                     WoW.CastSpell("Avenging Wrath");
                     return;
                 }
 
                 //Hammer of Justice
-                if (DetectKeyPress.GetKeyState(DetectKeyPress.NumpadADD) < 0 && WoW.CanCast("Hammer of Justice"))
+                if (DetectKeyPress.GetKeyState(DetectKeyPress.NumpadADD) < 0
+                   && WoW.CanCast("Hammer of Justice")
+                    )
                 {
                     WoW.CastSpell("Hammer of Justice");
                     return;
                 }
 
                 //Holy Wrath
-                if (WoW.CanCast("Holy Wrath") && CharInfo.T7 == 3 && WoW.HealthPercent <= 40 && WoW.IsSpellInRange("Templar Verdict"))
+                if (WoW.CanCast("Holy Wrath")
+                    && CharInfo.T7 == 3
+                    && WoW.HealthPercent <= 40
+                    && WoW.IsSpellInRange("Templar Verdict"))
                 {
                     WoW.CastSpell("Holy Wrath");
                     return;
@@ -145,75 +141,105 @@ namespace PixelMagic.Rotation
                 //Single Target Rotation
 
                 //Execution Sentence
-                if (combatRoutine.Type == RotationType.SingleTarget && WoW.CanCast("Execution Sentence") && WoW.TargetHasDebuff("Judgement") &&
-                    WoW.TargetDebuffTimeRemaining("Judgement") >= 6.5 && CharInfo.T1 == 2)
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CanCast("Execution Sentence")                    
+                    && WoW.TargetHasDebuff("Judgement")
+                    && WoW.TargetDebuffTimeRemaining("Judgement") >= 6.5
+                    && CharInfo.T1 == 2)
                 {
                     WoW.CastSpell("Execution Sentence");
                     return;
                 }
 
                 //Justicar's Vengeance
-                if (combatRoutine.Type == RotationType.SingleTarget && WoW.CanCast("Justicars Vengeance") && WoW.PlayerHasBuff("Divine Purpose") && WoW.IsSpellInRange("Templar Verdict") &&
-                    CharInfo.T5 == 1)
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CanCast("Justicars Vengeance")                    
+                    && WoW.PlayerHasBuff("Divine Purpose")
+                    && WoW.IsSpellInRange("Templar Verdict")
+                    && CharInfo.T5 == 1)
                 {
                     WoW.CastSpell("Justicars Vengeance");
                     return;
                 }
 
                 //Templar's Verdict
-                if (combatRoutine.Type == RotationType.SingleTarget &&
-                    (WoW.CurrentHolyPower >= 3 || WoW.PlayerHasBuff("Divine Purpose") || (WoW.CurrentHolyPower >= 2 && WoW.PlayerHasBuff("The Fires of Justice"))) &&
-                    WoW.CanCast("Templar Verdict") && WoW.IsSpellInRange("Templar Verdict") && WoW.TargetHasDebuff("Judgement") && WoW.TargetDebuffTimeRemaining("Judgement") >= 0.5)
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && (WoW.CurrentHolyPower >= 3 || WoW.PlayerHasBuff("Divine Purpose") || (WoW.CurrentHolyPower >= 2 && WoW.PlayerHasBuff("The Fires of Justice")))
+                    && WoW.CanCast("Templar Verdict")
+                    && WoW.IsSpellInRange("Templar Verdict")
+                    && WoW.TargetHasDebuff("Judgement")
+                    && WoW.TargetDebuffTimeRemaining("Judgement") >= 0.5)
                 {
                     WoW.CastSpell("Templar Verdict");
                     return;
                 }
 
                 //Judgement
-                if (combatRoutine.Type == RotationType.SingleTarget && WoW.CanCast("Judgement") && WoW.CurrentHolyPower >= 3)
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CanCast("Judgement")
+                    && WoW.CurrentHolyPower >= 3)
                 {
                     WoW.CastSpell("Judgement");
                     return;
                 }
 
                 //Wake of Ashes
-                if (combatRoutine.Type == RotationType.SingleTarget && WoW.CurrentHolyPower == 0 && WoW.CanCast("Wake of Ashes") && WoW.IsSpellInRange("Templar Verdict"))
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CurrentHolyPower == 0
+                    && WoW.CanCast("Wake of Ashes")
+                    && WoW.IsSpellInRange("Templar Verdict"))
                 {
                     WoW.CastSpell("Wake of Ashes");
                     return;
                 }
 
                 //Blade of Justice
-                if (combatRoutine.Type == RotationType.SingleTarget && WoW.CanCast("Blade of Justice") && WoW.CurrentHolyPower <= 3 && CharInfo.T4 != 3)
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CanCast("Blade of Justice")                    
+                    && WoW.CurrentHolyPower <= 3
+                    && CharInfo.T4 != 3)
                 {
                     WoW.CastSpell("Blade of Justice");
                     return;
                 }
 
                 //Divine Hammer
-                if (combatRoutine.Type == RotationType.SingleTarget && WoW.CanCast("Divine Hammer") && WoW.CurrentHolyPower <= 3 && CharInfo.T4 == 3)
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CanCast("Divine Hammer")                    
+                    && WoW.CurrentHolyPower <= 3
+                    && CharInfo.T4 == 3)
                 {
                     WoW.CastSpell("Divine Hammer");
                     return;
                 }
 
                 //Crusader Strike
-                if (combatRoutine.Type == RotationType.SingleTarget && WoW.CurrentHolyPower < 5 && WoW.PlayerSpellCharges("Crusader Strike") >= 1 && WoW.CanCast("Crusader Strike") &&
-                    CharInfo.T2 != 2)
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CurrentHolyPower < 5
+                    && WoW.PlayerSpellCharges("Crusader Strike") >= 1
+                    && WoW.CanCast("Crusader Strike")
+                    && CharInfo.T2 != 2)
                 {
                     WoW.CastSpell("Crusader Strike");
                     return;
                 }
 
                 //Zeal
-                if (combatRoutine.Type == RotationType.SingleTarget && WoW.CurrentHolyPower < 5 && WoW.PlayerSpellCharges("Zeal") >= 1 && WoW.CanCast("Zeal") && CharInfo.T2 == 2)
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CurrentHolyPower < 5
+                    && WoW.PlayerSpellCharges("Zeal") >= 1
+                    && WoW.CanCast("Zeal")
+                    && CharInfo.T2 == 2)
                 {
                     WoW.CastSpell("Zeal");
                     return;
                 }
 
                 //Consecration
-                if (combatRoutine.Type == RotationType.SingleTarget && WoW.CanCast("Consecration") && WoW.IsSpellInRange("Templar Verdict") && CharInfo.T1 == 3)
+                if (combatRoutine.Type == RotationType.SingleTarget
+                    && WoW.CanCast("Consecration")
+                    && WoW.IsSpellInRange("Templar Verdict")
+                    && CharInfo.T1 == 3)
                 {
                     WoW.CastSpell("Consecration");
                     return;
@@ -222,58 +248,80 @@ namespace PixelMagic.Rotation
                 //AoE Rotation = 3+ Targets
 
                 //Divine Storm
-                if (combatRoutine.Type == RotationType.AOE &&
-                    (WoW.CurrentHolyPower >= 3 || WoW.PlayerHasBuff("Divine Purpose") || (WoW.CurrentHolyPower >= 2 && WoW.PlayerHasBuff("The Fires of Justice"))) &&
-                    WoW.CanCast("Divine Storm") && WoW.IsSpellInRange("Templar Verdict"))
+                if (combatRoutine.Type == RotationType.AOE
+                    && (WoW.CurrentHolyPower >= 3 || WoW.PlayerHasBuff("Divine Purpose") || (WoW.CurrentHolyPower >= 2 && WoW.PlayerHasBuff("The Fires of Justice")))
+                    && WoW.CanCast("Divine Storm")
+                    && WoW.IsSpellInRange("Templar Verdict"))
                 {
                     WoW.CastSpell("Divine Storm");
                     return;
                 }
 
                 //Judgement
-                if (combatRoutine.Type == RotationType.AOE && WoW.CanCast("Judgement"))
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CanCast("Judgement"))
                 {
                     WoW.CastSpell("Judgement");
                     return;
                 }
 
                 //Wake of Ashes
-                if (combatRoutine.Type == RotationType.AOE && WoW.CurrentHolyPower == 0 && WoW.CanCast("Wake of Ashes") && WoW.IsSpellInRange("Templar Verdict"))
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CurrentHolyPower == 0
+                    && WoW.CanCast("Wake of Ashes")
+                    && WoW.IsSpellInRange("Templar Verdict"))
                 {
                     WoW.CastSpell("Wake of Ashes");
                     return;
                 }
 
                 //Consecration
-                if (combatRoutine.Type == RotationType.AOE && WoW.CanCast("Consecration") && WoW.IsSpellInRange("Templar Verdict") && CharInfo.T1 == 3)
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CanCast("Consecration")
+                    && WoW.IsSpellInRange("Templar Verdict")
+                    && CharInfo.T1 == 3)
                 {
                     WoW.CastSpell("Consecration");
                     return;
                 }
 
                 //Blade of Justice
-                if (combatRoutine.Type == RotationType.AOE && WoW.CanCast("Blade of Justice") && WoW.CurrentHolyPower <= 3 && CharInfo.T4 != 3)
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CanCast("Blade of Justice")                    
+                    && WoW.CurrentHolyPower <= 3
+                    && CharInfo.T4 != 3)
                 {
                     WoW.CastSpell("Blade of Justice");
                     return;
                 }
 
                 //Divine Hammer
-                if (combatRoutine.Type == RotationType.AOE && WoW.CanCast("Divine Hammer") && WoW.CurrentHolyPower <= 3 && CharInfo.T4 == 3)
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CanCast("Divine Hammer")
+                    && WoW.CurrentHolyPower <= 3
+                    && CharInfo.T4 == 3)
                 {
                     WoW.CastSpell("Divine Hammer");
                     return;
                 }
 
                 //Crusader Strike
-                if (combatRoutine.Type == RotationType.AOE && WoW.CurrentHolyPower < 5 && WoW.PlayerSpellCharges("Crusader Strike") >= 1 && WoW.CanCast("Crusader Strike") && CharInfo.T2 != 2)
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CurrentHolyPower < 5
+                    && WoW.PlayerSpellCharges("Crusader Strike") >= 1
+                    && WoW.CanCast("Crusader Strike")
+                    && CharInfo.T2 != 2)
                 {
                     WoW.CastSpell("Crusader Strike");
                     return;
                 }
 
                 //Zeal
-                if (combatRoutine.Type == RotationType.AOE && WoW.CurrentHolyPower < 5 && WoW.PlayerSpellCharges("Zeal") >= 1 && WoW.CanCast("Zeal") && CharInfo.T2 == 2)
+                if (combatRoutine.Type == RotationType.AOE
+                    && WoW.CurrentHolyPower < 5
+                    && WoW.PlayerSpellCharges("Zeal") >= 1
+                    && WoW.CanCast("Zeal")
+                    && CharInfo.T2 == 2)
                 {
                     WoW.CastSpell("Zeal");
                     return;
@@ -284,8 +332,48 @@ namespace PixelMagic.Rotation
                 {
                     // Do Single Target Cleave stuff here if applicable else ignore this one
                 }
+
             }
         }
+
+
+        public struct char_data
+        {
+            public int T1;
+            public int T2;
+            public int T3;
+            public int T4;
+            public int T5;
+            public int T6;
+            public int T7;
+            public float Mana;
+            public string Spec;
+            public string Race;
+
+            private char_data(int p1, int p2, int p3, int p4, int p5, int p6, int p7, float mana, string spec, string race)
+            {
+                T1 = p1;
+                T2 = p2;
+                T3 = p3;
+                T4 = p4;
+                T5 = p5;
+                T6 = p6;
+                T7 = p7;
+                Mana = mana;
+                Spec = spec;
+                Race = race;
+            }
+        }
+
+        public string[] Race = new string[] { "None", "Human", "Dwarf", "NightElf", "Gnome", "Dreanei", "Pandaren", "Orc", "Undead", "Tauren", "Troll", "BloodElf", "Goblin", "none" };
+        public string[] Spec = new string[] { "None", "Blood", "Frost", "Unholy", "Havoc", "Vengeance", "Balance", "Feral", "Guardian", "Restoration", "Beast Mastery", "Marksmanship", "Survival", "Arcane", "Fire", "Frost", "Brewmaster", "Mistweaver", "Windwalker", "Holy", "Protection", "Retribution", "Discipline", "HolyPriest", "Shadow", "Assassination", "Outlaw", "Subtlety", "Elemental", "Enhancement", "RestorationShaman", "Affliction", "Arms", "Fury", "Protection", "none" };
+        private int npcCount, players;
+        private bool Nameplates = false;
+        private Color pixelColor = Color.FromArgb(0);
+        private double hastePct;
+        private char_data CharInfo = new char_data();
+        private bool AddonEmbeded = false;
+        private bool RangeLib = false;
 
         private void PlayerStats()
         {
@@ -294,33 +382,34 @@ namespace PixelMagic.Rotation
             // t4 t5 t7
             // t7 +-haste hastePCT
             // Spec, Mana, Race
-            var postive = 0;
-            if (Convert.ToDouble(pixelColor.R) == 255)
+            int postive = 0;
+            if ((Convert.ToDouble(pixelColor.R) == 255))
                 hastePct = 0f;
             else
-                hastePct = Convert.ToSingle(pixelColor.R)*100f/255f;
+                hastePct = (Convert.ToSingle(pixelColor.R) * 100f / 255f);
             int spec, race;
             pixelColor = WoW.GetBlockColor(1, 21);
-            CharInfo.T1 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R)*100/255));
-            CharInfo.T2 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G)*100/255));
-            CharInfo.T3 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B)*100/255));
+            CharInfo.T1 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
+            CharInfo.T2 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
+            CharInfo.T3 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) * 100 / 255));
             pixelColor = WoW.GetBlockColor(2, 21);
-            CharInfo.T4 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R)*100/255));
-            CharInfo.T5 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G)*100/255));
-            CharInfo.T6 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B)*100/255));
+            CharInfo.T4 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
+            CharInfo.T5 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
+            CharInfo.T6 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) * 100 / 255));
             pixelColor = WoW.GetBlockColor(3, 21);
-            CharInfo.T7 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R)*100/255));
-            spec = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G)*100/255));
-            race = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B)*100/255));
+            CharInfo.T7 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
+            spec = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
+            race = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) * 100 / 255));
             pixelColor = WoW.GetBlockColor(4, 21);
-            CharInfo.Mana = Convert.ToSingle(pixelColor.B)*100/255;
-            postive = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G)/255));
-            if (Convert.ToDouble(pixelColor.B) == 255)
+            CharInfo.Mana = (Convert.ToSingle(pixelColor.B) * 100 / 255);
+            postive = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) / 255));
+            if ((Convert.ToDouble(pixelColor.B) == 255))
                 hastePct = 0f;
-            else if (postive == 1)
-                hastePct = Convert.ToSingle(pixelColor.R)*100f/255f*-1;
             else
-                hastePct = Convert.ToSingle(pixelColor.G)*100f/255f;
+                if (postive == 1)
+                    hastePct = (Convert.ToSingle(pixelColor.R) * 100f / 255f) * (-1);
+                else
+                    hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f);
             if (race > 13)
                 race = 0;
             if (spec > 34)
@@ -330,14 +419,15 @@ namespace PixelMagic.Rotation
             CharInfo.Spec = Spec[spec];
             Log.Write(" T1 " + CharInfo.T1 + " T2 " + CharInfo.T2 + " T3 " + CharInfo.T3 + " T4 " + CharInfo.T4 + " T5 " + CharInfo.T5 + " T6 " + CharInfo.T6 + " T7 " + CharInfo.T7);
             //Log.Write("Char Haste " + hastePct + " Mana :" + CharInfo.Mana + " Race : " +CharInfo.Race + " Spec : "  +CharInfo.Spec ) ;
+
         }
 
         private void AoEStuff()
         {
-            var pixelColor = Color.FromArgb(0);
+            Color pixelColor = Color.FromArgb(0);
             pixelColor = WoW.GetBlockColor(11, 20);
-            npcCount = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G)*100/255));
-            if (Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B)/255)) == 1)
+            npcCount = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
+            if (Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) / 255)) == 1)
                 Nameplates = true;
             else
                 Nameplates = false;
@@ -349,23 +439,35 @@ namespace PixelMagic.Rotation
             {
                 if (npcCount >= 3 && !WoW.TargetIsPlayer)
                     combatRoutine.ChangeType(RotationType.AOE);
-                /* if ((npcCount == 0 || npcCount == 3) && !WoW.TargetIsPlayer)
+               /* if ((npcCount == 0 || npcCount == 3) && !WoW.TargetIsPlayer)
                     combatRoutine.ChangeType(RotationType.SingleTargetCleave);*/
                 if (npcCount <= 2)
                     combatRoutine.ChangeType(RotationType.SingleTarget);
             }
         }
 
+        private bool AddonEdited = false;
+        private static string AddonName = ConfigFile.ReadValue("PixelMagic", "AddonName");
+        private static string AddonEmbedName = "BossLib.xml";// Initialization variables		
+        private static string LuaAddon = "Shaman.lua";
+        public static string CustomLua
+        {
+            get
+            {
+                var customLua = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + LuaAddon);
+                return customLua;
+            }
+        }
         public void RangeLibCopy()
         {
             try
             {
-                var fileName = "text.txt";
-                var sourcePath = string.Concat(AppDomain.CurrentDomain.BaseDirectory + "LibSpellRange-1.0\\");
-                var sourcePathSub = string.Concat(AppDomain.CurrentDomain.BaseDirectory + "LibSpellRange-1.0\\lib\\LibStub\\");
-                var targetPath = string.Concat("" + WoW.AddonPath + "\\" + AddonName + "\\lib\\LibSpellRange-1.0\\");
-                var targetPathSub = string.Concat("" + WoW.AddonPath + "\\" + AddonName + "\\lib\\LibSpellRange-1.0\\lib\\LibStub\\");
-                var destFile = "text.txt";
+                string fileName = "text.txt";
+                string sourcePath = string.Concat(AppDomain.CurrentDomain.BaseDirectory + "LibSpellRange-1.0\\");
+                string sourcePathSub = string.Concat(AppDomain.CurrentDomain.BaseDirectory + "LibSpellRange-1.0\\lib\\LibStub\\");
+                string targetPath = string.Concat("" + WoW.AddonPath + "\\" + AddonName + "\\lib\\LibSpellRange-1.0\\");
+                string targetPathSub = string.Concat("" + WoW.AddonPath + "\\" + AddonName + "\\lib\\LibSpellRange-1.0\\lib\\LibStub\\");
+                string destFile = "text.txt";
 
                 // To copy a folder's contents to a new location:
                 // Create a new target folder, if necessary.
@@ -385,8 +487,8 @@ namespace PixelMagic.Rotation
                     Log.Write("Dirctory doesn't exist:" + sourcePathSub);
                 if (Directory.Exists(sourcePath))
                 {
-                    var files = Directory.GetFiles(sourcePath);
-                    foreach (var s in files)
+                    string[] files = Directory.GetFiles(sourcePath);
+                    foreach (string s in files)
                     {
                         Log.Write("Generating file" + s);
                         fileName = Path.GetFileName(s);
@@ -396,9 +498,9 @@ namespace PixelMagic.Rotation
                 }
                 if (Directory.Exists(sourcePathSub))
                 {
-                    var files = Directory.GetFiles(sourcePathSub);
+                    string[] files = Directory.GetFiles(sourcePathSub);
 
-                    foreach (var s in files)
+                    foreach (string s in files)
                     {
                         Log.Write("Generating Sub file" + s);
                         fileName = Path.GetFileName(s);
@@ -419,14 +521,16 @@ namespace PixelMagic.Rotation
         {
             try
             {
+
                 Log.Write("Addon emedding Editing in progress");
                 if (!File.Exists(Path.Combine("" + WoW.AddonPath + "\\" + AddonName + "\\", AddonEmbedName)))
                 {
-                    var addonlua =
-                        " < Ui xmlns = \"http://www.blizzard.com/wow/ui/\" xmlns: xsi = \"http://www.w3.org/2001/XMLSchema-instance \" xsi: schemaLocation = \"http://www.blizzard.com/wow/ui/ ..\\FrameXML\\UI.xsd\" >" +
-                        Environment.NewLine + "< Script file = \"lib\\LibSpellRange-1.0\\LibSpellRange-1.0.lua\" />" + Environment.NewLine + "</ Ui >" + Environment.NewLine;
+                    string addonlua = " < Ui xmlns = \"http://www.blizzard.com/wow/ui/\" xmlns: xsi = \"http://www.w3.org/2001/XMLSchema-instance \" xsi: schemaLocation = \"http://www.blizzard.com/wow/ui/ ..\\FrameXML\\UI.xsd\" >" + Environment.NewLine
+                + "< Script file = \"lib\\LibSpellRange-1.0\\LibSpellRange-1.0.lua\" />" + Environment.NewLine
+                + "</ Ui >" + Environment.NewLine;
                     File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonEmbedName, addonlua);
                     Log.Write("Addon Embedding complete");
+
                 }
                 AddonEmbeded = true;
             }
@@ -438,6 +542,7 @@ namespace PixelMagic.Rotation
 
         public void AddonCreationPulse()
         {
+
             // Editing the addon
             if (AddonEdited == false)
             {
@@ -445,6 +550,7 @@ namespace PixelMagic.Rotation
                 AddonEdit();
                 Log.Write("Editing Addon Complete");
                 Thread.Sleep(2000);
+
             }
             if (AddonEmbeded == false)
             {
@@ -456,28 +562,25 @@ namespace PixelMagic.Rotation
             if (RangeLib == false)
             {
                 RangeLibCopy();
-                WoW.SendMacro("/reload");
+                WoW.Reload();
             }
             Thread.Sleep(350);
         }
-
         private void AddonEdit()
         {
             try
             {
                 if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + LuaAddon))
                 {
-                    var addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
+                    string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
                     Log.Write("Addon Editing in progress");
                     addonlua = addonlua.Replace("if name == \"Wild Imps\"", "if (name == \"Wild Imps\" or name == \"Spirit Wolf\" or name == \"Totem Mastery\")");
                     addonlua = addonlua.Replace("and(startTime + duration - GetTime() > 1.6) ", "and(startTime + duration - GetTime() > (1.5 / (1 + (GetHaste() / 100) ))) ");
                     addonlua = addonlua.Replace("end" + Environment.NewLine + Environment.NewLine + "local function InitializeTwo()", Environment.NewLine);
-                    addonlua = addonlua.Replace("	--print (\"Initialising Spell Charges Frames\")",
-                        "end" + Environment.NewLine + "local function InitializeTwo()" + Environment.NewLine + "	--print (\"Initialising Spell Charges Frames\")" + Environment.NewLine);
+                    addonlua = addonlua.Replace("	--print (\"Initialising Spell Charges Frames\")", "end" + Environment.NewLine + "local function InitializeTwo()" + Environment.NewLine + "	--print (\"Initialising Spell Charges Frames\")" + Environment.NewLine);
                     addonlua = addonlua.Replace("IsSpellInRange(name, \"target\")", "LibStub(\"SpellRange-1.0\").IsSpellInRange(name, \"target\")");
                     addonlua = addonlua.Replace("local function InitializeOne()", Environment.NewLine + CustomLua + Environment.NewLine + "local function InitializeOne()");
-                    addonlua = addonlua.Replace("InitializeOne()" + Environment.NewLine + "            InitializeTwo()",
-                        "InitializeOne()" + Environment.NewLine + "            InitializeTwo()" + Environment.NewLine + "            InitializeThree()");
+                    addonlua = addonlua.Replace("InitializeOne()" + Environment.NewLine + "            InitializeTwo()", "InitializeOne()" + Environment.NewLine + "            InitializeTwo()" + Environment.NewLine + "            InitializeThree()");
                     addonlua = addonlua.Replace("healthFrame:SetScript(\"OnUpdate\", updateHealth)", "");
                     addonlua = addonlua.Replace("powerFrame: SetScript(\"OnUpdate\", updatePower)", "");
                     addonlua = addonlua.Replace("	targetHealthFrame: SetScript(\"OnUpdate\", updateTargetHealth) ", "");
@@ -521,35 +624,7 @@ namespace PixelMagic.Rotation
             Log.Write("Editing Addon Complete");
         }
 
-
-        public struct char_data
-        {
-            public int T1;
-            public int T2;
-            public int T3;
-            public int T4;
-            public int T5;
-            public int T6;
-            public int T7;
-            public float Mana;
-            public string Spec;
-            public string Race;
-
-            private char_data(int p1, int p2, int p3, int p4, int p5, int p6, int p7, float mana, string spec, string race)
-            {
-                T1 = p1;
-                T2 = p2;
-                T3 = p3;
-                T4 = p4;
-                T5 = p5;
-                T6 = p6;
-                T7 = p7;
-                Mana = mana;
-                Spec = spec;
-                Race = race;
-            }
-        }
-
+        public override Form SettingsForm { get; set; }
         public class DetectKeyPress
         {
             public static int Num1 = 0x31;
