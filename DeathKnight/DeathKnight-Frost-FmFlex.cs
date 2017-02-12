@@ -456,7 +456,7 @@ namespace PixelMagic.Rotation
 
                 File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
                 Log.Write("Addon Editing in progress");
-                WoW.SendMacro("/reload");
+                WoW.Reload();
 
                 while (WoW.HealthPercent == 0)
                 {
