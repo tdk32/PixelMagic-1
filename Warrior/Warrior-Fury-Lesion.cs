@@ -77,7 +77,7 @@ namespace PixelMagic.Rotation
 			
 			Log.Write("---------------------------------------------------------", Color.Blue);
             Log.Write("IF True = Frothing Zerk, IF False = Massacre = ", Color.Red);
-			Log.Write("TFZFMint", Color.Blue);
+			Log.Write("=" + TFZFMint, Color.Blue);
            	Log.Write("---------------------------------------------------------", Color.Blue);
 		}	
 			private void CmdSave_Click(object sender, EventArgs e)
