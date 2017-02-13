@@ -4,13 +4,17 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using PixelMagic.Helpers;
+using System.Threading;
 
 namespace PixelMagic.Rotation.DeathKnight.DK
 
 {
-    public class DKBlood : CombatRoutine
+    public class DK_Blood_FmFlex : CombatRoutine
     {
-        private static int[] spellToKick;
+        public string gcdTime = "1.1";
+        public bool AddonEdited = false;
+
+        private static int[] spellToKick = { 0 };
         private int bonesStack;
         private readonly CheckBox checkIsTalentBloodDrinker = new CheckBox();
         private readonly CheckBox checkIsTalentBoneStorm = new CheckBox();
@@ -137,7 +141,7 @@ namespace PixelMagic.Rotation.DeathKnight.DK
             labelIsCDDefEnable.ForeColor = Color.White;
             SettingsForm.Controls.Add(labelIsCDDefEnable); //113; 114 
 
-            isCDDefEnableBox = new CheckBox {Checked = isCDDefEnable, TabIndex = 2, Size = new Size(15, 14), Left = 200, Top = 114};
+            isCDDefEnableBox = new CheckBox { Checked = isCDDefEnable, TabIndex = 2, Size = new Size(15, 14), Left = 200, Top = 114 };
             //isCDDefEnableBox.Appearance = Appearance.Button;
             SettingsForm.Controls.Add(isCDDefEnableBox);
 
@@ -153,7 +157,7 @@ namespace PixelMagic.Rotation.DeathKnight.DK
             labelSpellToKick.ForeColor = Color.White;
             SettingsForm.Controls.Add(labelSpellToKick);
 
-            spellToKickTextBox = new TextBox {Text = spellToKickString, Size = new Size(350, 35), Left = 12, Top = 160};
+            spellToKickTextBox = new TextBox { Text = spellToKickString, Size = new Size(350, 35), Left = 12, Top = 160 };
             spellToKickTextBox.Multiline = true;
 
             SettingsForm.Controls.Add(spellToKickTextBox);
@@ -212,6 +216,34 @@ namespace PixelMagic.Rotation.DeathKnight.DK
         public override void Stop()
         {
         }
+        private void AddonEdit()
+        {
+            string AddonName = ConfigFile.ReadValue("PixelMagic", "AddonName");
+            try
+            {
+                string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
+                string modif = "if remainingTime > " + gcdTime + " then";
+
+                addonlua = addonlua.Replace("if remainingTime ~= 0 then", modif);
+
+
+                File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
+                Log.Write("Addon Editing in progress");
+                WoW.Reload();
+
+                while (WoW.HealthPercent == 0)
+                {
+                    Thread.Sleep(25);
+                }
+                AddonEdited = true;
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("" + ex, "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+        }
 
         public static bool CanCastInRange(string spell)
         {
@@ -225,6 +257,8 @@ namespace PixelMagic.Rotation.DeathKnight.DK
 
         public override void Pulse() // Updated for Legion (tested and working for single target)
         {
+            if (!AddonEdited)
+                AddonEdit();
             renewBones = !WoW.PlayerHasBuff("Bone Shield") || WoW.PlayerBuffTimeRemaining("Bone Shield") <= 5;
             isMelee = WoW.CanCast("Marrowrend", false, false, true, false, false);
             bonesStack = WoW.PlayerBuffStacks("Bone Shield");
@@ -404,24 +438,6 @@ namespace PixelMagic.Rotation.DeathKnight.DK
             }
             return false;
         }
-    }
-
-
-    public static class DetectKeyPress
-    {
-        public const int VK_XBUTTON1 = 0x05;
-        public static int Shift = 0x10;
-        public static int Ctrl = 0x11;
-        public static int Alt = 0x12;
-        public static int VK_XBUTTON2 = 0x06;
-        public static int BoS_BUTTON = 0x78;
-
-        public static int Z = 0x5A;
-        public static int X = 0x58;
-        public static int C = 0x43;
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        internal static extern short GetKeyState(int virtualKeyCode);
     }
 }
 
