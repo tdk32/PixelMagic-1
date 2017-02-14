@@ -2,9 +2,13 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable ConvertPropertyToExpressionBody
 
+using System;
+using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Diagnostics;
 using PixelMagic.Helpers;
+using PixelMagic.GUI;
 
 namespace PixelMagic.Rotation
 {
@@ -21,7 +25,8 @@ namespace PixelMagic.Rotation
         }
 
         public override Form SettingsForm { get; set; }
-
+		
+		private readonly Stopwatch Openingwatch = new Stopwatch();
 
         public override void Initialize()
         {
@@ -38,16 +43,16 @@ namespace PixelMagic.Rotation
         {
             if (combatRoutine.Type == RotationType.SingleTarget) // Do Single Target Stuff here
             {
-                if (WoW.CanCast("Battle Cry") && !WoW.IsSpellOnCooldown("Battle Cry"))
-                {
-                    WoW.CastSpell("Battle Cry");
-                    return;
-                }
+                //if (WoW.IsSpellInRange("Mortal Strike") && WoW.IsInCombat && WoW.CanCast("Battle Cry") && !WoW.IsSpellOnCooldown("Battle Cry"))
+                //{
+                //    WoW.CastSpell("Battle Cry");
+                //    return;
+               // }
 
                 //AOE on Press
-                if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_KEY_Z) < 0)
+                if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_KEY_Q) < 0)
                 {
-                    if (WoW.HasTarget && WoW.IsInCombat && WoW.TargetIsEnemy)
+                    if (WoW.HasTarget && WoW.IsInCombat)
                     {
                         if (WoW.CanCast("Bladestorm") && WoW.IsSpellOnCooldown("Warbreaker"))
                         {
@@ -79,80 +84,148 @@ namespace PixelMagic.Rotation
                         }
                     }
                 }
-
+					if (WoW.IsInCombat && WoW.IsSpellInRange("Mortal Strike") && DetectKeyPress.GetKeyState(DetectKeyPress.VK_KEY_X) < 0)
+						{
+						
+							//Colossus smash control
+                        if (WoW.CanCast("Colossus Smash") && !WoW.TargetHasDebuff("Colossus Smash"))
+                        {
+                            WoW.CastSpell("Colossus Smash");
+                        }
+						if (WoW.CanCast("Colossus Smash") 
+							&& WoW.TargetHasDebuff("Colossus Smash") 
+							&& !WoW.PlayerHasBuff("Shattered Defenses")
+							&& WoW.PlayerBuffStacks("Focused Rage") == 3)
+                        {
+                            WoW.CastSpell("Colossus Smash");
+                        }	
+						//Cooldowns
+						if (WoW.IsSpellInRange("Mortal Strike")
+							&& WoW.CanCast("Battle Cry") 
+							&& !WoW.IsSpellOnCooldown("Battle Cry") 
+							&& WoW.TargetHasDebuff("Colossus Smash"))
+						{
+						WoW.CastSpell("Battle Cry");
+						return;
+						}
+						if (WoW.IsSpellInRange("Mortal Strike")
+							&& WoW.CanCast("Avatar") 
+							&& !WoW.IsSpellOnCooldown("Avatar") 
+							&& WoW.TargetHasDebuff("Colossus Smash"))
+						{
+						WoW.CastSpell("Avatar");
+						return;
+						}
+						// Mortal Strike Control
+						if (WoW.IsSpellInRange("Mortal Strike")
+							&& WoW.CanCast("Mortal Strike") 
+							&& WoW.TargetHasDebuff("Colossus Smash")
+							&& WoW.PlayerHasBuff("Battle Cry")
+							&& WoW.PlayerHasBuff("Avatar")
+							&& WoW.PlayerHasBuff("Shattered Defenses")
+							&& WoW.PlayerBuffStacks("Focused Rage") == 3)
+						{
+						WoW.CastSpell("Mortal Strike");
+						return;
+						}
+												
+						//Slam control
+						if (WoW.IsSpellInRange("Mortal Strike")
+							&& WoW.CanCast("Slam") 
+							&& !WoW.CanCast("Colossus Smash")
+							&& !WoW.CanCast("Mortal Strike")
+							&& WoW.PlayerHasBuff("Shattered Defenses"))
+						{
+						WoW.CastSpell("Slam");
+						return;
+						}
+						
+						// Focused Rage whenever.				
+						if (WoW.CanCast("Focused Rage") && WoW.PlayerBuffStacks("Focused Rage") < 3)
+                        {
+                            WoW.CastSpell("Focused Rage");
+						}
+						}
+						
+						
                 //Normal ST rotation
-                if (!WoW.PlayerHasBuff("Battle Cry") && WoW.HasTarget && WoW.IsInCombat && WoW.TargetIsEnemy && WoW.IsSpellInRange("Mortal Strike"))
-                {
-                    if (WoW.TargetHealthPercent >= 20)
+                if (!WoW.PlayerHasBuff("Battle Cry") && WoW.HasTarget && WoW.IsInCombat && WoW.IsSpellInRange("Mortal Strike"))
+                {	
+									
+                    if (WoW.TargetHealthPercent >  20)
                         //When targets are above 20%. Not in Execute phase.
                     {
-                        //opening 
-                        if (WoW.CanCast("Focused Rage") && WoW.WasLastCasted("Charge") && WoW.PlayerBuffStacks("Focused Rage") == 1)
-                        {
-                            WoW.CastSpell("Focused Rage");
-                        }
-                        if (WoW.CanCast("Focused Rage") && WoW.WasLastCasted("Colossus Smash") && WoW.PlayerBuffStacks("Focused Rage") == 2)
-                        {
-                            WoW.CastSpell("Focused Rage");
-                        }
+                       
+												
                         //FR Control
-                        if (WoW.CanCast("Focused Rage") && WoW.Rage > 50 && WoW.SpellCooldownTimeRemaining("Battle Cry") > 6 && WoW.IsSpellOnCooldown("Mortal Strike") &&
-                            WoW.IsSpellOnCooldown("Colossus Smash"))
+                        if (WoW.CanCast("Focused Rage") && WoW.Rage > 50)
                         {
                             WoW.CastSpell("Focused Rage");
                         }
-                        if (WoW.CanCast("Focused Rage") && WoW.SpellCooldownTimeRemaining("Battle Cry") < 6)
+						
+                        if (WoW.CanCast("Focused Rage")
+							&& WoW.IsSpellOnCooldown("Battle Cry")
+							&& WoW.SpellCooldownTimeRemaining("Battle Cry") < 6
+							&& WoW.PlayerBuffStacks("Focused Rage") < 3)
                         {
                             WoW.CastSpell("Focused Rage");
                         }
-
+						
+						
 
                         //CS Control
-                        if (WoW.CanCast("Colossus Smash") && !WoW.PlayerHasBuff("Shattered Defenses") && WoW.SpellCooldownTimeRemaining("Battle Cry") >= 4 &&
-                            !WoW.IsSpellOnCooldown("Colossus Smash"))
+                        if (WoW.CanCast("Colossus Smash") 
+							&& !WoW.PlayerHasBuff("Shattered Defenses") 
+							&& !WoW.IsSpellOnCooldown("Colossus Smash") || WoW.IsSpellOverlayed("Colossus Smash"))
                         {
                             WoW.CastSpell("Colossus Smash");
                             return;
                         }
-                        if (WoW.CanCast("Colossus Smash") && WoW.SpellCooldownTimeRemaining("Battle Cry") == 1)
+                        if (WoW.CanCast("Colossus Smash") 
+							&& WoW.SpellCooldownTimeRemaining("Battle Cry") < 1)
                         {
                             WoW.CastSpell("Colossus Smash");
                             return;
                         }
                         //MS 
-                        if (WoW.CanCast("Mortal Strike") && WoW.SpellCooldownTimeRemaining("Battle Cry") >= 6 && !WoW.IsSpellOnCooldown("Mortal Strike"))
+                        if (WoW.CanCast("Mortal Strike") 
+							&& !WoW.IsSpellOnCooldown("Mortal Strike") || WoW.IsSpellOverlayed("Mortal Strike"))
                         {
                             WoW.CastSpell("Mortal Strike");
                             return;
                         }
                         //Slam
-                        if (WoW.CanCast("Slam") && WoW.Rage >= 32 && WoW.IsSpellOnCooldown("Colossus Smash") && WoW.IsSpellOnCooldown("Mortal Strike") && WoW.WasLastCasted("Focused Rage"))
+                        if (WoW.CanCast("Slam") && WoW.Rage >= 32 
+						&& !WoW.CanCast("Colossus Smash") 
+						&& !WoW.CanCast("Mortal Strike"))
                         {
                             WoW.CastSpell("Slam");
                             return;
                         }
                     }
-                    if (WoW.TargetHealthPercent <= 20)
+                    if (WoW.TargetHealthPercent < 20)
 
                     {
                         //Non BC ST
-                        if (WoW.CanCast("Colossus Smash") && WoW.SpellCooldownTimeRemaining("Battle Cry") >= 4 && !WoW.IsSpellOnCooldown("Colossus Smash") &&
-                            !WoW.PlayerHasBuff("Shattered Defenses"))
+                        if (WoW.CanCast("Colossus Smash") 
+							&& !WoW.IsSpellOnCooldown("Colossus Smash") 
+							&& !WoW.PlayerHasBuff("Shattered Defenses"))
                         {
                             WoW.CastSpell("Colossus Smash");
                             return;
                         }
-                        if (WoW.CanCast("Colossus Smash") && WoW.SpellCooldownTimeRemaining("Battle Cry") == 1 && !WoW.IsSpellOnCooldown("Colossus Smash"))
-                        {
-                            WoW.CastSpell("Colossus Smash");
-                            return;
-                        }
-                        if (WoW.CanCast("Focused Rage") && WoW.Rage >= 85 && WoW.PlayerBuffStacks("Focused Rage") <= 3)
+                       
+                        if (WoW.CanCast("Focused Rage") 
+							&& WoW.Rage >= 85 
+							&&!WoW.PlayerHasBuff("Focused Rage")
+							|| WoW.PlayerBuffStacks("Focused Rage") < 3)
                         {
                             WoW.CastSpell("Focused Rage");
                         }
 
-                        if (WoW.CanCast("Execute") && WoW.Rage >= 18 && WoW.PlayerHasBuff("Shattered Defenses"))
+                        if (WoW.CanCast("Execute") 
+							&& WoW.Rage >= 18 
+							&& WoW.PlayerHasBuff("Shattered Defenses"))
                         {
                             WoW.CastSpell("Execute");
                             return;
@@ -165,7 +238,7 @@ namespace PixelMagic.Rotation
                     }
                 }
 
-                if (WoW.PlayerHasBuff("Battle Cry") && WoW.HasTarget && WoW.IsInCombat && WoW.TargetIsEnemy && WoW.IsSpellInRange("Mortal Strike"))
+                if (WoW.PlayerHasBuff("Battle Cry") && WoW.HasTarget && WoW.IsInCombat && WoW.IsSpellInRange("Mortal Strike"))
 
 
                 {
@@ -174,18 +247,14 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Avatar");
                         return;
                     }
-                    if (WoW.TargetHealthPercent >= 20)
+                    if (WoW.TargetHealthPercent > 20)
                     {
                         //Maintain FR Stacks
                         if (WoW.CanCast("Focused Rage") && WoW.PlayerBuffStacks("Focused Rage") <= 3)
                         {
                             WoW.CastSpell("Focused Rage");
                         }
-                        //FR after CS
-                        if (WoW.CanCast("Focused Rage") && WoW.WasLastCasted("Colossus Smash"))
-                        {
-                            WoW.CastSpell("Focused Rage");
-                        }
+                        
                         //CS on cooldown but not overlapping SD
                         if (WoW.CanCast("Colossus Smash") && !WoW.IsSpellOnCooldown("Colossus Smash") && !WoW.PlayerHasBuff("Shattered Defenses"))
                         {
@@ -212,11 +281,7 @@ namespace PixelMagic.Rotation
                     }
                     if (WoW.TargetHealthPercent <= 20)
                     {
-                        if (WoW.CanCast("Focused Rage") && WoW.PlayerBuffStacks("Focused Rage") < 3)
-                        {
-                            WoW.CastSpell("Focused Rage");
-                        }
-                        if (WoW.CanCast("Focused Rage") && !WoW.TargetHasDebuff("Colossus Smash"))
+                        if (WoW.CanCast("Focused Rage") &&!WoW.PlayerHasBuff("Focused Rage") || WoW.PlayerBuffStacks("Focused Rage") < 3)
                         {
                             WoW.CastSpell("Focused Rage");
                         }
@@ -230,13 +295,14 @@ namespace PixelMagic.Rotation
                             WoW.CastSpell("Colossus Smash");
                             return;
                         }
-                        if (WoW.CanCast("Execute") && WoW.WasLastCasted("Mortal Strike"))
+                        if (WoW.CanCast("Execute") && !WoW.CanCast("Mortal Strike"))
                         {
                             WoW.CastSpell("Execute");
                             return;
                         }
                     }
                 }
+				
             }
             if (combatRoutine.Type == RotationType.AOE)
             {
@@ -269,6 +335,7 @@ Spell,845,Cleave,F3
 Spell,1680,Whirlwind,D8
 Spell,227847,Bladestorm,D9
 Aura,227847,Bladestorm
+Aura,107574,Avatar
 Aura,208086,Colossus Smash
 Aura,209706,Shattered Defenses
 Aura,1719,Battle Cry
