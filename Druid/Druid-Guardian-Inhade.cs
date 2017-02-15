@@ -2560,14 +2560,6 @@ namespace PixelMagic.Rotation
                 await WaitForInterrupt();
             }
 
-            // Checks if user chose to tab-aggro and a tab-aggro is due now
-            // and if so, goes to the asynchronous task that switches to a target in melee range
-
-            if (combatRoutine.Type == RotationType.AOE && TabAOE && IsInMeleeRange() && IsCompleted)
-            {
-                await ChangeTarget();
-            }
-
             // Prowl when out of combat if selected
 
             if (!WoW.IsInCombat && ProwlOOC && WoW.CanCast("Prowl") && !WoW.PlayerHasBuff("Prowl"))
@@ -3263,41 +3255,7 @@ namespace PixelMagic.Rotation
         // either by a /targetenemy macro (more efficient and safe)
         // or by PM sending the keystrokes themselves
 
-        private static async Task ChangeTarget()
-        {
-            IsCompleted = false;
-            {
-                if (TabMacro == 0)
-                {
-                    for (var a = 1; a < 4; a++)
-                    {
-                        WoW.CastSpell("TabMacro");
-                        if (IsInMeleeRange())
-                        {
-							await Task.Delay(TabAOEDelay);
-                            IsCompleted = true;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    for (var a = 1; a < 4; a++)
-                    {
-                        WoW.SendMacro("/targetenemy");
-                        if (IsInMeleeRange())
-                        {
-                            await Task.Delay(TabAOEDelay);
-                            IsCompleted = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            IsCompleted = true;
-        }
-
-        // Checks if the spell currently being cast by the target is in the list of spells to be interrupted
+      // Checks if the spell currently being cast by the target is in the list of spells to be interrupted
         // Currently the list contains only PVP spells
 
         private bool Interruptible()
