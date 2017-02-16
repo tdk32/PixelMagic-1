@@ -1,10 +1,12 @@
-// winifix@gmail.com
+// cheers to winifix@gmail.com !
 // ReSharper disable UnusedMember.Global
-// Todo: implement GCD lock on Blade dance to keep it on  top priority
+// To do, add buttons to set in options (for eye and cd's), blade dance wait for 1 sec gcd - will be better dps or no
 
 
 using System;
 using System.Drawing;
+using System.IO;
+using System.Diagnostics;
 using System.Windows.Forms;
 using PixelMagic.Helpers;
 
@@ -13,6 +15,8 @@ namespace PixelMagic.Rotation
     public class DemonHunterHavocJe : CombatRoutine
     {
         private NumericUpDown nudBlurPercentValue;
+		
+		private static readonly Stopwatch coolDownStopWatch = new Stopwatch();
 
         public override string Name => "Havoc dual by Jedix";
 
@@ -32,7 +36,7 @@ namespace PixelMagic.Rotation
             Log.Write("Suggested builds:single target - 2223311, aoe/cleave(good in myth+) - 1223112", Color.Green);
             Log.Write("IMPORTANT!", Color.Red);
             Log.Write("When you want to use single target build, use only single target rotation, when u want to use aoe build - use aoe/cleave rotations", Color.Black);
-            Log.Write("When you use single target rotation, use your eye beam manually for 2+ targets (example - on botanic's second and third phases)", Color.Black);
+            Log.Write("When you use single target rotation, hold Z key to use eye beam in priority list automatically - to cleave, when needed. Numpad * key controls cooldown's use (on/off)", Color.Black);
             Log.Write("When you use aoe/cleave rotation, use your retreat and rush manually, to not fail (same for Meta burst)", Color.Black);
 
             SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 800, Height = 490, ShowIcon = false};
@@ -62,44 +66,58 @@ namespace PixelMagic.Rotation
         {
             if (combatRoutine.Type == RotationType.SingleTarget) // Do Single Target Stuff here
             {
+				if (!coolDownStopWatch.IsRunning || coolDownStopWatch.ElapsedMilliseconds > 60000)
+							coolDownStopWatch.Restart();
+					if (DetectKeyPress.GetKeyState(0x6A) < 0)  //Use cooldowns manage by *numButton
+					{
+						if (coolDownStopWatch.ElapsedMilliseconds > 1000)
+						{
+							combatRoutine.UseCooldowns = !combatRoutine.UseCooldowns;
+							WoW.Speak("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
+							coolDownStopWatch.Restart();
+						}
+					}
                 if (WoW.HasTarget && !WoW.PlayerIsChanneling && WoW.TargetIsEnemy && WoW.IsInCombat)
                 {
                     if (WoW.PlayerHasBuff("Metamorphosis"))
                     {
-                        if (WoW.CanCast("Nemesis") && WoW.IsSpellInRange("Chaos Strike"))
-                        {
-                            WoW.CastSpell("Nemesis");
-                            return;
-                        }
-                        if (WoW.CanCast("Chaos Blades") && WoW.IsSpellInRange("Chaos Strike"))
-                        {
-                            WoW.CastSpell("Chaos Blades");
-                            return;
-                        }
-                        if (WoW.CanCast("FOTI") && WoW.IsSpellInRange("Chaos Strike"))
-                        {
-                            WoW.CastSpell("FOTI");
-                            return;
-                        }
+						if (combatRoutine.UseCooldowns)
+						{
+							if (WoW.CanCast("Nemesis") && WoW.IsSpellInRange("Chaos Strike"))
+							{
+								WoW.CastSpell("Nemesis");
+								return;
+							}
+							if (WoW.CanCast("Chaos Blades") && WoW.IsSpellInRange("Chaos Strike"))
+							{
+								WoW.CastSpell("Chaos Blades");
+								return;
+							}
+						
+							if (WoW.CanCast("FOTI") && WoW.IsSpellInRange("Chaos Strike"))
+							{
+								WoW.CastSpell("FOTI");
+								return;
+							}
+						}
                         if (WoW.CanCast("Death Sweep") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury >= 15)
                         {
                             WoW.CastSpell("Death Sweep");
                             return;
                         }
-                        if (WoW.CanCast("Felblade") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury < 100) //Felblade only at melee range to not make worse (if you need to gtfo)
+                        if (WoW.CanCast("Felblade") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury < 100) 
                         {
-                            WoW.CastSpell("Felblade");
+                            WoW.CastSpell("Felblade"); //Felblade only at melee range to not make worse (if you need to gtfo)
                             return;
                         }
-                        //if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.IsSpellInRange("Chaos Strike"))  // Outdated to not use at single target anymore
-                        //{																
-                        //    WoW.CastSpell("Eye Beam");
-                        //    return;
-                        //}
-                        if (WoW.CanCast("Annihilation") && WoW.IsSpellInRange("Chaos Strike") &&
-                            (WoW.Fury >= 70 || (WoW.Fury >= 55 && (WoW.PlayerHasBuff("Chaos Blades") || WoW.SpellCooldownTimeRemaining("Nemesis") >= 60))))
+                        if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.IsSpellInRange("Chaos Strike") && (DetectKeyPress.GetKeyState(0x5A) < 0))
+                        {																
+                            WoW.CastSpell("Eye Beam"); //Use Eyebeam by Z press
+                            return;
+                        }
+                        if (WoW.CanCast("Annihilation") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury >= 55)
                         {
-                            WoW.CastSpell("Annihilation"); //If we got damage buffs - spent fury on CS instantly (15 save for Blade Dance)
+                            WoW.CastSpell("Annihilation");
                             return;
                         }
                         //if (WoW.CanCast("Demons Bite") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury <= 70)  // Fury Generator
@@ -113,37 +131,40 @@ namespace PixelMagic.Rotation
                             return;
                         }
                     }
-                    if (WoW.CanCast("Nemesis") && WoW.IsSpellInRange("Chaos Strike"))
-                    {
-                        WoW.CastSpell("Nemesis");
-                        return;
-                    }
-                    if (WoW.CanCast("Chaos Blades") && WoW.IsSpellInRange("Chaos Strike"))
-                    {
-                        WoW.CastSpell("Chaos Blades");
-                        return;
-                    }
-
-                    if (WoW.CanCast("FOTI") && WoW.IsSpellInRange("Chaos Strike"))
-                    {
-                        WoW.CastSpell("FOTI");
-                        return;
-                    }
+					if (combatRoutine.UseCooldowns)
+					{
+						if (WoW.CanCast("Nemesis") && WoW.IsSpellInRange("Chaos Strike"))
+						{
+							WoW.CastSpell("Nemesis");
+							return;
+						}
+						if (WoW.CanCast("Chaos Blades") && WoW.IsSpellInRange("Chaos Strike"))
+						{
+							WoW.CastSpell("Chaos Blades");
+							return;
+						}
+					
+						if (WoW.CanCast("FOTI") && WoW.IsSpellInRange("Chaos Strike"))
+						{
+							WoW.CastSpell("FOTI");
+							return;
+						}
+					}
                     if (WoW.CanCast("Blade Dance") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury >= 15)
                     {
                         WoW.CastSpell("Blade Dance");
                         return;
                     }
-                    if (WoW.CanCast("Felblade") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury < 100) //Felblade only at melee range to not make worse (if you need to gtfo)
+                    if (WoW.CanCast("Felblade") && WoW.IsSpellInRange("Chaos Strike") && WoW.Fury < 100) 
                     {
-                        WoW.CastSpell("Felblade");
+                        WoW.CastSpell("Felblade"); //Felblade only at melee range to not make worse (if you need to gtfo)
                         return;
                     }
-                    //if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.IsSpellInRange("Chaos Strike")) // Outdated to not use at single target anymore
-                    //{
-                    //   WoW.CastSpell("Eye Beam");
-                    //    return;
-                    //}
+                    if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.IsSpellInRange("Chaos Strike") && (DetectKeyPress.GetKeyState(0x5A) < 0))
+                    {
+                       WoW.CastSpell("Eye Beam"); //Use Eyebeam by Z press
+                        return;
+                    }
                     if (WoW.CanCast("Chaos Strike") && WoW.IsSpellInRange("Chaos Strike") &&
                         (WoW.Fury >= 70 || (WoW.Fury >= 55 && (WoW.PlayerHasBuff("Chaos Blades") || WoW.SpellCooldownTimeRemaining("Nemesis") >= 60))))
                     {
@@ -174,11 +195,6 @@ namespace PixelMagic.Rotation
                 {
                     if (WoW.PlayerHasBuff("Metamorphosis"))
                     {
-                        //if (WoW.CanCast("Chaos Blades") && !WoW.IsSpellOnCooldown("Chaos Blades") && WoW.HasBossTarget)
-                        //{
-                        //    WoW.CastSpell("Chaos Blades");
-                        //    return;
-                        //}
                         if (WoW.CanCast("FOTI") && WoW.PlayerHasBuff("Momentum") && WoW.IsSpellInRange("Chaos Strike"))
                         {
                             WoW.CastSpell("FOTI");
@@ -195,7 +211,7 @@ namespace PixelMagic.Rotation
                             WoW.CastSpell("Death Sweep");
                             return;
                         }
-                        if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.PlayerHasBuff("Momentum") && (WoW.PlayerBuffTimeRemaining("Momentum") >= 1.5) && WoW.IsSpellInRange("Chaos Strike"))
+                        if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.PlayerHasBuff("Momentum") && (WoW.PlayerBuffTimeRemaining("Momentum") >= 1) && WoW.IsSpellInRange("Chaos Strike"))
                         {
                             WoW.CastSpell("Eye Beam");
                             return;
@@ -222,12 +238,6 @@ namespace PixelMagic.Rotation
                             return;
                         }
                     }
-                    //if (WoW.CanCast("Chaos Blades") && WoW.IsSpellInRange("Chaos Strike") && !WoW.IsSpellOnCooldown("Chaos Blades") && WoW.HasBossTarget)
-                    //{
-                    //    WoW.CastSpell("Chaos Blades");
-                    //    return;
-                    //}
-
                     if (WoW.CanCast("FOTI") && WoW.PlayerHasBuff("Momentum") && WoW.IsSpellInRange("Chaos Strike"))
                     {
                         WoW.CastSpell("FOTI");
@@ -244,7 +254,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Blade Dance");
                         return;
                     }
-                    if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.PlayerHasBuff("Momentum") && (WoW.PlayerBuffTimeRemaining("Momentum") >= 1.5) && WoW.IsSpellInRange("Chaos Strike"))
+                    if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.PlayerHasBuff("Momentum") && (WoW.PlayerBuffTimeRemaining("Momentum") > 1) && WoW.IsSpellInRange("Chaos Strike"))
                     {
                         WoW.CastSpell("Eye Beam");
                         return;
