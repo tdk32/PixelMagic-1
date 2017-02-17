@@ -138,7 +138,7 @@ namespace PixelMagic.Rotation
                             WoW.CastSpell("Mutilate");
                             return;
                         }
-                        if (UseCooldowns && WoW.CanCast("Vendetta") && !WoW.IsSpellOnCooldown("Vendetta") && WoW.Energy <= 50)
+                        if (!WoW.PlayerHasBuff("Critbuff") && UseCooldowns && WoW.CanCast("Vendetta") && !WoW.IsSpellOnCooldown("Vendetta") && WoW.Energy <= 50)
                         {
                             WoW.CastSpell("Vendetta");
                             return;
@@ -233,6 +233,7 @@ Aura,1943,Rupture
 Aura,1784,Stealth
 Aura,703,Garrote
 Aura,208693,FoK
+Aura,235027,Critbuff
 Aura,1856,Vanish
 Aura,192425,Toxins
 Aura,32645,Envenom
