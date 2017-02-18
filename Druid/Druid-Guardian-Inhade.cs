@@ -1,14 +1,8 @@
-﻿// winifix@gmail.com
+// winifix@gmail.com
 // ReSharper disable UnusedMember.Global
 // ReSharper disable ConvertPropertyToExpressionBody
 
-/*
-
-Guardian Rotation version 1.0
-
-Change log:
-
-0.1 
+/*Guardian Rotation version 1.0Change log:0.1 
 Initial Release
 
 0.1.1
@@ -3475,43 +3469,43 @@ namespace PixelMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Inhade
-AddonName=BrokerIgnore
+AddonName=HaloWars
 WoWVersion=Legion - 70100
 [SpellBook.db]
-Spell,22812,Barkskin,Multiply
+Spell,22812,Barkskin,Add
 Spell,20484,Rebirth,F1
 Spell,197626,Starsurge,F4
 Spell,197628,Lunar Strike,F5
 Spell,8921,Moonfire,F6
-Spell,5176,Solar Wrath,F7
+Spell,5176,Solar Wrath,NumLock
 Spell,93402,Sunfire,F8
 Spell,197625,Moonkin Form,F9
 Spell,5215,Prowl,F11
-Spell,22842,Frenzied Regeneration,PageUp
-Spell,210037,Growl,OemQuotes
-Spell,33917,Mangle,End
-Spell,77758,Thrash,Home
-Spell,192081,Ironfur,Insert
-Spell,5487,Bear Form,Decimal
+Spell,22842,Frenzied Regeneration,Multiply
+Spell,210037,Growl,F12
+Spell,33917,Mangle,D4
+Spell,77758,Thrash,D6
+Spell,192081,Ironfur,F8
+Spell,5487,Bear Form,D1
 Spell,1822,Rake,Oemtilde
 Spell,5221,Shred,OemCloseBrackets
 Spell,1079,Rip,OemOpenBrackets
 Spell,22568,Ferocious Bite,Oemplus
 Spell,768,Cat Form,Subtract
 Spell,1,Tier4,PageDown
-Spell,80313,Pulverize,NumPad8
-Spell,106785,Swipe,Divide
-Spell,192083,Mark of Ursol,NumPad2
-Spell,6807,Maul,NumPad3
-Spell,2,TabMacro,F12
-Spell,106839,Skull Bash,NumPad4
-Spell,61336,Survival Instincts,Numpad6
-Spell,102558,Incarnation: Guardian of Ursoc,NumPad7
-Spell,99,Incapacitating Roar,NumPad9
+Spell,80313,Pulverize,D5
+Spell,106785,Swipe,F7
+Spell,192083,Mark of Ursol,F10
+Spell,6807,Maul,D0
+Spell,2,TabMacro,D8
+Spell,106839,Skull Bash,F5
+Spell,61336,Survival Instincts,D7
+Spell,102558,Incarnation: Guardian of Ursoc,D9
+Spell,99,Incapacitating Roar,Add
 Spell,204066,Lunar Beam,F2
 Spell,200851,Rage of the Sleeper,NumPad0
 Spell,155835,Bristling Fur,NumPad1
-Spell,102401,Wild Charge,NumPad5
+Spell,102401,Wild Charge,F2
 Aura,22812,Barkskin
 Aura,200851,Rage of the Sleeper
 Aura,102558,Incarnation: Guardian of Ursoc
