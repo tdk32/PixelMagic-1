@@ -2,20 +2,18 @@
  * Shadow rotation written by Miestro.
  * 
  * TODO:
- *  Add support for other talents.
- *  Add direct support for surrender to madness.
- *  Add support for a list of spells to interrupt.
- *  Check haste for rotation changes
+ *  Allow for toggle of cooldown usage.
  *  
  * 
  * Published November 27th, 2016
+ * Updated Febuary 18th, 2016
  */
 
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
-using System.Windows.Forms;
 using PixelMagic.Helpers;
+using System.Windows.Forms;
 
 /**
  * Shadow priest rotation.
@@ -50,11 +48,17 @@ namespace PixelMagic.Rotation
         //Aura Constants
         private const string VOIDFORM_AURA = "Voidform";
         private const string SHADOWFORM_AURA = "Shadowform";
+        private const string POWER_INFUSION = "Power Infusion";
 
         /// <summary>
         ///     Private variable for timing interrupt delay.
         /// </summary>
         private readonly Stopwatch timer = new Stopwatch();
+
+        /// <summary>
+        ///     Whether or not to use cooldowns automatically in the rotation.
+        /// </summary>
+        private bool useCooldowns = true;
 
         /**
          * Member Variables
@@ -75,11 +79,21 @@ namespace PixelMagic.Rotation
             Log.Write("Welcome to Miestro's Shadow rotation", Color.Orange);
             Log.Write("Please make sure your specialization is as follows: http://us.battle.net/wow/en/tool/talent-calculator#Xba!0100000", Color.Orange);
             Log.Write("Note: legendaries are not supported. If you need one supported or something fixed, please make note of it in the discord.", Color.Orange);
+            //Log.Write("To enable/disable the use of cooldowns, press Alt+f", Color.Green);
+            SettingsForm = new Form();
+            SettingsForm.KeyUp+=keyUpEvent;
         }
 
         public override void Stop()
         {
             //Do nothing
+        }
+
+        private void keyUpEvent(object sender, KeyEventArgs evt) {
+            if (evt.KeyCode==Keys.F) {
+                this.useCooldowns=!this.useCooldowns;
+                Log.Write(useCooldowns ? "We are now using cooldowns" : "We are no longer using cooldowns", Color.Red);
+            }
         }
 
         public override void Pulse()
@@ -91,7 +105,7 @@ namespace PixelMagic.Rotation
             }
 
             //Heal yourself, Can't do damage if you're dead.
-            if (WoW.HealthPercent <= 60)
+            if (WoW.HealthPercent <= 15)
             {
                 if (isPlayerBusy(true, false) && !WoW.PlayerHasBuff(POWER_WORD_SHIELD))
                 {
@@ -100,7 +114,7 @@ namespace PixelMagic.Rotation
                 castWithRangeCheck(SHADOW_MEND);
             }
             //Shield if health is dropping.
-            if (WoW.HealthPercent <= 80 && !WoW.PlayerHasBuff(POWER_WORD_SHIELD))
+            if (WoW.HealthPercent <= 45 && !WoW.PlayerHasBuff(POWER_WORD_SHIELD))
             {
                 castWithRangeCheck(POWER_WORD_SHIELD, true);
             }
@@ -111,15 +125,15 @@ namespace PixelMagic.Rotation
                 castWithRangeCheck(SHADOWFORM);
             }
 
-            if (WoW.HasTarget && WoW.TargetIsEnemy)
+            if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && WoW.TargetIsVisible)
             {
                 if (!WoW.PlayerHasBuff(VOIDFORM_AURA))
                 {
                     //Just so happens that the spell and debuff name are the same, this is not ALWAYS the case.
                     maintainDebuff(VAMPIRIC_TOUCH, VAMPIRIC_TOUCH, 5);
                     maintainDebuff(SHADOW_PAIN, SHADOW_PAIN, 2);
-                }
-                else
+                } 
+                else 
                 {
                     maintainDebuff(VAMPIRIC_TOUCH, VAMPIRIC_TOUCH, WoW.SpellCooldownTimeRemaining(VOID_BOLT));
                     maintainDebuff(SHADOW_PAIN, SHADOW_PAIN, WoW.SpellCooldownTimeRemaining(VOID_BOLT));
@@ -160,7 +174,7 @@ namespace PixelMagic.Rotation
         /// </summary>
         private void doRotation(bool isSingleTarget = true)
         {
-            var ignoreMovement = WoW.PlayerHasBuff(SURRENDER_MADNESS);
+            bool ignoreMovement = WoW.PlayerHasBuff(SURRENDER_MADNESS);
 
             if (WoW.Insanity >= 70 || WoW.PlayerHasBuff(VOIDFORM_AURA))
             {
@@ -175,7 +189,9 @@ namespace PixelMagic.Rotation
                     castWithRangeCheck(VOID_BOLT);
 
                     //Cast it.
-                    castWithRangeCheck(VOID_TORRENT, ignoreMovement);
+                    if(calculateInsanityDrain() > (WoW.Insanity-35)) { 
+                        castWithRangeCheck(VOID_TORRENT, ignoreMovement);
+                    }
 
                     //If the boss health is at or below our set threshold SW:D
                     if (WoW.TargetHealthPercent <= HEALTH_PERCENT_FOR_SWD)
@@ -195,21 +211,17 @@ namespace PixelMagic.Rotation
                         }
                     }
 
+                    if(WoW.Insanity <= 40 && !WoW.PlayerHasBuff(POWER_INFUSION)) {
+                        castWithRangeCheck(POWER_INFUSION, false, false);
+                    }
+
                     //Cast shadowfiend if we have more than 15 stacks of voidform aura.
-                    if (WoW.PlayerBuffStacks(VOIDFORM_AURA) >= 15)
-                    {
+                    if(WoW.PlayerBuffStacks(VOIDFORM_AURA) >= 15) {
                         castWithRangeCheck(SHADOW_FIEND);
                     }
 
                     //If we can, cast it.
                     castWithRangeCheck(MIND_BLAST);
-
-                    //If we have high stacks, cast shadowfiend.
-                    /* Disabled, allow player to cast. 
-                    if (WoW.PlayerBuffStacks(VOIDFORM_AURA)>=15) {
-                        castWithRangeCheck(SHADOWFIEND);
-                    }
-                    */
 
                     if (!isPlayerBusy(ignoreChanneling: false))
                     {
@@ -320,6 +332,7 @@ Spell,34433,Shadowfiend,D7
 Spell,232698,Shadowform,D0
 Spell,15487,Silence,R
 Spell,47585,Dispersion,T
+Spell,10060,Power Infusion,D9
 Aura,232698,Shadowform
 Aura,34914,Vampiric Touch
 Aura,589,Shadow Word: Pain
@@ -327,4 +340,5 @@ Aura,197937,Lingering Insanity
 Aura,194249,Voidform
 Aura,193223,Surrender to Madness
 Aura,17,Power Word: Shield
+Aura,10060,Power Infusion
 */
