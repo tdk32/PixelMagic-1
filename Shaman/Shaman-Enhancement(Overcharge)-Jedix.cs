@@ -49,7 +49,7 @@ namespace PixelMagic.Rotation
             {
                 if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerHasBuff("Ghost Wolf") && WoW.IsInCombat) //First things go first but break if we wanna run in Wolf
                 {
-					if (WoW.TargetIsCastingAndSpellIsInterruptible && WoW.IsSpellInRange("Wind Shear")) //interupt every spell
+					if (WoW.CanCast("Wind Shear") && WoW.TargetIsCastingAndSpellIsInterruptible && WoW.IsSpellInRange("Wind Shear")) //interupt every spell
                     {
                         WoW.CastSpell("Wind Shear");
                         return;
@@ -156,7 +156,7 @@ namespace PixelMagic.Rotation
             {
                 if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerHasBuff("Ghost Wolf") && WoW.IsInCombat) //First things go first
                 {
-                    if (WoW.TargetIsCastingAndSpellIsInterruptible && WoW.IsSpellInRange("Wind Shear")) //interupt every spell
+                    if (WoW.CanCast("Wind Shear") && WoW.TargetIsCastingAndSpellIsInterruptible && WoW.IsSpellInRange("Wind Shear")) //interupt every spell
                     {
                         WoW.CastSpell("Wind Shear");
                         return;
@@ -270,7 +270,7 @@ namespace PixelMagic.Rotation
             {
                 if (WoW.HasTarget && WoW.TargetIsEnemy && !WoW.PlayerHasBuff("Ghost Wolf") && WoW.IsInCombat) //First things go first
                 {
-                    if (WoW.TargetIsCastingAndSpellIsInterruptible && WoW.IsSpellInRange("Wind Shear")) //interupt every spell
+                    if (WoW.CanCast("Wind Shear") && WoW.TargetIsCastingAndSpellIsInterruptible && WoW.IsSpellInRange("Wind Shear")) //interupt every spell
                     {
                         WoW.CastSpell("Wind Shear");
                         return;
