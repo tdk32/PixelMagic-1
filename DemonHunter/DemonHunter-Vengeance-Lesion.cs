@@ -913,7 +913,11 @@ namespace PixelMagic.Rotation
 						return;
 					}
 					
-				
+					if (!WoW.IsMoving && FlameCrash && ! AbyssalStrike && WoW.CanCast("Sigil of Flame") && !WoW.IsSpellOnCooldown("Sigil of Flame"))
+					{
+						WoW.CastSpell("Sigil of Flame");
+						return;
+					}
 					if (!FlameCrash && ! AbyssalStrike && WoW.CanCast("Sigil of Flame") && !WoW.IsSpellOnCooldown("Sigil of Flame"))
 					{
 						WoW.CastSpell("Sigil of Flame");
