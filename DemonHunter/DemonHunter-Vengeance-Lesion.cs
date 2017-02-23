@@ -399,6 +399,8 @@ namespace PixelMagic.Rotation
             SettingsForm.Controls.Add(lblDiscordBox);
 			
 			var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 5, Top = 425, Size = new Size(120, 31)};
+			
+			var cmdReadme = new Button {Text = "Macros! Use Them", Width = 65, Height = 25, Left = 125, Top = 425, Size = new Size(120, 31)};
 			// Checkboxes
 			//T1 Checkboxes
 			AbyssalStrikeBox = new CheckBox {Checked = AbyssalStrike, TabIndex = 8, Size = new Size(13, 13), Left = 415, Top = 63};
@@ -486,6 +488,7 @@ namespace PixelMagic.Rotation
 			
 			//cmdSave
             cmdSave.Click += CmdSave_Click;
+			cmdReadme.Click += CmdReadme_Click;
             AbyssalStrikeBox.CheckedChanged += AbyssalStrike_Click;
 			RazorSpikeBox.CheckedChanged += RazorSpike_Click;
 			FeastofSoulsBox.CheckedChanged += FeastofSouls_Click;
@@ -509,6 +512,7 @@ namespace PixelMagic.Rotation
 			Preset6Box.CheckedChanged += Preset6_Click;
 			
 			SettingsForm.Controls.Add(cmdSave);
+			SettingsForm.Controls.Add(cmdReadme);
 			lblDiscordBox.BringToFront();
 			lblTextBox.BringToFront();
 			lblTextBox2.BringToFront();
@@ -567,6 +571,12 @@ namespace PixelMagic.Rotation
 			
             MessageBox.Show("Settings saved.", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SettingsForm.Close();
+        }
+		private void CmdReadme_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(
+                "Macros:\n \n \n Please Use the following Macros: \n \n Infernal Strike Macro \n \n #showtooltip \n /cast [mod:shift,target=player][nomod,target=player][mod:ctrl,target=player] Infernal Strike \n /cast [mod:alt] Infernal Strike \n /script UIErrorsFrame:Clear() \n \n Sigil of Flame Macro \n \n #showtooltip \n /cast [mod:shift,target=player][nomod,target=player][mod:ctrl,target=player] Sigil of Flame \n /cast [mod:alt] Sigil of Flame \n /script UIErrorsFrame:Clear() ",
+                "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 			// Checkboxes
 			//T1 Clicky deealz
