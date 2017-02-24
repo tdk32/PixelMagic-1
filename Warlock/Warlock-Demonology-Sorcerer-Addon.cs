@@ -30,6 +30,9 @@ namespace PixelMagic.Rotation
             Log.Write("Welcome to the Demonology Warlock rotation", Color.Purple);
             Log.Write("IN ORDER FOR THIS ROTATION TO WORK YOU WILL NEED TO DOWNLOAD AND INSTALL THE ADDON.", Color.Red);
             Log.Write("Poke me on DISCORD for the addon", Color.Blue);
+            Log.Write("Use Scroll Lock key to toggle ST/AOE/CLEAVE auto detection", Color.Blue);
+            Log.Write("If Scroll Lock LED is ON ST/AOE/CLEAVE auto detection is ENABLED", Color.Blue);
+            Log.Write("If Scroll Lock LED is OFF ST/AOE/CLEAVE auto detection is DISABLED use the manual mode to select ST/AOE/CLEAVE (Default: ALT+S, ALT+A)", Color.Blue);
         }
 
         public override void Stop()
@@ -386,12 +389,15 @@ namespace PixelMagic.Rotation
         {
             if (Nameplates)
             {
-                if (npcCount >= 4 && !WoW.TargetIsPlayer)
-                    combatRoutine.ChangeType(RotationType.AOE);
-                /*  if ((npcCount == 2 || npcCount == 3) && !WoW.TargetIsPlayer)
-                      combatRoutine.ChangeType(RotationType.SingleTargetCleave);*/
-                if (npcCount <= 1)
-                    combatRoutine.ChangeType(RotationType.SingleTarget);
+                if (Control.IsKeyLocked(Keys.Scroll))
+                {
+                    if (npcCount >= 4 && !WoW.TargetIsPlayer)
+                        combatRoutine.ChangeType(RotationType.AOE);
+                    /*  if ((npcCount == 2 || npcCount == 3) && !WoW.TargetIsPlayer)
+                          combatRoutine.ChangeType(RotationType.SingleTargetCleave);*/
+                    if (npcCount <= 1)
+                        combatRoutine.ChangeType(RotationType.SingleTarget);
+                }
             }
         }
 
