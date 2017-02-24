@@ -192,7 +192,7 @@ namespace PixelMagic.Rotation
 							{WoW.CastSpell("Whirlwind"); return;}
 							
 							if (WoW.CanCast("Rampage")
-								&& WoW.IsSpellOverlayed("Rampage")
+								&& WoW.Rage >= 100
 								&& WoW.PlayerHasBuff("Meat Cleaver"))
 							{WoW.CastSpell("Rampage"); return;}
 							
@@ -282,7 +282,7 @@ namespace PixelMagic.Rotation
                         if (TFZFMint)
                         {
                             if (WoW.CanCast("Rampage")
-                                && WoW.IsSpellOverlayed("Rampage") || WoW.Rage >= 100)
+                                && WoW.Rage >= 100)
                             { WoW.CastSpell("Rampage"); return; }
 
                             if (WoW.CanCast("Bloodthirst")
@@ -342,7 +342,7 @@ namespace PixelMagic.Rotation
                         if (TFZFMint)
                         {
                             if (WoW.CanCast("Rampage")
-                                && WoW.IsSpellOverlayed("Rampage") || WoW.Rage >= 100)
+                                && WoW.Rage >= 100)
                             { WoW.CastSpell("Rampage"); return; }
 
                             if (WoW.CanCast("Bloodthirst")
