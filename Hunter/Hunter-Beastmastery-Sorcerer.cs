@@ -112,6 +112,15 @@ namespace PixelMagic.Rotation
                 return;
             }
 
+            //Intimidation //Binding Shot
+            if (DetectKeyPress.GetKeyState(DetectKeyPress.Ctrl) < 0
+                && ((WoW.CanCast("Intimidation") && CharInfo.T5 == 3) || (WoW.CanCast("Binding Shot") && CharInfo.T5 == 1)))
+            {
+                WoW.CastSpell("Binding Shot");
+                WoW.CastSpell("Intimidation");
+                return;
+            }        
+
             if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !WoW.PlayerHasBuff("Mount") && !WoW.PlayerIsChanneling && !WoW.PlayerHasBuff("Feign Death") && WoW.HealthPercent != 0)
             {
                 //Stampede
@@ -121,16 +130,7 @@ namespace PixelMagic.Rotation
                 {
                     WoW.CastSpell("Stampede");
                     return;
-                }
-
-                //Intimidation //Binding Shot
-                if (DetectKeyPress.GetKeyState(DetectKeyPress.Ctrl) < 0                    
-                    && ((WoW.CanCast("Intimidation") && CharInfo.T5 == 3) || (WoW.CanCast("Binding Shot") && CharInfo.T5 == 1)))
-                {
-                    WoW.CastSpell("Binding Shot");
-                    WoW.CastSpell("Intimidation");
-                    return;
-                }                
+                }                       
 
                 //Cooldowns
                 if (UseCooldowns)
@@ -162,7 +162,7 @@ namespace PixelMagic.Rotation
                             && WoW.CanCast("Bestial Wrath")
                             && !WoW.PlayerHasBuff("Aspect of the Turtle")
                             && WoW.IsSpellInRange("Cobra Shot")
-                            && (WoW.Focus >= 110))
+                            && (WoW.Focus >= 105))
                         {
                             WoW.CastSpell("Bestial Wrath");
                             WoW.CastSpell("Kill Command");
@@ -192,6 +192,7 @@ namespace PixelMagic.Rotation
                         //Kill Command
                         if (combatRoutine.Type == RotationType.SingleTarget
                             && WoW.CanCast("Kill Command")
+                            && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") - WoW.SpellCooldownTimeRemaining("Kill Command") > 2 || (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 23 && WoW.SpellCooldownTimeRemaining("Dire Beast") - WoW.SpellCooldownTimeRemaining("Kill Command") > 2))
                             && WoW.Focus >= 100)
                         {
                             WoW.CastSpell("Kill Command");
@@ -548,12 +549,8 @@ namespace PixelMagic.Rotation
         {
             try
             {
-                string fileName = "text.txt";
-                string sourcePath = string.Concat(AppDomain.CurrentDomain.BaseDirectory + "LibSpellRange-1.0\\");
-                string sourcePathSub = string.Concat(AppDomain.CurrentDomain.BaseDirectory + "LibSpellRange-1.0\\lib\\LibStub\\");
                 string targetPath = string.Concat("" + WoW.AddonPath + "\\" + AddonName + "\\lib\\LibSpellRange-1.0\\");
                 string targetPathSub = string.Concat("" + WoW.AddonPath + "\\" + AddonName + "\\lib\\LibSpellRange-1.0\\lib\\LibStub\\");
-                string destFile = "text.txt";
 
                 // To copy a folder's contents to a new location:
                 // Create a new target folder, if necessary.
@@ -567,32 +564,35 @@ namespace PixelMagic.Rotation
                     Log.Write("Sub target:" + targetPathSub);
                     Directory.CreateDirectory(targetPathSub);
                 }
-                if (!Directory.Exists(sourcePath))
-                    Log.Write("Dirctory doesn't exist:" + sourcePath);
-                if (!Directory.Exists(sourcePathSub))
-                    Log.Write("Dirctory doesn't exist:" + sourcePathSub);
-                if (Directory.Exists(sourcePath))
+
+                if (Directory.Exists(targetPath))
                 {
-                    string[] files = Directory.GetFiles(sourcePath);
-                    foreach (string s in files)
+                    if (!File.Exists(Path.Combine(targetPath, LibSpellToc)))
                     {
-                        Log.Write("Generating file" + s);
-                        fileName = Path.GetFileName(s);
-                        destFile = Path.Combine(targetPath, fileName);
-                        File.Copy(s, destFile, true);
+
+                        File.WriteAllText(Path.Combine(targetPath, LibSpellToc), LibSpellTocContent);
+                    }
+                    if (!File.Exists(Path.Combine(targetPath, LibSpellLua)))
+                    {
+                        File.WriteAllText(Path.Combine(targetPath, LibSpellLua), LibSpellLuaContent);
+                    }
+                    if (!File.Exists(Path.Combine(targetPath, LibXml)))
+                    {
+                        File.WriteAllText(Path.Combine(targetPath, LibXml), LibXmlContent);
                     }
                 }
-                if (Directory.Exists(sourcePathSub))
-                {
-                    string[] files = Directory.GetFiles(sourcePathSub);
 
-                    foreach (string s in files)
+                if (Directory.Exists(targetPathSub))
+                {
+                    if (!File.Exists(Path.Combine(targetPathSub, LibStubLua)))
                     {
-                        Log.Write("Generating Sub file" + s);
-                        fileName = Path.GetFileName(s);
-                        destFile = Path.Combine(targetPathSub, fileName);
-                        File.Copy(s, destFile, true);
+                        File.WriteAllText(Path.Combine(targetPathSub, LibStubLua), LibStubLuaContent);
                     }
+                    if (!File.Exists(Path.Combine(targetPathSub, LibStubToc)))
+                    {
+                        File.WriteAllText(Path.Combine(targetPathSub, LibStubToc), LibStubTocContent);
+                    }
+
                 }
             }
             catch (Exception ex)
@@ -601,6 +601,7 @@ namespace PixelMagic.Rotation
             }
             Thread.Sleep(2000);
             RangeLib = true;
+
         }
 
         private void AddonEmbedEdit()
@@ -1364,6 +1365,8 @@ local function HealinEventHandler(self,event, ...)
 		CharRaceUpdate()
 		Talents()
 		UpdateMana()
+        updatePower()
+        updateUnitPower()
 		updateCombat()
 		updateSetBonus()
 	end
