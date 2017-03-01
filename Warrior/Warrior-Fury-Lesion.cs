@@ -18,7 +18,6 @@ namespace PixelMagic.Rotation
 		//will check a list of spells and interrupt ones deemed important by wowhead guides
         private CheckBox mplusint;		
 		private CheckBox TrueFrothingZerkerFalseMassacre;
-		private CheckBox MplusAoE;
 		
 		
 		 public override string Name => "Fury Warrior";
@@ -38,16 +37,7 @@ namespace PixelMagic.Rotation
             set { ConfigFile.WriteValue("FuryWarrior", "TFZFMint", value.ToString()); }
         }
 		
-		private static bool MplusAoEint
-		{
-            get
-            {
-                var MplusAoE = ConfigFile.ReadValue("FuryWarrior", "MplusAoE").Trim();
-
-                return MplusAoE != "" && Convert.ToBoolean(MplusAoE);
-            }
-            set { ConfigFile.WriteValue("FuryWarrior", "MplusAoE", value.ToString()); }
-        }
+		
         private static bool mythicplusinterrupts
         {
             get
@@ -64,10 +54,8 @@ namespace PixelMagic.Rotation
         public override void Initialize()
         {
             Log.Write("Welcome to Fury Warrior", Color.Green);
-			Log.Write("Talent build 1 : ", Color.Green);
 			Log.Write("Written based on WoWHead Guide ", Color.Green);
-			Log.Write("ST Raid build = 2333(1or2)32 ", Color.Green);
-			Log.Write("M+ AoE build = 1113(1or2)32  ", Color.Green);
+			
 			
 			
 			
@@ -88,18 +76,7 @@ namespace PixelMagic.Rotation
             TrueFrothingZerkerFalseMassacre = new CheckBox {Checked = TFZFMint, TabIndex = 2, Size = new Size(15, 14), Left = 200, Top = 14};
             SettingsForm.Controls.Add(TrueFrothingZerkerFalseMassacre);
 			//
-			 var lblMplusAoEintText = new Label //12; 114 LEFT is first value, Top is second.
-            {
-                Text = "Tick for M+/AoE",
-                Size = new Size(188, 13), //81; 13
-                Left = 12,
-                Top = 29
-            };
-            SettingsForm.Controls.Add(lblMplusAoEintText); //113; 114 
-
-            MplusAoE = new CheckBox {Checked = MplusAoEint, TabIndex = 2, Size = new Size(15, 14), Left = 200, Top = 29};
-            SettingsForm.Controls.Add(MplusAoE);
-			
+						
 			var lblMythicPlusText = new Label //12; 129 is first value, Top is second.
             {
                 Text = "M+ Interrupts",
@@ -116,17 +93,14 @@ namespace PixelMagic.Rotation
 			var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 150, Size = new Size(120, 48)};
 			
 			TrueFrothingZerkerFalseMassacre.Checked = TFZFMint;
-			MplusAoE.Checked = MplusAoEint;
 			mplusint.Checked = mythicplusinterrupts;
 			
 			cmdSave.Click += CmdSave_Click;
 			TrueFrothingZerkerFalseMassacre.CheckedChanged += TFZFM_Click;
-			MplusAoE.CheckedChanged += MplusAoE_Click;
             mplusint.CheckedChanged += MP_Click;
 			
 			SettingsForm.Controls.Add(cmdSave);
             lblTFZFMintText.BringToFront();
-			lblMplusAoEintText.BringToFront();
 			lblMythicPlusText.BringToFront();
 			
 			Log.Write("---------------------------------------------------------", Color.Blue);
@@ -137,7 +111,6 @@ namespace PixelMagic.Rotation
 			private void CmdSave_Click(object sender, EventArgs e)
         {
             TFZFMint = TrueFrothingZerkerFalseMassacre.Checked;
-			MplusAoEint = MplusAoE.Checked;
             mythicplusinterrupts = mplusint.Checked;
             			
             MessageBox.Show("Settings saved", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -149,11 +122,7 @@ namespace PixelMagic.Rotation
             TFZFMint = TrueFrothingZerkerFalseMassacre.Checked;
         }
 		
-		private void MplusAoE_Click(object sender, EventArgs e)
-        {
-            MplusAoEint = MplusAoE.Checked;
-        }
-		
+				
 		private void MP_Click(object sender, EventArgs e)
         {
             mythicplusinterrupts = mplusint.Checked;
@@ -179,77 +148,8 @@ namespace PixelMagic.Rotation
 				
 								
 			//AOE on Press
-			if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_KEY_Z) < 0)
-			{
-				if (WoW.HasTarget&&WoW.IsInCombat&&WoW.TargetIsEnemy)
-				{
-				 
-
-				if (TFZFMint)
-						{
-							if (WoW.CanCast("Whirlwind")
-								&& !WoW.PlayerHasBuff("Meat Cleaver"))
-							{WoW.CastSpell("Whirlwind"); return;}
-							
-							if (WoW.CanCast("Rampage")
-								&& WoW.Rage >= 100
-								&& WoW.PlayerHasBuff("Meat Cleaver"))
-							{WoW.CastSpell("Rampage"); return;}
-							
-							if (WoW.CanCast("Bloodthirst")
-								&& !WoW.PlayerHasBuff("Enrage")
-								&& WoW.PlayerHasBuff("Meat Cleaver"))
-							{WoW.CastSpell("Bloodthirst"); return;}
-							
-							if (WoW.CanCast("Execute")
-								&& WoW.IsSpellOverlayed("Execute"))
-							{WoW.CastSpell("Execute"); return;}
-							
-							if (WoW.CanCast("Raging Blow")
-								&& !WoW.CanCast("Bloodthirst")
-								&& !WoW.CanCast("Rampage"))
-							{WoW.CastSpell("Raging Blow"); return;}
-							
-							if (WoW.CanCast("Bloodthirst")
-								&& WoW.PlayerHasBuff("Enrage")
-								&& WoW.PlayerHasBuff("Meat Cleaver"))
-							{WoW.CastSpell("Bloodthirst"); return;}
-							
-						}
-						
-						if (!TFZFMint)
-						{
-							if (WoW.CanCast("Whirlwind")
-								&& !WoW.PlayerHasBuff("Meat Cleaver"))
-							{WoW.CastSpell("Whirlwind"); return;}
-							
-							if (WoW.CanCast("Rampage")
-								&& !WoW.PlayerHasBuff("Enrage"))
-							{WoW.CastSpell("Rampage"); return;}
-							
-							if (WoW.CanCast("Bloodthirst")
-								&& !WoW.PlayerHasBuff("Enrage")
-								&& WoW.PlayerHasBuff("Meat Cleaver"))
-							{WoW.CastSpell("Bloodthirst"); return;}
-							
-							if (WoW.CanCast("Execute")
-								&& WoW.IsSpellOverlayed("Execute"))
-							{WoW.CastSpell("Execute"); return;}
-							
-							if (WoW.CanCast("Raging Blow")
-								&& !WoW.CanCast("Bloodthirst")
-								&& !WoW.CanCast("Rampage"))
-							{WoW.CastSpell("Raging Blow"); return;}
-							
-							if (WoW.CanCast("Bloodthirst")
-								&& WoW.PlayerHasBuff("Enrage")
-								&& WoW.PlayerHasBuff("Meat Cleaver"))
-							{WoW.CastSpell("Bloodthirst"); return;}
-						}
-				
-				
-				}
-			}
+			
+			
 
                 //Normal ST rotation
                 if (WoW.HasTarget && WoW.IsInCombat && WoW.TargetIsEnemy && WoW.IsSpellInRange("Bloodthirst"))
@@ -257,28 +157,46 @@ namespace PixelMagic.Rotation
                     if (WoW.TargetHealthPercent >= 20)
                         //When targets are above 20%. Not in Execute phase. (need to change this to TTExecute)
                         //Single target with Reckless Abandon -  Battle Cry  Avatar  Rampage -  Raging Blow -  Odyn's Fury -  Bloodthirst - Raging Blow -  Furious Slash -  Bloodthirst
-						if (MplusAoEint)
-						{
+						
+						if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_KEY_Q) < 0)
+							
+							{
+								
 							if (WoW.CanCast("Whirlwind")
-								&& !WoW.PlayerHasBuff("Meat Cleaver"))
+								&& TFZFMint
+								&& !WoW.PlayerHasBuff("Meat Cleaver")
+								&& WoW.Rage <= 99)
+							{WoW.CastSpell("Whirlwind"); return;}
+								
+							if (WoW.CanCast("Whirlwind")
+								&& !TFZFMint
+								&& !WoW.PlayerHasBuff("Meat Cleaver")
+								&& WoW.Rage <= 85)
 							{WoW.CastSpell("Whirlwind"); return;}
 							
-							
 							if (WoW.CanCast("Whirlwind")
+								&& TFZFMint
+								&& WoW.Rage <= 99
 								&& !WoW.CanCast("Bloodthirst")
 								&& !WoW.CanCast("Raging Blow")
 								&& !WoW.CanCast("Rampage")
 								)
 							{WoW.CastSpell("Whirlwind"); return;}
 							
-							if (WoW.CanCast("Raging Blow")
-                                && !WoW.CanCast("Bloodthirst"))
-                            { WoW.CastSpell("Raging Blow"); return; }
-							
-							
-							
-							
-						}
+							if (WoW.CanCast("Whirlwind")
+								&& !TFZFMint
+								&& WoW.Rage <= 85
+								&& !WoW.CanCast("Bloodthirst")
+								&& !WoW.CanCast("Raging Blow")
+								&& !WoW.CanCast("Rampage")
+								)
+							{WoW.CastSpell("Whirlwind"); return;}
+								
+								
+							}
+						
+						
+						
                         if (TFZFMint)
                         {
                             if (WoW.CanCast("Rampage")
@@ -290,10 +208,12 @@ namespace PixelMagic.Rotation
                             { WoW.CastSpell("Bloodthirst"); return; }
 
                             if (WoW.CanCast("Execute")
-                                && WoW.IsSpellOverlayed("Execute"))
+								&& WoW.TargetHealthPercent <= 20
+                                && WoW.IsSpellOverlayed("Execute") || WoW.Rage >= 25)
                             { WoW.CastSpell("Execute"); return; }
 
-                            if (!MplusAoEint && WoW.CanCast("Raging Blow")
+                            if (WoW.CanCast("Raging Blow")
+								&& WoW.Rage <= 85
                                 && !WoW.CanCast("Bloodthirst"))
                             { WoW.CastSpell("Raging Blow"); return; }
 
@@ -310,18 +230,20 @@ namespace PixelMagic.Rotation
                     if (!TFZFMint)
                     {
                         if (WoW.CanCast("Rampage")
-                            && !WoW.PlayerHasBuff("Enrage"))
+							&& WoW.Rage >= 85)
                         { WoW.CastSpell("Rampage"); return; }
 
                         if (WoW.CanCast("Bloodthirst")
                             && !WoW.PlayerHasBuff("Enrage"))
                         { WoW.CastSpell("Bloodthirst"); return; }
 
-                        if (WoW.CanCast("Execute")
-                            && WoW.IsSpellOverlayed("Execute"))
-                        { WoW.CastSpell("Execute"); return; }
+                        //if (WoW.CanCast("Execute")
+						//	&& WoW.TargetHealthPercent <= 20
+                        //    && WoW.IsSpellOverlayed("Execute") || WoW.Rage >= 25)
+                        //{ WoW.CastSpell("Execute"); return; }
 
                         if (WoW.CanCast("Raging Blow")
+							&& WoW.Rage <= 85
                             && !WoW.CanCast("Bloodthirst"))
                         { WoW.CastSpell("Raging Blow"); return; }
 
@@ -350,8 +272,7 @@ namespace PixelMagic.Rotation
                             { WoW.CastSpell("Bloodthirst"); return; }
 
                             if (WoW.CanCast("Execute")
-                                && WoW.IsSpellOverlayed("Execute")
-                                && WoW.Rage > 25)
+                                && WoW.IsSpellOverlayed("Execute") || WoW.Rage >= 25)
                             { WoW.CastSpell("Execute"); return; }
 
                             if (WoW.CanCast("Execute")
@@ -391,7 +312,7 @@ namespace PixelMagic.Rotation
                                 && WoW.Rage < 25)
                             { WoW.CastSpell("Bloodthirst"); return; }
 
-                            if (!MplusAoEint && WoW.CanCast("Raging Blow")
+                            if (WoW.CanCast("Raging Blow")
                                 && WoW.Rage < 25)
                             { WoW.CastSpell("Raging Blow"); return; }
 
