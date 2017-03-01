@@ -52,7 +52,7 @@ namespace PixelMagic.Rotation
                 if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Mount"))
                 {
 
-                    if (WoW.CurrentSoulShards >= 1
+                   /* if (WoW.CurrentSoulShards >= 1
                         && WoW.WasLastCasted("Unstable Affliction")
                         && WoW.CanCast("Reap Souls")
                         && WoW.IsSpellInRange("Agony")
@@ -63,7 +63,8 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Reap Souls");
                         Thread.Sleep(200);
                         return;
-                    }
+                    }*/
+                    
 
                     if ((!WoW.TargetHasDebuff("Agony") || WoW.TargetDebuffTimeRemaining("Agony") <= 5.4)
                         && (!WoW.PlayerIsChanneling || WoW.TargetDebuffTimeRemaining("Agony") <= 1.5)
@@ -74,16 +75,34 @@ namespace PixelMagic.Rotation
                         return;
                     }
 
-                    if ((WoW.CurrentSoulShards >= 3 || WoW.WasLastCasted("Unstable Affliction"))
+                    if ((WoW.CurrentSoulShards >= 3 || (WoW.CurrentSoulShards >= 2 && WoW.WasLastCasted("Unstable Affliction")))
                         && !WoW.IsMoving
                         && WoW.CanCast("Unstable Affliction")
-                        && WoW.IsSpellInRange("Agony")
-                        && WoW.CurrentSoulShards >= 1)
+                        && WoW.IsSpellInRange("Agony"))
                     {
                         WoW.CastSpell("Unstable Affliction");
                         Thread.Sleep(200);
                         return;
                     }
+
+                    if ((WoW.TargetHasDebuff("Unstable Affliction1") && WoW.TargetHasDebuff("Unstable Affliction2")
+                        || WoW.TargetHasDebuff("Unstable Affliction1") && WoW.TargetHasDebuff("Unstable Affliction3")
+                        || WoW.TargetHasDebuff("Unstable Affliction1") && WoW.TargetHasDebuff("Unstable Affliction4")
+                        || WoW.TargetHasDebuff("Unstable Affliction1") && WoW.TargetHasDebuff("Unstable Affliction5")
+                        || WoW.TargetHasDebuff("Unstable Affliction2") && WoW.TargetHasDebuff("Unstable Affliction3")
+                        || WoW.TargetHasDebuff("Unstable Affliction2") && WoW.TargetHasDebuff("Unstable Affliction4")
+                        || WoW.TargetHasDebuff("Unstable Affliction2") && WoW.TargetHasDebuff("Unstable Affliction5")
+                        || WoW.TargetHasDebuff("Unstable Affliction3") && WoW.TargetHasDebuff("Unstable Affliction4")
+                        || WoW.TargetHasDebuff("Unstable Affliction3") && WoW.TargetHasDebuff("Unstable Affliction5")
+                        || WoW.TargetHasDebuff("Unstable Affliction4") && WoW.TargetHasDebuff("Unstable Affliction5"))
+                        && !WoW.PlayerIsCasting
+                        && WoW.CanCast("Reap Souls")
+                        && !WoW.PlayerHasBuff("Deadwind Harvester")
+                        && WoW.PlayerHasBuff("Tormented Souls"))
+                    {
+                        WoW.CastSpell("Reap Souls");
+                        return;
+                    }           
 
                     if (WoW.CanCast("Life Tap") && !WoW.PlayerIsChanneling && CharInfo.T2 == 3 && !WoW.PlayerHasBuff("Empowered Life Tap"))
                     {
@@ -107,33 +126,6 @@ namespace PixelMagic.Rotation
                         && WoW.IsSpellInRange("Agony"))
                     {
                         WoW.CastSpell("Siphon Life");
-                        return;
-                    }                  
-
-                    /*if (WoW.TargetHasDebuff("Unstable Affliction1") && WoW.TargetHasDebuff("Unstable Affliction2")
-                        || (WoW.TargetHasDebuff("Unstable Affliction1") && WoW.TargetHasDebuff("Unstable Affliction3"))
-                        || (WoW.TargetHasDebuff("Unstable Affliction1") && WoW.TargetHasDebuff("Unstable Affliction4"))
-                        || (WoW.TargetHasDebuff("Unstable Affliction1") && WoW.TargetHasDebuff("Unstable Affliction5"))
-                        || (WoW.TargetHasDebuff("Unstable Affliction2") && WoW.TargetHasDebuff("Unstable Affliction3"))
-                        || (WoW.TargetHasDebuff("Unstable Affliction2") && WoW.TargetHasDebuff("Unstable Affliction4"))
-                        || (WoW.TargetHasDebuff("Unstable Affliction2") && WoW.TargetHasDebuff("Unstable Affliction5"))
-                        || (WoW.TargetHasDebuff("Unstable Affliction3") && WoW.TargetHasDebuff("Unstable Affliction4"))
-                        || (WoW.TargetHasDebuff("Unstable Affliction3") && WoW.TargetHasDebuff("Unstable Affliction5"))
-                        || (WoW.TargetHasDebuff("Unstable Affliction4") && WoW.TargetHasDebuff("Unstable Affliction5"))
-                        && !WoW.PlayerIsCasting
-                        && WoW.CanCast("Reap Souls")
-                        && !WoW.PlayerHasBuff("Deadwind Harvester")
-                        && WoW.PlayerHasBuff("Tormented Souls"))
-                    {
-                        WoW.CastSpell("Reap Souls");
-                        return;
-                    }*/
-
-                    
-
-                    if (WoW.CanCast("Reap Souls") && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Deadwind Harvester") && WoW.PlayerHasBuff("Tormented Souls"))
-                    {
-                        WoW.CastSpell("Reap Souls");
                         return;
                     }
 
@@ -432,6 +424,7 @@ namespace PixelMagic.Rotation
             {
                 string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
                 Log.Write("Addon Editing in progress");
+                addonlua = addonlua.Replace("local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId, canApplyAura, isBossDebuff, value1, value2, value3 = UnitDebuff(\"target\", auraName, nil, \"PLAYER|HARMFUL\")", UACountLua);
                 addonlua = addonlua.Replace("if name == \"Wild Imps\"", "if (name == \"Wild Imps\" or name == \"Spirit Wolf\" or name == \"Totem Mastery\")");
                 addonlua = addonlua.Replace("and(startTime + duration - GetTime() > 1.6) ", "and(startTime + duration - GetTime() > (1.5 / (1 + (GetHaste() / 100) ))) ");
                 addonlua = addonlua.Replace("end" + Environment.NewLine + Environment.NewLine + "local function InitializeTwo()", Environment.NewLine);
@@ -518,6 +511,29 @@ namespace PixelMagic.Rotation
             [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
             internal static extern short GetKeyState(int virtualKeyCode);
         }
+
+        private const string UACountLua = @"        local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId, canApplyAura, isBossDebuff, value1, value2, value3 = UnitDebuff(""target"", auraName, nil, ""PLAYER|HARMFUL"")
+        
+            if name == ""Unstable Affliction"" and (name == auraName) then
+              count = 0
+                index = 1
+                
+                UA = true
+                while UA do
+                    name2, _, _, count2,_, duration, expirationTime2, _, _, _, spellId2, _, _, _, _, _ = UnitDebuff(""target"", index, ""PLAYER|HARMFUL"")
+                    if name2 ~= nil then
+                        index = index +1
+                        if auraId == spellId2 then
+                            UA = false
+                            expirationTime = expirationTime2
+                            count = count2
+                        end
+                    else 
+                            UA = false
+                    end
+                end
+                
+            end";
 
         private const string CustomLua = @"local Healingbuffs =  ""Riptide""
 local Race = {
