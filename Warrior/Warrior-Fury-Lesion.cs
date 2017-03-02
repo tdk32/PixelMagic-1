@@ -155,6 +155,7 @@ namespace PixelMagic.Rotation
                 if (WoW.HasTarget && WoW.IsInCombat && WoW.TargetIsEnemy && WoW.IsSpellInRange("Bloodthirst"))
                 {
                     if (WoW.TargetHealthPercent >= 20)
+					{
                         //When targets are above 20%. Not in Execute phase. (need to change this to TTExecute)
                         //Single target with Reckless Abandon -  Battle Cry  Avatar  Rampage -  Raging Blow -  Odyn's Fury -  Bloodthirst - Raging Blow -  Furious Slash -  Bloodthirst
 						
@@ -226,6 +227,7 @@ namespace PixelMagic.Rotation
                                 && !WoW.CanCast("Raging Blow"))
                             { WoW.CastSpell("Furious Slash"); return; }
                         }
+					
 
                     if (!TFZFMint)
                     {
@@ -256,7 +258,7 @@ namespace PixelMagic.Rotation
                             && !WoW.CanCast("Raging Blow"))
                         { WoW.CastSpell("Furious Slash"); return; }
                     }
-
+					}
 
                     if (WoW.TargetHealthPercent <= 20)
 
@@ -417,5 +419,6 @@ Spell,1719,Battle Cry,F3
 Spell,5308,Execute,Z
 Spell,190411,Whirlwind,D6
 Aura,184362,Enrage
+Aura,206316,Massacre
 Aura,85739,Meat Cleaver
 */
