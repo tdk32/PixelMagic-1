@@ -283,10 +283,10 @@ namespace PixelMagic.Rotation
             EmeraldDreamcatcherBox = new CheckBox { Checked = EmeraldDreamcatcher, TabIndex = 6, Size = new Size(15, 14), Left = 520, Top = 29 };
             SettingsForm.Controls.Add(EmeraldDreamcatcherBox);
 
-            var lblStarfallMacroText = new Label { Text = "Macro : Have Starfall Macro", Size = new Size(200, 13), Left = 312, Top = 29 };
+            var lblStarfallMacroText = new Label { Text = "Macro : Have Starfall Macro", Size = new Size(200, 13), Left = 312, Top = 44 };
             SettingsForm.Controls.Add(lblStarfallMacroText);
 
-            StarfallMacroBox = new CheckBox { Checked = StarfallMacro, TabIndex = 6, Size = new Size(15, 14), Left = 520, Top = 29 };
+            StarfallMacroBox = new CheckBox { Checked = StarfallMacro, TabIndex = 6, Size = new Size(15, 14), Left = 520, Top = 44 };
             SettingsForm.Controls.Add(StarfallMacroBox);
 
             var cmdSave = new Button { Text = "Save", Width = 65, Height = 25, Left = 462, Top = 118, Size = new Size(108, 31) };
@@ -2066,6 +2066,7 @@ Spell,24858,Moonkin,F11
 Spell,108238,Renewal,F7
 Spell,202360,BlessingOfAncients,F10
 Spell,235991,KBW,T
+Aura,224706,EmeraldDreamcatcherBuff
 Aura,164547,LunarEmp
 Aura,164545,SolarEmp
 Aura,164812,Moonfire
