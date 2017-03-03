@@ -3,49 +3,56 @@
 // ReSharper disable ConvertPropertyToExpressionBody
 
 // Balance Druid rotation by Scotishdwarf and Daniel
-// Known Bugs :
-// Addon Lua Errors, probably not because of rotation.
+// Known Bugs / TODO :
+// - Sometimes overcapping Astral Power due PixelMagic not detecting Astral Power fast enough.
+// - Oneth's Intuition not coded in to normal rotation yet, it's coded in Emerald Dreamcatcher rotation, it's in TODO.
 // Changelog :
-// Version 2.2
+// Version r24
+// - Fixed small issue with Moonfire and Sunfire not being applied with Emerald Dreamcatcher enabled.
+// - Added buff id for Oneth's Overconfidence (Oneth's Intuition legendary) for Emerald Dreamcatcher rotation
+// - Changed build numbers from Version X.X to Version rXX
+// Version r23
+// - Added Emerald Dreamcatcher buff id and fixed overlapping settings bug.
+// Version r22
 // - Added beta version of Emerald Dreamcatcher rotation
-// Version 2.1
+// Version r21
 // - Temporarily fix to problems with Empowerements (using Thread.Sleep)
-// Version 2.0
+// Version r20
 // - Coded in Soul of the Forest  (AoE), Shooting Stars, Stellar Drift
 // - Legendary : Kil'jaeden's Burning Wish
-// Version 1.9
+// Version r19
 // - Small improvements on movement, empowerements and Starsurge.
-// Version 1.8
+// Version r18
 // - Fulmination Charge support, will try use Starsurge's at 8+ stacks.
-// Version 1.7
+// Version r17
 // - Improved usage for Incarnation (will cast it in heroism)
 // - Blessing of the Ancients support
-// Version 1.6
+// Version r16
 // - Added support for Talents : Renewal, Restoration Affinnity (Swiftmeld, Rejuvenation).
 // - Restoration Affinity : You need only leave Moonkin form at under 50% health and it will use Swiftmeld and Rejuvenation and go back to Moonkin.
 // - Renewal : Will cast it at under 30% health
 // - Heroism/Timewarp : Will use Incarnation if available.
-// Version 1.5
+// Version r15
 // - Improved Solar Wrath and Lunar Strike usage under Empowerements.
-// Version 1.4
+// Version r14
 // - Fixed to work with latest donator build.
 // - Added starfall use to aoe.
-// Version 1.3
+// Version r13
 // - Improved Pull
-// Version 1.2
+// Version r12
 // - Improved AoE
-// Version 1.1
+// Version r11
 // - Better handling of everything
 // - Added opener
 // - More configuration options
-// Version 1.0
+// Version r10
 // Added : 
 // - AoE, manual use of Starfall required. 
 // - Better handling of Solar Wrath, Lunar Strike, Starsurge etc..
 // - Basic cooldown usage on bosses.
-// Version 0.2
+// Version r2
 // Completly reworked how rotation works
-// Version 0.1
+// Version r1
 // Start building the rotation
 using PixelMagic.Helpers;
 using System.Diagnostics;
@@ -211,7 +218,7 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            MessageBox.Show("Welcome to Balance Druid by Scotishdwarf 2.0.\n\nMy talent build : 3,1,3,1,3,3,3.\n\nNoteworthy things :\n- If using Stellar Drift and SotF, in single target use it manually, AoE will use automatically.\n- Starsurge used at 80 AP, pooling it high to minimize dps loss while moving, you can force cast it by moving.\n- On AOE, manual Starfall usage required, you can make cast at cursor macro for this.\n\nRecommended to use addon that hides Lua Errors for now.\n\nPress OK to continue loading rotation.");
+            MessageBox.Show("Welcome to Balance Druid by Scotishdwarf r24.\n\nMy talent build : 3,1,3,1,3,3,3.\n\nNoteworthy things :\n- If using Stellar Drift and SotF, in single target use it manually, AoE will use automatically.\n- Starsurge used at 70 AP, pooling it high to minimize dps loss while moving, you can force cast it by moving.\n- On AOE, manual Starfall usage required, you can make cast at cursor macro for this.\n\nRecommended to use addon that hides Lua Errors for now.\n\nPress OK to continue loading rotation.");
             Log.Write("Welcome to Balance rotation", Color.Green);
 
             // TALENT CONFIG
@@ -235,7 +242,7 @@ namespace PixelMagic.Rotation
             AstralCommunionBox = new CheckBox {Checked = AstralCommunion, TabIndex = 6, Size = new Size(15, 14), Left = 220, Top = 44};
             SettingsForm.Controls.Add(AstralCommunionBox);
 
-            var lblStellarFlareText = new Label { Text = "Talent : Stellar Flare", Size = new Size(200, 13), Left = 12, Top = 59 };
+            var lblStellarFlareText = new Label { Text = "Talent : StellarFlare", Size = new Size(200, 13), Left = 12, Top = 59 };
             SettingsForm.Controls.Add(lblStellarFlareText);
 
             StellarFlareBox = new CheckBox { Checked = StellarFlare, TabIndex = 6, Size = new Size(15, 14), Left = 220, Top = 59 };
@@ -335,7 +342,7 @@ namespace PixelMagic.Rotation
             Log.Write("Natures Balance = " + NaturesBalance);
 			Log.Write("Incarnation = " + NaturesBalance);
 			Log.Write("Astral Communion = " + NaturesBalance);
-            Log.Write("Stellar Flare = " + StellarFlare);
+            Log.Write("StellarFlare = " + StellarFlare);
             Log.Write("Healing under 30% HP = " + HealingLowHP);
             Log.Write("Renewal = " + Renewal);
             Log.Write("BlessingOfAncients = " + BlessingOfAncients);
@@ -518,9 +525,16 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // actions.ed+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2&astral_power>=15
+                    // need add multiple target detection
                     if (StellarFlare && WoW.CanCast("StellarFlare") && WoW.TargetDebuffTimeRemaining("StellarFlare") <= 7 && WoW.CurrentAstralPower >= 15);
                     {
                         WoW.CastSpell("StellarFlare");
+                        return;
+                    }
+                    // moonfire if not in target
+                    if (WoW.CanCast("Moonfire") && !WoW.TargetHasDebuff("Moonfire")) ;
+                    {
+                        WoW.CastSpell("Moonfire");
                         return;
                     }
                     // actions.ed+=/moonfire,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
@@ -529,6 +543,12 @@ namespace PixelMagic.Rotation
                         && (WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1 || !WoW.PlayerHasBuff("EmeraldDreamcatcherBuff"))) ;
                     {
                         WoW.CastSpell("Moonfire");
+                        return;
+                    }
+                    // sunfire if not in target
+                    if (WoW.CanCast("Sunfire") && !WoW.TargetHasDebuff("Sunfire")) ;
+                    {
+                        WoW.CastSpell("Sunfire");
                         return;
                     }
                     // actions.ed+=/sunfire,if=((talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
@@ -582,7 +602,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // actions.ed+=/starfall,if=buff.oneths_overconfidence.up&remains<2
-                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence") && WoW.TargetDebuffTimeRemaining("Starfall") < 2);
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence") && WoW.TargetDebuffTimeRemaining("Starfall") < 2) ;
                     {
                         WoW.CastSpell("Starfall");
                         return;
@@ -735,22 +755,22 @@ namespace PixelMagic.Rotation
                             Thread.Sleep(100);
                             return;
 						}
-						// Stellar Flare if not in target
-						if (WoW.IsSpellInRange("Stellar Flare")
-							&& WoW.CanCast("Stellar Flare")
+						// StellarFlare if not in target
+						if (WoW.IsSpellInRange("StellarFlare")
+							&& WoW.CanCast("StellarFlare")
 							&& WoW.CurrentAstralPower >= 15
-							&& !WoW.TargetHasDebuff("Stellar Flare"))
+							&& !WoW.TargetHasDebuff("StellarFlare"))
 						{
-							WoW.CastSpell("Stellar Flare");
+							WoW.CastSpell("StellarFlare");
 							return;
 						}
-						// Stellar Flare if under 5 remaining and at over 15 astral power
-						if (StellarFlare && WoW.IsSpellInRange("Stellar Flare")
-							&& WoW.CanCast("Stellar Flare")
+						// StellarFlare if under 5 remaining and at over 15 astral power
+						if (StellarFlare && WoW.IsSpellInRange("StellarFlare")
+							&& WoW.CanCast("StellarFlare")
 							&& WoW.CurrentAstralPower >= 15
-							&& WoW.TargetDebuffTimeRemaining("Stellar Flare") <= 5)
+							&& WoW.TargetDebuffTimeRemaining("StellarFlare") <= 5)
 						{
-							WoW.CastSpell("Stellar Flare");
+							WoW.CastSpell("StellarFlare");
 							return;
 						}
                         // New Moon
@@ -840,22 +860,22 @@ namespace PixelMagic.Rotation
 							WoW.CastSpell("LStrike");
 							return;
 						}
-						// Stellar Flare if under 7.2 remaining and at over 15 astral power
-						if (StellarFlare && WoW.IsSpellInRange("Stellar Flare")
-							&& WoW.CanCast("Stellar Flare")
+						// StellarFlare if under 7.2 remaining and at over 15 astral power
+						if (StellarFlare && WoW.IsSpellInRange("StellarFlare")
+							&& WoW.CanCast("StellarFlare")
 							&& WoW.CurrentAstralPower >= 15
-							&& !WoW.TargetHasDebuff("Stellar Flare"))
+							&& !WoW.TargetHasDebuff("StellarFlare"))
 						{
-							WoW.CastSpell("Stellar Flare");
+							WoW.CastSpell("StellarFlare");
 							return;
 						}
-						// Stellar Flare if under 7.2 remaining and at over 15 astral power
-						if (StellarFlare && WoW.IsSpellInRange("Stellar Flare")
-							&& WoW.CanCast("Stellar Flare")
+						// StellarFlare if under 7.2 remaining and at over 15 astral power
+						if (StellarFlare && WoW.IsSpellInRange("StellarFlare")
+							&& WoW.CanCast("StellarFlare")
 							&& WoW.CurrentAstralPower >= 15
-							&& WoW.TargetDebuffTimeRemaining("Stellar Flare") <= 5)
+							&& WoW.TargetDebuffTimeRemaining("StellarFlare") <= 5)
 						{
-							WoW.CastSpell("Stellar Flare");
+							WoW.CastSpell("StellarFlare");
 							return;
 						}
                         // Cast LunarStrike if no SolarEmp and have LunarEmp
@@ -1005,13 +1025,13 @@ namespace PixelMagic.Rotation
                         Thread.Sleep(100);
                         return;
                     }
-                    // Stellar Flare if no stellar flare
-                    if (StellarFlare && WoW.IsSpellInRange("Stellar Flare")
-                        && WoW.CanCast("Stellar Flare")
+                    // StellarFlare if no StellarFlare
+                    if (StellarFlare && WoW.IsSpellInRange("StellarFlare")
+                        && WoW.CanCast("StellarFlare")
                         && WoW.CurrentAstralPower >= 15
-                        && !WoW.TargetHasDebuff("Stellar Flare"))
+                        && !WoW.TargetHasDebuff("StellarFlare"))
                     {
-                        WoW.CastSpell("Stellar Flare");
+                        WoW.CastSpell("StellarFlare");
                         return;
                     }
                     // New Moon
@@ -1122,13 +1142,13 @@ namespace PixelMagic.Rotation
                         Thread.Sleep(100);
                         return;
                     }
-                    // Stellar Flare if no stellar flare
-                    if (StellarFlare && WoW.IsSpellInRange("Stellar Flare")
-                        && WoW.CanCast("Stellar Flare")
+                    // StellarFlare if no StellarFlare
+                    if (StellarFlare && WoW.IsSpellInRange("StellarFlare")
+                        && WoW.CanCast("StellarFlare")
                         && WoW.CurrentAstralPower >= 15
-                        && !WoW.TargetHasDebuff("Stellar Flare"))
+                        && !WoW.TargetHasDebuff("StellarFlare"))
                     {
-                        WoW.CastSpell("Stellar Flare");
+                        WoW.CastSpell("StellarFlare");
                         return;
                     }
                     // New Moon
@@ -1285,13 +1305,13 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Sunfire");
                         return;
                     }
-                    // Stellar Flare if under 7.2 remaining and at over 15 astral power
-                    if (WoW.IsSpellInRange("Stellar Flare")
-                        && WoW.CanCast("Stellar Flare")
+                    // StellarFlare if under 7.2 remaining and at over 15 astral power
+                    if (WoW.IsSpellInRange("StellarFlare")
+                        && WoW.CanCast("StellarFlare")
                         && WoW.CurrentAstralPower >= 15
-                        && WoW.TargetDebuffTimeRemaining("Stellar Flare") <= 7.2)
+                        && WoW.TargetDebuffTimeRemaining("StellarFlare") <= 7.2)
                     {
-                        WoW.CastSpell("Stellar Flare");
+                        WoW.CastSpell("StellarFlare");
                         return;
                     }
                     // Solar Wrath at 3 solar empowerement
@@ -1324,20 +1344,20 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Sunfire");
                         return;
                     }
-                    // Stellar Flare if not on target
-                    if (WoW.IsSpellInRange("Stellar Flare")
-                        && WoW.CanCast("Stellar Flare")
-                        && !WoW.TargetHasDebuff("Stellar Flare"))
+                    // StellarFlare if not on target
+                    if (WoW.IsSpellInRange("StellarFlare")
+                        && WoW.CanCast("StellarFlare")
+                        && !WoW.TargetHasDebuff("StellarFlare"))
                     {
-                        WoW.CastSpell("Stellar Flare");
+                        WoW.CastSpell("StellarFlare");
                         return;
                     }
-                    // Stellar Flare if not on target
-                    if (WoW.IsSpellInRange("Stellar Flare")
-                        && WoW.CanCast("Stellar Flare")
-                        && WoW.TargetDebuffTimeRemaining("Stellar Flare") < 5)
+                    // StellarFlare if not on target
+                    if (WoW.IsSpellInRange("StellarFlare")
+                        && WoW.CanCast("StellarFlare")
+                        && WoW.TargetDebuffTimeRemaining("StellarFlare") < 5)
                     {
-                        WoW.CastSpell("Stellar Flare");
+                        WoW.CastSpell("StellarFlare");
                         return;
                     }
                     // Secondary priority execute order
@@ -1390,7 +1410,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Starsurge
-                    if (WoW.IsSpellInRange("Starsurge") && WoW.CanCast("Starsurge") && WoW.CurrentAstralPower >= 80 && (!WoW.PlayerHasBuff("SolarEmp") || WoW.PlayerBuffStacks("SolarEmp") < 3) && (!WoW.PlayerHasBuff("LunarEmp") || WoW.PlayerBuffStacks("LunarEmp") < 3))
+                    if (WoW.IsSpellInRange("Starsurge") && WoW.CanCast("Starsurge") && WoW.CurrentAstralPower >= 70 && (!WoW.PlayerHasBuff("SolarEmp") || WoW.PlayerBuffStacks("SolarEmp") < 3) && (!WoW.PlayerHasBuff("LunarEmp") || WoW.PlayerBuffStacks("LunarEmp") < 3))
                     {
                         WoW.CastSpell("Starsurge");
                         return;
@@ -1702,13 +1722,13 @@ namespace PixelMagic.Rotation
                         Thread.Sleep(100);
                         return;
                     }
-                    // Stellar Flare if no stellar flare
-                    if (StellarFlare && WoW.IsSpellInRange("Stellar Flare")
-                        && WoW.CanCast("Stellar Flare")
+                    // StellarFlare if no StellarFlare
+                    if (StellarFlare && WoW.IsSpellInRange("StellarFlare")
+                        && WoW.CanCast("StellarFlare")
                         && WoW.CurrentAstralPower >= 15
-                        && !WoW.TargetHasDebuff("Stellar Flare"))
+                        && !WoW.TargetHasDebuff("StellarFlare"))
                     {
-                        WoW.CastSpell("Stellar Flare");
+                        WoW.CastSpell("StellarFlare");
                         return;
                     }
                     // Cast SolarWrath when nothing else to do
@@ -1776,13 +1796,13 @@ namespace PixelMagic.Rotation
                         Thread.Sleep(100);
                         return;
                     }
-                    // Stellar Flare if no stellar flare
-                    if (StellarFlare && WoW.IsSpellInRange("Stellar Flare")
-                        && WoW.CanCast("Stellar Flare")
+                    // StellarFlare if no StellarFlare
+                    if (StellarFlare && WoW.IsSpellInRange("StellarFlare")
+                        && WoW.CanCast("StellarFlare")
                         && WoW.CurrentAstralPower >= 15
-                        && !WoW.TargetHasDebuff("Stellar Flare"))
+                        && !WoW.TargetHasDebuff("StellarFlare"))
                     {
-                        WoW.CastSpell("Stellar Flare");
+                        WoW.CastSpell("StellarFlare");
                         return;
                     }
                     // Cast SolarWrath when nothing else to do
@@ -1890,13 +1910,13 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Sunfire");
                         return;
                     }
-                    // Stellar Flare if under 7.2 remaining and at over 15 astral power
-                    if (WoW.IsSpellInRange("Stellar Flare")
-                        && WoW.CanCast("Stellar Flare")
+                    // StellarFlare if under 7.2 remaining and at over 15 astral power
+                    if (WoW.IsSpellInRange("StellarFlare")
+                        && WoW.CanCast("StellarFlare")
                         && WoW.CurrentAstralPower >= 15
-                        && WoW.TargetDebuffTimeRemaining("Stellar Flare") <= 7.2)
+                        && WoW.TargetDebuffTimeRemaining("StellarFlare") <= 7.2)
                     {
-                        WoW.CastSpell("Stellar Flare");
+                        WoW.CastSpell("StellarFlare");
                         return;
                     }
                     // Lunar Strike at 3 solar empowerement
@@ -1929,20 +1949,20 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Sunfire");
                         return;
                     }
-                    // Stellar Flare if not on target
-                    if (WoW.IsSpellInRange("Stellar Flare")
-                        && WoW.CanCast("Stellar Flare")
-                        && !WoW.TargetHasDebuff("Stellar Flare"))
+                    // StellarFlare if not on target
+                    if (WoW.IsSpellInRange("StellarFlare")
+                        && WoW.CanCast("StellarFlare")
+                        && !WoW.TargetHasDebuff("StellarFlare"))
                     {
-                        WoW.CastSpell("Stellar Flare");
+                        WoW.CastSpell("StellarFlare");
                         return;
                     }
-                    // Stellar Flare if not on target
-                    if (WoW.IsSpellInRange("Stellar Flare")
-                        && WoW.CanCast("Stellar Flare")
-                        && WoW.TargetDebuffTimeRemaining("Stellar Flare") < 5)
+                    // StellarFlare if not on target
+                    if (WoW.IsSpellInRange("StellarFlare")
+                        && WoW.CanCast("StellarFlare")
+                        && WoW.TargetDebuffTimeRemaining("StellarFlare") < 5)
                     {
-                        WoW.CastSpell("Stellar Flare");
+                        WoW.CastSpell("StellarFlare");
                         return;
                     }
                     // Secondary priority execute order
@@ -2055,7 +2075,7 @@ Spell,194153,LStrike,D2
 Spell,190984,SolarW,D1
 Spell,202771,FullMoon,G
 Spell,202768,HalfMoon,G
-Spell,202347,Stellar Flare,F9
+Spell,202347,StellarFlare,F9
 Spell,194223,CelestialAlignment,Z
 Spell,202359,Astral Communion,F10
 Spell,202430,NaturesBalance,E
@@ -2066,13 +2086,14 @@ Spell,24858,Moonkin,F11
 Spell,108238,Renewal,F7
 Spell,202360,BlessingOfAncients,F10
 Spell,235991,KBW,T
+Aura,209407,OnethsOverconfidence
 Aura,224706,EmeraldDreamcatcherBuff
 Aura,164547,LunarEmp
 Aura,164545,SolarEmp
 Aura,164812,Moonfire
 Aura,93402,Sunfire
 Aura,24858,Moonkin
-Aura,202347,Stellar Flare
+Aura,202347,StellarFlare
 Aura,194223,CelestialAlignment
 Aura,102560,Incarnation
 Aura,80353,Timewarp
