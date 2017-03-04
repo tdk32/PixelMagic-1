@@ -373,7 +373,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Bestial Wrath");
                         return;
                     }
-					if (WoW.CanCast("Bestial Wrath") && WoW.Focus >= 101 && WoW.IsSpellInRange("Cobra Shot") && !WoW.PlayerHasBuff("Turtle") && !WoW.IsSpellOnCooldown("Bestial Wrath") && !WoW.IsSpellOnCooldown("Kill Command"))
+					if (WoW.CanCast("Bestial Wrath") && WoW.Focus >= 108 && WoW.IsSpellInRange("Cobra Shot") && !WoW.PlayerHasBuff("Turtle") && !WoW.IsSpellOnCooldown("Bestial Wrath") && WoW.SpellCooldownTimeRemaining("Kill Command") <= 3)
                     {
                         WoW.CastSpell("Bestial Wrath");
                         return;
@@ -389,7 +389,7 @@ namespace PixelMagic.Rotation
 						//WoW.CastSpell("Potion Power");
 						//return;
 					//}
-					if (WoW.CanCast("Kill Command") && WoW.Focus >= 103 && WoW.IsSpellInRange("Kill Command") && !(WoW.SpellCooldownTimeRemaining("Bestial Wrath") <= 1))
+					if (WoW.CanCast("Kill Command") && WoW.Focus >= 100 && WoW.IsSpellInRange("Kill Command"))
                     {
                         WoW.CastSpell("Kill Command");
                         return;
@@ -403,7 +403,7 @@ namespace PixelMagic.Rotation
                         return;
 						}
                     }
-                    if (WoW.CanCast("Kill Command") && WoW.Focus >= 30 && WoW.IsSpellInRange("Kill Command") && !(WoW.SpellCooldownTimeRemaining("Bestial Wrath") <= 1))
+                    if (WoW.CanCast("Kill Command") && WoW.Focus >= 30 && WoW.IsSpellInRange("Kill Command"))
                     {
                         WoW.CastSpell("Kill Command");
                         return;
@@ -423,7 +423,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Cobra Shot");
                         return;
                     }
-					if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 91) && WoW.IsSpellInRange("Cobra Shot") && WoW.SpellCooldownTimeRemaining("Bestial Wrath") < WoW.SpellCooldownTimeRemaining("Kill Command") && WoW.SpellCooldownTimeRemaining("Kill Command") >= 1)
+					if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 108) && WoW.IsSpellInRange("Cobra Shot") && WoW.SpellCooldownTimeRemaining("Kill Command") >= 1)
                     {
                         WoW.CastSpell("Cobra Shot");
                         return;
