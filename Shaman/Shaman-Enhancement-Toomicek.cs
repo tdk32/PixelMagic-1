@@ -1,4 +1,4 @@
-﻿// winifix@gmail.com
+// winifix@gmail.com
 // ReSharper disable UnusedMember.Global
 
 
@@ -413,7 +413,7 @@ namespace PixelMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Toomicek
-AddonName=Pawn
+AddonName=RGB
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,57994,Wind Shear,NumPad9

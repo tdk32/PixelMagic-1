@@ -1,4 +1,4 @@
-﻿// winifix@gmail.com
+// winifix@gmail.com
 // ReSharper disable UnusedMember.Global
 
 
@@ -17,9 +17,21 @@ namespace PixelMagic.Rotation
 		
 		private CheckBox fourt19Box;
 		
-        public override string Name => "Enhancement(Tempest) by Jedix";
+		public override string Name 
+		{
+			get
+			{				
+				return "Enhancement(Tempest) by Jedix";		
+			}
+		}
 
-        public override string Class => "Shaman";
+        public override string Class 
+		{
+			get
+			{				
+				return "Shaman";		
+			}
+		}
 
         public override Form SettingsForm { get; set; }
 		
@@ -40,7 +52,6 @@ namespace PixelMagic.Rotation
             Log.Write("Suggested build: 3212112", Color.Green);
 			Log.Write("If you got atleast 2pieces of t19, use this rotation for most dps. Numpad * controls cooldowns on/off", Color.Green);
 			Log.Write("If you got 4pieces of t19 set checkbox in options", Color.Green);
-            WoW.Speak("PixelMagic Enhancement");
 			
 			SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 480, Height = 300, ShowIcon = false};
 
@@ -90,7 +101,7 @@ namespace PixelMagic.Rotation
 						if (coolDownStopWatch.ElapsedMilliseconds > 1000)
 						{
 							combatRoutine.UseCooldowns = !combatRoutine.UseCooldowns;
-							WoW.Speak("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
+
 							coolDownStopWatch.Restart();
 						}
 					}
@@ -433,7 +444,7 @@ namespace PixelMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Jedix
-AddonName=Pawn
+AddonName=RGB
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,57994,Wind Shear,NumPad9
