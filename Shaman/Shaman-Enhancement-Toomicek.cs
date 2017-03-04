@@ -10,17 +10,28 @@ namespace PixelMagic.Rotation
 {
     public class Enhancement : CombatRoutine
     {
-        public override string Name => "Enhancement Toomicek";
+		public override string Name 
+		{
+			get
+			{				
+				return "Enhancement Toomicek";		
+			}
+		}
 
-        public override string Class => "Shaman";
+        public override string Class 
+		{
+			get
+			{				
+				return "Shaman";		
+			}
+		}
 
         public override Form SettingsForm { get; set; }
 
         public override void Initialize()
         {
             Log.Write("Welcome to Enhancement Shaman by Toomicek", Color.Green);
-            Log.Write("Suggested build: 1213112", Color.Green);
-            WoW.Speak("PixelMagic Enhancement");
+            Log.Write("Suggested build: 1213112", Color.Green);            
         }
 
         public override void Stop()
