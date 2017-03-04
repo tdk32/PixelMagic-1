@@ -73,7 +73,7 @@ namespace PixelMagic.Rotation
         //Talents
         private CheckBox SerenityBox;
 
-        private static string HitCombo { set; get; } = "";
+        private static string HitCombo { set; get; } 
 
         private static bool Katsuo
         {
@@ -108,9 +108,21 @@ namespace PixelMagic.Rotation
 
         public override Form SettingsForm { get; set; }
 
-        public override string Name => "Windwalker Monk";
+        public override string Name 
+		{
+			get
+			{
+				return "Windwalker Monk";
+			}
+		}
 
-        public override string Class => "Monk";
+        public override string Class 
+		{
+			get		
+			{
+				return "Monk";
+			}
+		}
 
         public override void Initialize()
         {
@@ -122,8 +134,7 @@ namespace PixelMagic.Rotation
             Log.Write("", Color.SpringGreen);
             Log.Write("Feedback is appreciated in the Monk section on PixelMagic's Discord.", Color.SpringGreen);
             Log.Write("Tag it with @[EU] Mixo to notify me. :)", Color.SpringGreen);
-            Log.DrawHorizontalLine();
-            WoW.Speak("Mix Oh! Vind! Walker!");
+            Log.DrawHorizontalLine();            
 
             SettingsForm = new Form {Text = "Mixo's Windwalker Monk Rotation - Settings", StartPosition = FormStartPosition.CenterScreen, Width = 480, Height = 318, ShowIcon = false};
 
