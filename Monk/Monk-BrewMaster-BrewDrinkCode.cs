@@ -1,5 +1,4 @@
 ﻿// ReSharper disable UnusedMember.Global
-
 // ReSharper disable UseStringInterpolation
 // ReSharper disable CheckNamespace
 
@@ -13,15 +12,26 @@ namespace PixelMagic.Rotation
     {
         private static bool _ironSkinFired;
 
-        public override string Name => "BrewMaster Rotation";
-
-        public override string Class => "Monk";
+		public override string Name 
+		{
+			get		
+			{
+				return "BrewMaster Rotation";
+			}
+		}
+		
+		public override string Class 
+		{
+			get		
+			{
+				return "Monk";
+			}
+		}
 
         public override Form SettingsForm { get; set; }
 
         public override void Initialize()
-        {
-            WoW.Speak("Welcome to Brew Drink Code's Brew Master Pee Vee E Rotation");
+        {            
             Log.Write("Welcome to Monk BM rotation", Color.Green);
         }
 
@@ -37,7 +47,7 @@ namespace PixelMagic.Rotation
                 //Heal if not in combat
                 if (!WoW.IsInCombat && WoW.HealthPercent <= 95 & WoW.Energy >= 30 && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
                 {
-                    WoW.SendMacro("/cast [@player] Effuse");
+                    //WoW.SendMacro("/cast [@player] Effuse");
                     return;
                 }
 
@@ -136,7 +146,7 @@ namespace PixelMagic.Rotation
             //if We Can Cast Exploding Keg and in Melee range then do so
             if (WoW.CanCast("Exploding Keg") && !WoW.IsSpellOnCooldown("Exploding Keg") && WoW.IsSpellInRange("Tiger Palm"))
             {
-                WoW.SendMacro("/cast [@player] Exploding Keg");
+                //WoW.SendMacro("/cast [@player] Exploding Keg");
                 return;
             }
 
