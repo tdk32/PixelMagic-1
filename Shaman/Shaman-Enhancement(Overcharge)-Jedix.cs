@@ -24,7 +24,7 @@ namespace PixelMagic.Rotation
             Log.Write("Welcome to Enhancement Shaman by Jedix", Color.Green);
             Log.Write("Suggested build: 2212222 (HotHand+Overcharge+FoA)", Color.Green);
 			Log.Write("If you got no set t19, use this rotation for most dps. Numpad * controls cooldowns on/off", Color.Green);
-            WoW.Speak("PixelMagic Enhancement");
+            //WoW.Speak("PixelMagic Enhancement");
         }
 
         public override void Stop()
@@ -35,12 +35,12 @@ namespace PixelMagic.Rotation
         {
 			if (!coolDownStopWatch.IsRunning || coolDownStopWatch.ElapsedMilliseconds > 60000)
 							coolDownStopWatch.Restart();
-					if (DetectKeyPress.GetKeyState(0x6A) < 0)  //Use cooldowns manage by *numButton
+					if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_MULTIPLY) < 0)  //Use cooldowns manage by *numButton
 					{
 						if (coolDownStopWatch.ElapsedMilliseconds > 1000)
 						{
 							combatRoutine.UseCooldowns = !combatRoutine.UseCooldowns;
-							WoW.Speak("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
+							//WoW.Speak("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
 							coolDownStopWatch.Restart();
 						}
 					}
