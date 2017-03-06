@@ -422,7 +422,6 @@ namespace PixelMagic.Rotation
                     if (stopwatch.ElapsedMilliseconds > 1000)
                     {
                         combatRoutine.UseCooldowns = !combatRoutine.UseCooldowns;
-                        WoW.Speak("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
                         stopwatch.Restart();
                     }
                 }
