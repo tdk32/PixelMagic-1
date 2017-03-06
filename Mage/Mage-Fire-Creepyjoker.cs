@@ -205,7 +205,6 @@ namespace PixelMagic.Rotation
                 "Make sure you created the macro /stopcasting /cast Phoenix's Flames ; /cast [@cursor] Flamestrike ; /cast [@cursor] Ring of Frost and /cast [@cursor] Meteor and it's also set on your keybind.",
                 Color.Red);
             Log.Write("Check README from Rotation Settings for further informations.", Color.Red);
-            WoW.Speak("Welcome to CreepyFireMage rotation. Donators Version.");
             //
             SettingsForm = new Form
             {
@@ -461,7 +460,6 @@ namespace PixelMagic.Rotation
                     if (stopwatch.ElapsedMilliseconds > 1000)
                     {
                         combatRoutine.UseCooldowns = !combatRoutine.UseCooldowns;
-                        WoW.Speak("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
                         stopwatch.Restart();
                     }
                 }
