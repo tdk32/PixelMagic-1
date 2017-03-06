@@ -20,7 +20,6 @@ namespace PixelMagic.Rotation
         {
             Log.Write("Welcome to Rogue-Subtlety", Color.Green);
             Log.Write("Suggested build: http://www.wowhead.com/talent-calc/rogue/subtlety/cTIz");
-            WoW.Speak("Welcome to PixelMagic Subtlety");
         }
 
         public override void Stop()
