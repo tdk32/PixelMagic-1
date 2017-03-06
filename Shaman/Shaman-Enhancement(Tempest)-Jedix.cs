@@ -96,7 +96,7 @@ namespace PixelMagic.Rotation
         {
 			if (!coolDownStopWatch.IsRunning || coolDownStopWatch.ElapsedMilliseconds > 60000)
 							coolDownStopWatch.Restart();
-					if (DetectKeyPress.GetKeyState(0x6A) < 0)  //Use cooldowns manage by *numButton
+					if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_MULTIPLY) < 0)  //Use cooldowns manage by *numButton
 					{
 						if (coolDownStopWatch.ElapsedMilliseconds > 1000)
 						{
