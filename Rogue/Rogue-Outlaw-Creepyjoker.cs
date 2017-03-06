@@ -243,9 +243,8 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            Log.Write("Welcome to CreepyOutlaw rotation. V2.2. Report any issues on #rogue Discord channel with @Creepyjoker tag for further fixes.", Color.Red);
+            Log.Write("Welcome to CreepyOutlaw rotation. V2.3. Report any issues on #rogue Discord channel with @Creepyjoker tag for further fixes.", Color.Red);
             Log.Write("Suggested build: 1212231");
-            WoW.Speak("Welcome to CreepyOutlaw rotation.");
             SettingsFormCJO = new SettingsFormCJO();
             SettingsForm = SettingsFormCJO;
 
