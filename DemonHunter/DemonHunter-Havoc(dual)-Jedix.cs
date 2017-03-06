@@ -26,7 +26,7 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            WoW.Speak("Welcome to PixelMagic Havoc by Jedix");
+            //WoW.Speak("Welcome to PixelMagic Havoc by Jedix");
 
             if (ConfigFile.ReadValue("DemonHunter", "Blur Usage Percent") == "")
             {
@@ -68,12 +68,12 @@ namespace PixelMagic.Rotation
             {
 				if (!coolDownStopWatch.IsRunning || coolDownStopWatch.ElapsedMilliseconds > 60000)
 							coolDownStopWatch.Restart();
-					if (DetectKeyPress.GetKeyState(0x6A) < 0)  //Use cooldowns manage by *numButton
+					if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_MULTIPLY) < 0)  //Use cooldowns manage by *numButton
 					{
 						if (coolDownStopWatch.ElapsedMilliseconds > 1000)
 						{
 							combatRoutine.UseCooldowns = !combatRoutine.UseCooldowns;
-							WoW.Speak("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
+							//WoW.Speak("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
 							coolDownStopWatch.Restart();
 						}
 					}
@@ -110,7 +110,7 @@ namespace PixelMagic.Rotation
                             WoW.CastSpell("Felblade"); //Felblade only at melee range to not make worse (if you need to gtfo)
                             return;
                         }
-                        if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.IsSpellInRange("Chaos Strike") && (DetectKeyPress.GetKeyState(0x5A) < 0))
+                        if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.IsSpellInRange("Chaos Strike") && (DetectKeyPress.GetKeyState(DetectKeyPress.VK_KEY_Z) < 0))
                         {																
                             WoW.CastSpell("Eye Beam"); //Use Eyebeam by Z press
                             return;
@@ -160,7 +160,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Felblade"); //Felblade only at melee range to not make worse (if you need to gtfo)
                         return;
                     }
-                    if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.IsSpellInRange("Chaos Strike") && (DetectKeyPress.GetKeyState(0x5A) < 0))
+                    if (WoW.CanCast("Eye Beam") && WoW.Fury >= 50 && WoW.IsSpellInRange("Chaos Strike") && (DetectKeyPress.GetKeyState(DetectKeyPress.VK_KEY_Z) < 0))
                     {
                        WoW.CastSpell("Eye Beam"); //Use Eyebeam by Z press
                         return;
