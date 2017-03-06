@@ -79,18 +79,18 @@ namespace PixelMagic.Rotation
                 if (togglewatch.ElapsedMilliseconds > 1000)
                 {
                     combatRoutine.UseCooldowns = !combatRoutine.UseCooldowns;
-                    WoW.Speak("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
+                    Log.Write("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
                     togglewatch.Restart();
                     if (!UseCooldowns && Opener)
                     {
                         Opener = !Opener;
-                        WoW.Speak("Opener " + (Opener ? "Enabled" : "Disabled"));
+                        Log.Write("Opener " + (Opener ? "Enabled" : "Disabled"));
                         Log.WritePixelMagic("Disabling Opener because you disabled Cooldowns.", Color.Red);
                     }
                     if (!UseCooldowns && autoCD)
                     {
                         autoCD = !autoCD;
-                        WoW.Speak("Auto Burst " + (Opener ? "Enabled" : "Disabled"));
+                        Log.Write("Auto Burst " + (Opener ? "Enabled" : "Disabled"));
                         Log.WritePixelMagic("Disabling Automatic burst because you disabled Cooldowns.", Color.Red);
                     }
                 }
@@ -125,13 +125,13 @@ namespace PixelMagic.Rotation
                             !WoW.IsSpellOnCooldown("Mirror Image"))
                         {
                             Opener = !Opener;
-                            WoW.Speak("Opener " + (Opener ? "Enabled" : "Disabled"));
+                            Log.Write("Opener " + (Opener ? "Enabled" : "Disabled"));
                             Log.Write("Opener " + (Opener ? "Enabled" : "Disabled"), Color.Red);
                             openerwatch.Restart();
                         }
                         else
                         {
-                            WoW.Speak("Error");
+                            Log.Write("Error");
                             Log.Write("ERROR: You don't have all necessary CD's/CHARGES to enable OPENER or you didn't ENABLE COOLDOWNS first!", Color.Red);
                             openerwatch.Restart();
                         }
@@ -139,7 +139,7 @@ namespace PixelMagic.Rotation
                     else
                     {
                         Opener = !Opener;
-                        WoW.Speak("Opener " + (Opener ? "Enabled" : "Disabled"));
+                        Log.Write("Opener " + (Opener ? "Enabled" : "Disabled"));
                         Log.Write("Opener " + (Opener ? "Enabled" : "Disabled"), Color.Red);
                         openerwatch.Restart();
                     }
@@ -158,7 +158,7 @@ namespace PixelMagic.Rotation
                 if (LBwatch.ElapsedMilliseconds > 1000)
                 {
                     UseLB = !UseLB;
-                    WoW.Speak("Bomb " + (UseLB ? "On" : "Off"));
+                    Log.Write("Bomb " + (UseLB ? "On" : "Off"));
                     Log.Write("Living Bomb " + (UseLB ? "ON" : "OFF"), Color.Red);
                     LBwatch.Restart();
                 }
@@ -176,7 +176,7 @@ namespace PixelMagic.Rotation
                 if (interruptwatch.ElapsedMilliseconds > 1000)
                 {
                     autointerrupt = !autointerrupt;
-                    WoW.Speak("Interrupt " + (autointerrupt ? "On" : "Off"));
+                    Log.Write("Interrupt " + (autointerrupt ? "On" : "Off"));
                     Log.Write("Auto interrupt " + (autointerrupt ? "ON" : "OFF"), Color.Red);
                     interruptwatch.Restart();
                 }
@@ -194,7 +194,7 @@ namespace PixelMagic.Rotation
                 if (autoCDwatch.ElapsedMilliseconds > 1000)
                 {
                     autoCD = !autoCD;
-                    WoW.Speak("Auto Burst " + (autoCD ? "On" : "Off"));
+                    Log.Write("Auto Burst " + (autoCD ? "On" : "Off"));
                     Log.Write("Automatic burst " + (autoCD ? "ON" : "OFF"), Color.Red);
                     autoCDwatch.Restart();
                 }
@@ -264,7 +264,7 @@ namespace PixelMagic.Rotation
                         Thread.Sleep(700);
                         WoW.CastSpell("Combustion");
                         Opener = !Opener;
-                        WoW.Speak("Opener Finished" + (Opener ? "Enabled" : "Disabled"));
+                        Log.Write("Opener Finished" + (Opener ? "Enabled" : "Disabled"));
                         Log.Write("Opener Finished and disabled", Color.Red);
                         CombatWatch.Reset();
                         return;
@@ -276,7 +276,7 @@ namespace PixelMagic.Rotation
                 if (CombatWatch.IsRunning && CombatWatch.ElapsedMilliseconds > 6500 && Opener)
                 {
                     Opener = !Opener;
-                    WoW.Speak("Opener Finished" + (Opener ? "Enabled" : "Disabled"));
+                    Log.Write("Opener Finished" + (Opener ? "Enabled" : "Disabled"));
                     Log.Write("Opener Finished and disabled", Color.Red);
                     CombatWatch.Reset();
                 }
@@ -314,7 +314,7 @@ namespace PixelMagic.Rotation
                     Thread.Sleep(700);
                     WoW.CastSpell("Combustion");
                     autoCD = !autoCD;
-                    WoW.Speak("Burst Finished");
+                    Log.Write("Burst Finished");
                     Log.Write("Burst done, disabling burst", Color.Red);
                     return;
                 }
