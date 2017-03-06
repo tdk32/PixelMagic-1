@@ -113,7 +113,7 @@ namespace PixelMagic.Rotation
             }
 
             //Intimidation //Binding Shot
-            if (DetectKeyPress.GetKeyState(DetectKeyPress.Ctrl) < 0
+            if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_KEY_Z) < 0
                 && ((WoW.CanCast("Intimidation") && CharInfo.T5 == 3) || (WoW.CanCast("Binding Shot") && CharInfo.T5 == 1)))
             {
                 WoW.CastSpell("Binding Shot");
@@ -124,7 +124,7 @@ namespace PixelMagic.Rotation
             if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !WoW.PlayerHasBuff("Mount") && !WoW.PlayerIsChanneling && !WoW.PlayerHasBuff("Feign Death") && WoW.HealthPercent != 0)
             {
                 //Stampede
-                if (DetectKeyPress.GetKeyState(DetectKeyPress.Shift) < 0
+                if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_LSHIFT) < 0
                     && WoW.CanCast("Stampede")
                     && CharInfo.T7 == 1)
                 {
@@ -162,7 +162,7 @@ namespace PixelMagic.Rotation
                             && WoW.CanCast("Bestial Wrath")
                             && !WoW.PlayerHasBuff("Aspect of the Turtle")
                             && WoW.IsSpellInRange("Cobra Shot")
-                            && (WoW.Focus >= 105))
+                            && (WoW.Focus >= 107 || (WoW.Focus >= 90 && WoW.CanCast("Aspect of the Wild"))))
                         {
                             WoW.CastSpell("Bestial Wrath");
                             WoW.CastSpell("Kill Command");
@@ -191,8 +191,9 @@ namespace PixelMagic.Rotation
 
                         //Kill Command
                         if (combatRoutine.Type == RotationType.SingleTarget
-                            && WoW.CanCast("Kill Command")
-                            && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") - WoW.SpellCooldownTimeRemaining("Kill Command") > 2 || (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 23 && WoW.SpellCooldownTimeRemaining("Dire Beast") - WoW.SpellCooldownTimeRemaining("Kill Command") > 2))
+                            //&& WoW.CanCast("Kill Command")
+                            && WoW.SpellCooldownTimeRemaining("Kill Command") <= 0.5
+                            && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") - WoW.SpellCooldownTimeRemaining("Kill Command") > 0 || (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 23 && WoW.SpellCooldownTimeRemaining("Dire Beast") - WoW.SpellCooldownTimeRemaining("Kill Command") > 0))
                             && WoW.Focus >= 100)
                         {
                             WoW.CastSpell("Kill Command");
@@ -225,8 +226,9 @@ namespace PixelMagic.Rotation
 
                         //Kill Command
                         if (combatRoutine.Type == RotationType.SingleTarget
-                            && WoW.CanCast("Kill Command")
-                            && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") - WoW.SpellCooldownTimeRemaining("Kill Command") > 2 || (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 23 && WoW.SpellCooldownTimeRemaining("Dire Beast") - WoW.SpellCooldownTimeRemaining("Kill Command") > 2))
+                            //&& WoW.CanCast("Kill Command")
+                            && WoW.SpellCooldownTimeRemaining("Kill Command") <= 0.5
+                            && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") - WoW.SpellCooldownTimeRemaining("Kill Command") > 0 || (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 23 && WoW.SpellCooldownTimeRemaining("Dire Beast") - WoW.SpellCooldownTimeRemaining("Kill Command") > 0))
                             && WoW.Focus >= 30)
                         {
                             WoW.CastSpell("Kill Command");
@@ -246,7 +248,7 @@ namespace PixelMagic.Rotation
 
                         //Cobra Shot
                         if (combatRoutine.Type == RotationType.SingleTarget
-                            && ((WoW.Focus >= 110) || (WoW.PlayerHasBuff("Bestial Wrath") && (WoW.Focus >= 40)))
+                            && ((WoW.Focus >= 100) || (WoW.PlayerHasBuff("Bestial Wrath") && (WoW.Focus >= 40)))
                             && WoW.IsSpellInRange("Cobra Shot")
                             && WoW.CanCast("Cobra Shot")
                             && !WoW.CanCast("Bestial Wrath"))
@@ -387,7 +389,7 @@ namespace PixelMagic.Rotation
                     //Kill Command
                     if (combatRoutine.Type == RotationType.SingleTargetCleave
                         && WoW.CanCast("Kill Command")
-                        && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") - WoW.SpellCooldownTimeRemaining("Kill Command") > 2 || (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 23 && WoW.SpellCooldownTimeRemaining("Dire Beast") - WoW.SpellCooldownTimeRemaining("Kill Command") > 2))
+                        //&& (WoW.SpellCooldownTimeRemaining("Bestial Wrath") - WoW.SpellCooldownTimeRemaining("Kill Command") > 2 || (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 23 && WoW.SpellCooldownTimeRemaining("Dire Beast") - WoW.SpellCooldownTimeRemaining("Kill Command") > 2))
                         && WoW.Focus >= 30)
                     {
                         WoW.CastSpell("Kill Command");
@@ -407,7 +409,7 @@ namespace PixelMagic.Rotation
 
                     //Cobra Shot
                     if (combatRoutine.Type == RotationType.SingleTargetCleave
-                        && ((WoW.Focus >= 110) || (WoW.PlayerHasBuff("Bestial Wrath") && (WoW.Focus >= 40)))
+                        && ((WoW.Focus >= 100) || (WoW.PlayerHasBuff("Bestial Wrath") && (WoW.Focus >= 40)))
                         && WoW.IsSpellInRange("Cobra Shot")
                         && WoW.CanCast("Cobra Shot")
                         && !WoW.CanCast("Bestial Wrath"))
@@ -457,7 +459,7 @@ namespace PixelMagic.Rotation
             }
         }
 
-        public string[] Race = new string[] { "None", "Human", "Dwarf", "NightElf", "Gnome", "Dreanei", "Pandaren", "Orc", "Undead", "Tauren", "Troll", "BloodElf", "Goblin", "none" };
+        public string[] Race = new string[] { "None", "Human", "Dwarf", "NightElf", "Gnome", "Dreanei", "Pandaren", "Orc", "Undead", "Tauren", "Troll", "BloodElf", "Goblin", "Worgen", "none" };
         public string[] Spec = new string[] { "None", "Blood", "Frost", "Unholy", "Havoc", "Vengeance", "Balance", "Feral", "Guardian", "Restoration", "Beast Mastery", "Marksmanship", "Survival", "Arcane", "Fire", "Frost", "Brewmaster", "Mistweaver", "Windwalker", "Holy", "Protection", "Retribution", "Discipline", "HolyPriest", "Shadow", "Assassination", "Outlaw", "Subtlety", "Elemental", "Enhancement", "RestorationShaman", "Affliction", "Arms", "Fury", "Protection", "none" };
         private int npcCount, players;
         private bool Nameplates = false;
@@ -710,41 +712,7 @@ namespace PixelMagic.Rotation
             Log.Write("Editing Addon Complete");
         }
 
-        public override Form SettingsForm { get; set; }
-        public class DetectKeyPress
-        {
-            public static int Num1 = 0x31;
-            public static int Num2 = 0x32;
-            public static int Num3 = 0x33;
-            public static int Num4 = 0x34;
-            public static int Num5 = 0x35;
-            public static int Num6 = 0x36;
-            public static int Numpad0 = 0x60;
-            public static int Numpad1 = 0x61;
-            public static int Numpad2 = 0x62;
-            public static int Numpad3 = 0x63;
-            public static int Numpad4 = 0x64;
-            public static int Numpad5 = 0x65;
-            public static int Numpad6 = 0x66;
-            public static int Numpad7 = 0x67;
-            public static int Numpad8 = 0x68;
-            public static int Numpad9 = 0x69;
-            public static int NumpadDot = 0x6E;
-            public static int NumpadADD = 0x6B;
-
-            public static int Shift = 0x10;
-            public static int Ctrl = 0x11;
-            public static int Alt = 0x12;
-
-            public static int Z = 0x5A;
-            public static int X = 0x58;
-            public static int C = 0x43;
-            public static int V = 0x56;
-            public static int Slash = 0xDC;
-
-            [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-            internal static extern short GetKeyState(int virtualKeyCode);
-        }
+        public override Form SettingsForm { get; set; }        
 
         private const string CustomLua = @"local Healingbuffs =  ""Riptide""
 local Race = {
@@ -760,6 +728,7 @@ local Race = {
 	[""Troll""]= 0.10,
 	[""Blood Elf""]= 0.11,
 	[""Goblin""]= 0.12,
+    [""Worgen""] = 0.13,
 }
 local Spec = {
 	[""Blood""] = 0.01,
