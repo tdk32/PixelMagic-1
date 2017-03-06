@@ -20,7 +20,6 @@ namespace PixelMagic.Rotation
         {
             Log.Write("Welcome to Rogue-Assassination", Color.Green);
             Log.Write("Suggested build: 2112111");
-            WoW.Speak("OK Google!");
         }
 
         public override void Stop()
