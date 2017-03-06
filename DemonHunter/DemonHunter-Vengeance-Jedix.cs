@@ -46,8 +46,8 @@ namespace PixelMagic.Rotation
             Log.WritePixelMagic("Welcome to PixelMagic Vengeance by Jedix", Color.Green);
             Log.Write("Suggested build: 3332333", Color.Green);
             Log.Write("IMPORTANT!", Color.Red);
-            Log.Write("You can use any talent instead of Fracture, just set bot to aoe/cleave - he will never use a Fracture", Color.Black);
-            Log.Write("Also need to do a macro (or get talent for non-target sigils) in wow to make Sigil of Flame(Silience) work, macro:",Color.Black);
+            Log.Write("You can use any talent instead of Fracture, just set bot to aoe - he will never use a Fracture", Color.Black);
+            Log.Write("Also need to do a macro in wow (or take a talent for non-target sigils) to make Sigil of Flame(Silience) work, macro:",Color.Black);
 			Log.Write("#showtooltip",Color.Black);
 			Log.Write("/cast [mod:shift,target=player][nomod,target=player][mod:ctrl,target=player] Sigil of Flame",Color.Black);
 			Log.Write("/cast [mod:alt] Sigil of Flame",Color.Black);
