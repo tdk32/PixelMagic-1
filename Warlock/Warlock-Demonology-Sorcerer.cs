@@ -58,7 +58,7 @@ namespace PixelMagic.Rotation
             }           
 
             //Shadowfury
-            if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0
+            if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_LMENU) < 0
                 && CharInfo.T3 == 3
                 && !WoW.IsMoving
                 && WoW.CanCast("Shadowfury"))
@@ -314,7 +314,7 @@ namespace PixelMagic.Rotation
             }
         }
 
-        public string[] Race = new string[] { "None", "Human", "Dwarf", "NightElf", "Gnome", "Dreanei", "Pandaren", "Orc", "Undead", "Tauren", "Troll", "BloodElf", "Goblin", "none" };
+        public string[] Race = new string[] { "None", "Human", "Dwarf", "NightElf", "Gnome", "Dreanei", "Pandaren", "Orc", "Undead", "Tauren", "Troll", "BloodElf", "Goblin", "Worgen", "none" };
         public string[] Spec = new string[] { "None", "Blood", "Frost", "Unholy", "Havoc", "Vengeance", "Balance", "Feral", "Guardian", "Restoration", "Beast Mastery", "Marksmanship", "Survival", "Arcane", "Fire", "Frost", "Brewmaster", "Mistweaver", "Windwalker", "Holy", "Protection", "Retribution", "Discipline", "HolyPriest", "Shadow", "Assassination", "Outlaw", "Subtlety", "Elemental", "Enhancement", "RestorationShaman", "Affliction", "Arms", "Fury", "Protection", "none" };
         private int npcCount, players;
         private bool Nameplates = false;
@@ -568,40 +568,6 @@ namespace PixelMagic.Rotation
         }
 
         public override Form SettingsForm { get; set; }
-        public class DetectKeyPress
-        {
-            public static int Num1 = 0x31;
-            public static int Num2 = 0x32;
-            public static int Num3 = 0x33;
-            public static int Num4 = 0x34;
-            public static int Num5 = 0x35;
-            public static int Num6 = 0x36;
-            public static int Numpad0 = 0x60;
-            public static int Numpad1 = 0x61;
-            public static int Numpad2 = 0x62;
-            public static int Numpad3 = 0x63;
-            public static int Numpad4 = 0x64;
-            public static int Numpad5 = 0x65;
-            public static int Numpad6 = 0x66;
-            public static int Numpad7 = 0x67;
-            public static int Numpad8 = 0x68;
-            public static int Numpad9 = 0x69;
-            public static int NumpadDot = 0x6E;
-            public static int NumpadADD = 0x6B;
-
-            public static int Shift = 0x10;
-            public static int Ctrl = 0x11;
-            public static int Alt = 0x12;
-
-            public static int Z = 0x5A;
-            public static int X = 0x58;
-            public static int C = 0x43;
-            public static int V = 0x56;
-            public static int Slash = 0xDC;
-
-            [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-            internal static extern short GetKeyState(int virtualKeyCode);
-        }
 
         private const string CustomLua = @"local Healingbuffs =  ""Riptide""
 local Race = {
@@ -617,6 +583,7 @@ local Race = {
 	[""Troll""]= 0.10,
 	[""Blood Elf""]= 0.11,
 	[""Goblin""]= 0.12,
+    [""Worgen""] = 0.13,
 }
 local Spec = {
 	[""Blood""] = 0.01,
