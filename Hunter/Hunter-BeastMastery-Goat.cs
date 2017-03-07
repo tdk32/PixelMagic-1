@@ -139,8 +139,7 @@ namespace PixelMagic.Rotation
         public override void Initialize()
         {
             Log.Write("Welcome to Hunter Beastmastery by Goat", Color.Green);
-            WoW.Speak("Welcome to Pixelmagic Beastmastery Rotation by Goat");
-
+            
             SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 480, Height = 300, ShowIcon = false};
 
             var picBox = new PictureBox {Left = 0, Top = 0, Width = 800, Height = 100, Image = TopLogo};
@@ -334,13 +333,7 @@ namespace PixelMagic.Rotation
 						WoW.CastSpell("Revive Pet") ;
 						return;
 					}
-								
-					/*if (WoW.CanCast("Ring") && !WoW.IsSpellOnCooldown("Ring") && !WoW.PlayerHasDebuff("Temptation"))
-                    {
-						WoW.CastSpell("Ring");
-						return;
-					}	*/
-                    if (WoW.TargetIsCasting && CounterShot && interruptwatch.ElapsedMilliseconds == 0)
+					if (WoW.TargetIsCasting && CounterShot && interruptwatch.ElapsedMilliseconds == 0)
                     {
 						interruptwatch.Start ();
 						Log.WritePixelMagic("interruptwatch started..", Color.Black);	
@@ -475,12 +468,7 @@ namespace PixelMagic.Rotation
 					{
 						WoW.CastSpell("Revive Pet") ;
 						return;
-					}
-					/*if (WoW.CanCast("Ring") && !WoW.IsSpellOnCooldown("Ring") && !WoW.PlayerHasDebuff("Temptation"))
-                    {
-						WoW.CastSpell("Ring");
-						return;
-					}	*/		
+					}		
                     if (WoW.TargetIsCasting && CounterShot && interruptwatch.ElapsedMilliseconds == 0)
                     {
 						interruptwatch.Start ();
@@ -627,12 +615,6 @@ namespace PixelMagic.Rotation
                         Log.WritePixelMagic("multishotwatch started..", Color.Black);
                         return;
                     }
-
-                    /*if (WoW.CanCast("Ring") && !WoW.IsSpellOnCooldown("Ring") && !WoW.PlayerHasDebuff("Temptation"))
-                    {
-						WoW.CastSpell("Ring");
-						return;
-					}*/
                     if (WoW.TargetIsCasting && CounterShot && interruptwatch.ElapsedMilliseconds == 0)
                     {
                         interruptwatch.Start();
@@ -759,6 +741,7 @@ Spell,5512,Healthstone,F7
 Spell,982,Revive Pet,V
 Spell,142117,Potion Power,F10
 Spell,136,Heal Pet,V
+Spell,144259,Kil'jaeden's Burning Wish,Q
 Aura,186265,Turtle
 Aura,11196,Bandaged
 Aura,234143,Temptation
@@ -772,4 +755,5 @@ Aura,229206,Potion Power
 Aura,19574,Bestial Wrath
 Aura,118455,Beast Cleave
 Aura,193530,Aspect of the Wild
+Item,144259,Kil'jaeden's Burning Wish
 */
