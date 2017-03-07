@@ -259,7 +259,7 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            WoW.Speak("Welcome to F m Flex Frost");
+            Log.Write("Welcome to F m Flex Frost");
             Log.Write("Welcome to the Frost DK by Fmflex", Color.Green);
             SettingsFormDFF = new SettingsFormDFF();
             SettingsForm = SettingsFormDFF;
@@ -493,7 +493,7 @@ namespace PixelMagic.Rotation
                 if (coolDownStopWatch.ElapsedMilliseconds > 1000)
                 {
                     combatRoutine.UseCooldowns = !combatRoutine.UseCooldowns;
-                    WoW.Speak("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
+                    Log.Write("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
                     coolDownStopWatch.Restart();
                 }
             }

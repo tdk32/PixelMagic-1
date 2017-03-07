@@ -82,7 +82,7 @@ namespace PixelMagic.Rotation
             Log.Write("Automatic cooldown usage at 10-30% of health.", Color.Purple);
             Log.Write("TO DO: Targets attacking me, Blessings, Resurrect, Stuns, Interupts", Color.Purple);
             Log.Write("Suggested build: 2132121", Color.Green);
-            WoW.Speak("Welcome to PixelMagic Protection Paladin");
+            Log.Write("Welcome to PixelMagic Protection Paladin");
 
             SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 600, Height = 200, ShowIcon = false};
 

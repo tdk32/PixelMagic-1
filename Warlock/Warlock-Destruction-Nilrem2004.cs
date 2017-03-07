@@ -22,7 +22,7 @@ namespace PixelMagic.Rotation
         {
             Log.Write("Destruction Warlock beta by: luck.exe");
             Log.Write("Talents are specced the following: 2,1,1,1,3,2,3");
-            WoW.Speak("Welcome to PixelMagic Destruction");
+            Log.Write("Welcome to PixelMagic Destruction");
         }
 
         public override void Stop()

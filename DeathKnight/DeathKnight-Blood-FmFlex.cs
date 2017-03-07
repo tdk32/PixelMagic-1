@@ -114,7 +114,7 @@ namespace PixelMagic.Rotation.DeathKnight.DK
 
         public override void Initialize()
         {
-            WoW.Speak("Welcome to PixelMagic Blood by F m Flex");
+            Log.Write("Welcome to PixelMagic Blood by F m Flex");
             Log.Write("Welcome to Blood DK V1.3 by FmFlex", Color.Green);
             SettingsForm = new Form
             {

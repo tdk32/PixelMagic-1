@@ -19,7 +19,7 @@ namespace PixelMagic.Rotation
         public override void Initialize()
         {
             Log.Write("Welcome to Hunter BM", Color.Green);
-            WoW.Speak("Welcome to PixelMagic Beastmastery");
+            Log.Write("Welcome to PixelMagic Beastmastery");
         }
 
         public override void Stop()

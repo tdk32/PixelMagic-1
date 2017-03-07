@@ -1288,7 +1288,7 @@ namespace PixelMagic.Rotation
         public override void Initialize()
         {
             Log.DrawHorizontalLine();
-            WoW.Speak("Welcome to PixelMagic Restoration");
+            Log.Write("Welcome to PixelMagic Restoration");
             Log.WritePixelMagic("Welcome to PixelMagic Restoration Rotation v0.6 beta by Inhade", Color.Black);
             Log.Write("Supports all talent choices. However, recommended talents are 11313312 and 11313313", Color.Green);
             Log.Write("Make sure you have \"Force Addon Reload\" checked the first time you start the rotation");
@@ -3741,7 +3741,7 @@ namespace PixelMagic.Rotation
                 {
                     DPSMode = !DPSMode;
                     Log.Write("DPS Mode " + (DPSMode ? "Activated" : "Deactivated"), Color.Red);
-                    WoW.Speak("D P S Mode " + (DPSMode ? "Activated" : "Deactivated"));
+                    Log.Write("D P S Mode " + (DPSMode ? "Activated" : "Deactivated"));
                     Thread.Sleep(50);
                     DPSTimer.Restart();
                     if (DisplayDPS) {
@@ -3755,7 +3755,7 @@ namespace PixelMagic.Rotation
                 if (UseCoolDowns && CoolDownTimer.ElapsedMilliseconds > 1000) {
                     CoolDowns = !CoolDowns;
                     Log.Write("Cooldown Mode " + (CoolDowns ? "Activated" : "Deactivated"), Color.Red);
-                    WoW.Speak("Cooldown Mode " + (CoolDowns ? "Activated" : "Deactivated"));
+                    Log.Write("Cooldown Mode " + (CoolDowns ? "Activated" : "Deactivated"));
                     Thread.Sleep(50);
                     CoolDownTimer.Restart();
                     if (DisplayCD) {
@@ -3769,7 +3769,7 @@ namespace PixelMagic.Rotation
                 if (UseTankHealing && TankHealingTimer.ElapsedMilliseconds > 1000) {
                     TankHealing = !TankHealing;
                     Log.Write("Tank Healing " + (CoolDowns ? "Activated" : "Deactivated"), Color.Red);
-                    WoW.Speak("Tank Healing " + (CoolDowns ? "Activated" : "Deactivated"));
+                    Log.Write("Tank Healing " + (CoolDowns ? "Activated" : "Deactivated"));
                     Thread.Sleep(50);
                     CoolDownTimer.Restart();
                     if (DisplayTank) {

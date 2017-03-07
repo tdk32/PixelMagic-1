@@ -27,7 +27,7 @@ namespace PixelMagic.Rotation
             Log.Write("Demonology Warlock", Color.Red);
             Log.Write("Suggested build: 2211232 - single target", Color.Red);
             Log.Write("Suggested build: 2311232 - AOE", Color.Red);
-            WoW.Speak("Welcome to PixelMagic Demonology");
+            Log.Write("Welcome to PixelMagic Demonology");
         }
 
         public override void Stop()

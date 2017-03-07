@@ -20,7 +20,7 @@ namespace PixelMagic.Rotation
         public override void Initialize()
         {
             Log.Write("Welcome to Arcane Mage", Color.Green);
-            WoW.Speak("Welcome to PixelMagic Arcane");
+            Log.Write("Welcome to PixelMagic Arcane");
         }
 
         public override void Stop()

@@ -21,7 +21,7 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            WoW.Speak("Welcome to PixelMagic Demon Hunter Havoc");
+            Log.Write("Welcome to PixelMagic Demon Hunter Havoc");
 
             if (ConfigFile.ReadValue("DemonHunter", "Blur Usage Percent") == "")
             {

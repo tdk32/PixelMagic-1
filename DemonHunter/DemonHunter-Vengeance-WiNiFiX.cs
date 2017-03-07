@@ -26,7 +26,7 @@ namespace PixelMagic.Rotation
         public override void Initialize()
         {
             Log.DrawHorizontalLine();
-            WoW.Speak("Welcome to PixelMagic Vengeance");
+            Log.Write("Welcome to PixelMagic Vengeance");
             Log.WritePixelMagic("Welcome to PixelMagic Vengeance", Color.Black);
         }
 
@@ -53,7 +53,7 @@ namespace PixelMagic.Rotation
 
             if (WoW.HealthPercent < 30 && !WoW.IsSpellOnCooldown("Metamorphasis"))
             {
-                WoW.Speak("Metamorphasis");
+                Log.Write("Metamorphasis");
                 Log.Write("Health low < 70% using CDs...", Color.Red);
                 WoW.CastSpell("Metamorphasis"); // Off the GCD no return needed
             }
@@ -83,7 +83,7 @@ namespace PixelMagic.Rotation
             {
                 if (!WoW.IsSpellOnCooldown("Sigil of Silence") && WoW.WasLastCasted("Arcane Torrent"))
                 {
-                    WoW.Speak("Interrupting spell");
+                    Log.Write("Interrupting spell");
                     WoW.CastSpell("Sigil of Silence");
                     interruptwatch.Reset();
                     interruptwatch.Start();
@@ -92,7 +92,7 @@ namespace PixelMagic.Rotation
 
                 if (!WoW.IsSpellOnCooldown("Arcane Torrent") && WoW.WasLastCasted("Sigil of Silence"))
                 {
-                    WoW.Speak("Interrupting spell");
+                    Log.Write("Interrupting spell");
                     WoW.CastSpell("Arcane Torrent");
                     interruptwatch.Reset();
                     interruptwatch.Start();

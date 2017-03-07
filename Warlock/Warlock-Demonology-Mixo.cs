@@ -148,7 +148,7 @@ namespace PixelMagic.Rotation
             Log.Write("Feedback is appreciated in the Warlock section on PixelMagic's Discord.", Color.DarkViolet);
             Log.Write("Tag it with @[EU] Mixo to notify me. :)", Color.DarkViolet);
             Log.Write("-----", Color.DarkViolet);
-            WoW.Speak("Mix Oh! Demon Ology!");
+            Log.Write("Mix Oh! Demon Ology!");
 
             SettingsForm = new Form {Text = "Mixo's Demo Warlock Rotation - Settings", StartPosition = FormStartPosition.CenterScreen, Width = 480, Height = 318, ShowIcon = false};
 

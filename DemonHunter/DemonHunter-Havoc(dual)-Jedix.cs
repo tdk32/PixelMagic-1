@@ -26,7 +26,7 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            //WoW.Speak("Welcome to PixelMagic Havoc by Jedix");
+            //Log.Write("Welcome to PixelMagic Havoc by Jedix");
 
             if (ConfigFile.ReadValue("DemonHunter", "Blur Usage Percent") == "")
             {
@@ -73,7 +73,7 @@ namespace PixelMagic.Rotation
 						if (coolDownStopWatch.ElapsedMilliseconds > 1000)
 						{
 							combatRoutine.UseCooldowns = !combatRoutine.UseCooldowns;
-							//WoW.Speak("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
+							//Log.Write("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
 							coolDownStopWatch.Restart();
 						}
 					}

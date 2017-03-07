@@ -42,7 +42,7 @@ namespace PixelMagic.Rotation
                 ConfigFile.WriteValue("Demonhunter", "Metamorphosis Usage Percent", "20");
             }
             Log.DrawHorizontalLine();
-            //WoW.Speak("Welcome to PixelMagic Vengeance by Jedix");
+            //Log.Write("Welcome to PixelMagic Vengeance by Jedix");
             Log.WritePixelMagic("Welcome to PixelMagic Vengeance by Jedix", Color.Green);
             Log.Write("Suggested build: 3332333", Color.Green);
             Log.Write("IMPORTANT!", Color.Red);
@@ -100,7 +100,7 @@ namespace PixelMagic.Rotation
                 {
                     if (WoW.CanCast("Metamorphosis") && WoW.HealthPercent <= ConfigFile.ReadValue<int>("Demonhunter", "Metamorphosis Usage Percent"))
                     {
-                        //WoW.Speak("Metamorphosis");
+                        //Log.Write("Metamorphosis");
                         Log.Write("Health low < set % using CDs...", Color.Red);
                         WoW.CastSpell("Metamorphosis"); // Off the GCD no return needed
                     }
@@ -227,7 +227,7 @@ namespace PixelMagic.Rotation
                 {
                     if (WoW.CanCast("Metamorphosis") && WoW.HealthPercent <= ConfigFile.ReadValue<int>("Demonhunter", "Metamorphosis Usage Percent"))
                     {
-                        //WoW.Speak("Metamorphosis");
+                        //Log.Write("Metamorphosis");
                         Log.Write("Health low < set % using CDs...", Color.Red);
                         WoW.CastSpell("Metamorphosis"); // Off the GCD no return needed
                     }

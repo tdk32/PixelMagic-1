@@ -20,7 +20,7 @@ namespace PixelMagic.Rotation
         {
             Log.Write("Welcome to Elemental Shaman by Toomicek", Color.Green);
             Log.Write("Suggested build: 3112211", Color.Green);
-            WoW.Speak("PixelMagic Elemental");
+            Log.Write("PixelMagic Elemental");
         }
 
         public override void Stop()

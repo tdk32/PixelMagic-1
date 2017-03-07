@@ -19,7 +19,7 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            WoW.Speak("Welcome to PixelMagic Arms");
+            Log.Write("Welcome to PixelMagic Arms");
             Log.Write("Welcome to Arms Warrior", Color.Green);
             Log.Write("Suggested build: 3122111", Color.Green);
             Log.Write("Written based on this guide : http://tinyurl.com/jjowqs7 ", Color.Green);

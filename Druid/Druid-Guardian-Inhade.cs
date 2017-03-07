@@ -1084,7 +1084,7 @@ namespace PixelMagic.Rotation
             Log.Write("Choose what you want to be shown ticking the respective boxes", Color.Green);
             Log.Write("You can also change to prioritize magic or physical mitigation using a keybind", Color.Green);
             Log.Write("Feel free to ask anything in #druid and tag me!", Color.Red);
-            WoW.Speak("Guardian Rotation by Inhade");
+            Log.Write("Guardian Rotation by Inhade");
 
             SettingsForm = new Form();
 			
@@ -2442,7 +2442,7 @@ namespace PixelMagic.Rotation
 				{
 					DPSBurst = !DPSBurst;
 					Log.Write("DPS Burst " + (DPSBurst ? "Activated" : "Deactivated"), Color.Red);
-					WoW.Speak("D P S Burst " + (DPSBurst ? "Activated" : "Deactivated"));
+					Log.Write("D P S Burst " + (DPSBurst ? "Activated" : "Deactivated"));
 					Thread.Sleep(50);
 					DPSTimer.Restart();
 					if (DisplayDPS)
@@ -2460,7 +2460,7 @@ namespace PixelMagic.Rotation
 				{
 					CoolDowns = true;
 					Log.Write("Cooldowns Activated", Color.Red);
-					WoW.Speak("Cooldowns Activated");
+					Log.Write("Cooldowns Activated");
 					Thread.Sleep(50);
 					CoolDownTimer.Restart();
 					if (DisplayCD)
@@ -2479,7 +2479,7 @@ namespace PixelMagic.Rotation
 					{
 						Prioritize = 1;
 						Log.Write("Prioritizing for Magic Damage - Mark of Ursol", Color.Red);
-						WoW.Speak("Mark");
+						Log.Write("Mark");
 						if (DisplayMitigation)
 						{
 							DisplayText = "Magic Mitigation";
@@ -2490,7 +2490,7 @@ namespace PixelMagic.Rotation
 					{
 						Prioritize = 0;
 						Log.Write("Prioritizing for Physical Damage - Ironfur", Color.Red);
-						WoW.Speak("Ironfur");
+						Log.Write("Ironfur");
 						if (DisplayMitigation)
 						{
 							DisplayText = "Physical Mitigation";

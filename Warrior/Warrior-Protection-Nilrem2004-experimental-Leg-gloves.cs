@@ -60,7 +60,7 @@ namespace PixelMagic.Rotation
                 if (interruptwatch.ElapsedMilliseconds > 1000)
                 {
                     autointerrupt = !autointerrupt;
-                    WoW.Speak("Interrupt " + (autointerrupt ? "On" : "Off"));
+                    Log.Write("Interrupt " + (autointerrupt ? "On" : "Off"));
                     Log.WritePixelMagic("Auto interrupt " + (autointerrupt ? "ON" : "OFF"), Color.Red);
                     interruptwatch.Restart();
                 }

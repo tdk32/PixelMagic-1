@@ -19,7 +19,7 @@ namespace PixelMagic.Rotation
         public override void Initialize()
         {
             Log.Write("Welcome to Hunter Survival", Color.Green);
-            WoW.Speak("Welcome to PixelMagic Survival");
+            Log.Write("Welcome to PixelMagic Survival");
         }
 
         public override void Stop()

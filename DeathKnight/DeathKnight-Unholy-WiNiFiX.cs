@@ -18,7 +18,7 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            WoW.Speak("Welcome to PixelMagic Unholy");
+            Log.Write("Welcome to PixelMagic Unholy");
             Log.Write("Welcome to PixelMagic Unholy", Color.Green);
         }
 

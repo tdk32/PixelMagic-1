@@ -18,7 +18,7 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            WoW.Speak("Welcome to PixelMagic Frost");
+            Log.Write("Welcome to PixelMagic Frost");
             Log.Write("Welcome to the Frost DK Rotation by Vectarius", Color.Green);
         }
 

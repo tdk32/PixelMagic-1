@@ -1031,7 +1031,7 @@ namespace PixelMagic.Rotation
                     {
                         if (!WoW.IsSpellOnCooldown("Sigal of Silence") && WoW.WasLastCasted("Arcane Torrent"))
                         {
-                            WoW.Speak("Interrupting spell");
+                            Log.Write("Interrupting spell");
                             WoW.CastSpell("Sigal of Silence");
                             interruptwatch.Reset();
                             interruptwatch.Start();
@@ -1040,7 +1040,7 @@ namespace PixelMagic.Rotation
 
                         if (!WoW.IsSpellOnCooldown("Arcane Torrent") && WoW.WasLastCasted("Sigal of Silence"))
                         {
-                            WoW.Speak("Interrupting spell");
+                            Log.Write("Interrupting spell");
                             WoW.CastSpell("Arcane Torrent");
                             interruptwatch.Reset();
                             interruptwatch.Start();
