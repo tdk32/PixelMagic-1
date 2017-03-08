@@ -7,6 +7,8 @@
 // - Sometimes overcapping Astral Power due PixelMagic not detecting Astral Power fast enough.
 // - Oneth's Intuition not coded in to normal rotation yet, it's coded in Emerald Dreamcatcher rotation, it's in TODO.
 // Changelog :
+// Version r25
+// - Added user configurable Starsurge Astral Power, default = 60AsP
 // Version r24
 // - Fixed small issue with Moonfire and Sunfire not being applied with Emerald Dreamcatcher enabled.
 // - Added buff id for Oneth's Overconfidence (Oneth's Intuition legendary) for Emerald Dreamcatcher rotation
@@ -78,6 +80,7 @@ namespace PixelMagic.Rotation
         private CheckBox KBWBox;
         private CheckBox EmeraldDreamcatcherBox;
         private CheckBox StarfallMacroBox;
+        private NumericUpDown StarsurgeNum;
 
         public override string Name
         {
@@ -216,13 +219,30 @@ namespace PixelMagic.Rotation
             set { ConfigFile.WriteValue("BalanceDruid", "StarfallMacro", value.ToString()); }
         }
 
+        private static int StarsurgeAsP
+        {
+            get
+            {
+                var starsurgeAsP = ConfigFile.ReadValue("BalanceDruid", "StarsurgeAsP");
+                try
+                {
+                    return Convert.ToInt32(starsurgeAsP);
+                }
+                catch (FormatException)
+                {
+                    return 60;
+                }
+            }
+            set { ConfigFile.WriteValue("BalanceDruid", "StarsurgeAsP", value.ToString()); }
+        }
+
         public override void Initialize()
         {
-            MessageBox.Show("Welcome to Balance Druid by Scotishdwarf r24.\n\nMy talent build : 3,1,3,1,3,3,3.\n\nNoteworthy things :\n- If using Stellar Drift and SotF, in single target use it manually, AoE will use automatically.\n- Starsurge used at 70 AP, pooling it high to minimize dps loss while moving, you can force cast it by moving.\n- On AOE, manual Starfall usage required, you can make cast at cursor macro for this.\n\nRecommended to use addon that hides Lua Errors for now.\n\nPress OK to continue loading rotation.");
+            MessageBox.Show("Welcome to Balance Druid by Scotishdwarf r25.\n\nMy talent build : 3,1,3,1,3,3,3.\n\nNoteworthy things :\n- If using Stellar Drift and SotF, in single target use it manually, AoE will use automatically.\n- Starsurge used at 70 AP, pooling it high to minimize dps loss while moving, you can force cast it by moving.\n- On AOE, manual Starfall usage required, you can make cast at cursor macro for this.\n\nRecommended to use addon that hides Lua Errors for now.\n\nPress OK to continue loading rotation.");
             Log.Write("Welcome to Balance rotation", Color.Green);
 
             // TALENT CONFIG
-            SettingsForm = new Form { Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 600, Height = 200, ShowIcon = false };
+            SettingsForm = new Form { Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 600, Height = 250, ShowIcon = false };
 
             var lblNaturesBalanceText = new Label { Text = "Talent : NaturesBalance", Size = new Size(200, 13), Left = 12, Top = 14 };
             SettingsForm.Controls.Add(lblNaturesBalanceText);
@@ -230,16 +250,16 @@ namespace PixelMagic.Rotation
             NaturesBalanceBox = new CheckBox { Checked = NaturesBalance, TabIndex = 2, Size = new Size(15, 14), Left = 220, Top = 14 };
             SettingsForm.Controls.Add(NaturesBalanceBox);
 
-            var lblIncarnationText = new Label {Text = "Talent : Incarnation", Size = new Size(200, 13), Left = 12, Top = 29};
+            var lblIncarnationText = new Label { Text = "Talent : Incarnation", Size = new Size(200, 13), Left = 12, Top = 29 };
             SettingsForm.Controls.Add(lblIncarnationText);
 
-            IncarnationBox = new CheckBox {Checked = Incarnation, TabIndex = 4, Size = new Size(15, 14), Left = 220, Top = 29};
+            IncarnationBox = new CheckBox { Checked = Incarnation, TabIndex = 4, Size = new Size(15, 14), Left = 220, Top = 29 };
             SettingsForm.Controls.Add(IncarnationBox);
-			
-			var lblAstralCommunionText = new Label {Text = "Talent : Astral Communion", Size = new Size(200, 13), Left = 12, Top = 44};
+
+            var lblAstralCommunionText = new Label { Text = "Talent : Astral Communion", Size = new Size(200, 13), Left = 12, Top = 44 };
             SettingsForm.Controls.Add(lblAstralCommunionText);
 
-            AstralCommunionBox = new CheckBox {Checked = AstralCommunion, TabIndex = 6, Size = new Size(15, 14), Left = 220, Top = 44};
+            AstralCommunionBox = new CheckBox { Checked = AstralCommunion, TabIndex = 6, Size = new Size(15, 14), Left = 220, Top = 44 };
             SettingsForm.Controls.Add(AstralCommunionBox);
 
             var lblStellarFlareText = new Label { Text = "Talent : StellarFlare", Size = new Size(200, 13), Left = 12, Top = 59 };
@@ -296,7 +316,22 @@ namespace PixelMagic.Rotation
             StarfallMacroBox = new CheckBox { Checked = StarfallMacro, TabIndex = 6, Size = new Size(15, 14), Left = 520, Top = 44 };
             SettingsForm.Controls.Add(StarfallMacroBox);
 
-            var cmdSave = new Button { Text = "Save", Width = 65, Height = 25, Left = 462, Top = 118, Size = new Size(108, 31) };
+            var lblStarsurgeText = new Label { Text = "Starsurge Astral Power", Size = new Size(200, 13), Left = 312, Top = 89 };
+            SettingsForm.Controls.Add(lblStarsurgeText);
+
+            StarsurgeNum = new NumericUpDown { Value = StarsurgeAsP, TabIndex = 6, Size = new Size(57, 20), Left = 520, Top = 89 };
+            SettingsForm.Controls.Add(StarsurgeNum);
+            //StarsurgeNum.Location = new System.Drawing.Point(520, 59);
+            //StarsurgeNum.Name = "StarsurgeNum";
+            //StarsurgeNum.Size = new System.Drawing.Size(57, 20);
+            //StarsurgeNum.TabIndex = 9;
+            //StarsurgeNum.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            //StarsurgeNum.Value = StarsurgeAsP;
+            //StarsurgeNum.ValueChanged 
+
+            var cmdSave = new Button { Text = "Save", Width = 65, Height = 25, Left = 462, Top = 168, Size = new Size(108, 31) };
+
+            ((System.ComponentModel.ISupportInitialize)(StarsurgeNum)).EndInit();
 
             NaturesBalanceBox.Checked = NaturesBalance;
 			IncarnationBox.Checked = Incarnation;
@@ -310,6 +345,7 @@ namespace PixelMagic.Rotation
             EmeraldDreamcatcherBox.Checked = EmeraldDreamcatcher;
             StarfallMacroBox.Checked = StarfallMacro;
             KBWBox.Checked = KBW;
+            StarsurgeNum.Value = StarsurgeAsP;
 
             cmdSave.Click += CmdSave_Click;
             NaturesBalanceBox.CheckedChanged += NaturesBalance_Click;
@@ -324,6 +360,7 @@ namespace PixelMagic.Rotation
             EmeraldDreamcatcherBox.CheckedChanged += EmeraldDreamcatcher_Click;
             StarfallMacroBox.CheckedChanged += StarfallMacro_Click;
             KBWBox.CheckedChanged += KBW_Click;
+            StarsurgeNum.ValueChanged += StarsurgeAsP_ValueChanged;
 
             SettingsForm.Controls.Add(cmdSave);
             lblNaturesBalanceText.BringToFront();
@@ -338,6 +375,7 @@ namespace PixelMagic.Rotation
             lblEmeraldDreamcatcherText.BringToFront();
             lblStarfallMacroText.BringToFront();
             lblKBWText.BringToFront();
+            lblStarsurgeText.BringToFront();
 
             Log.Write("Natures Balance = " + NaturesBalance);
 			Log.Write("Incarnation = " + NaturesBalance);
@@ -351,6 +389,7 @@ namespace PixelMagic.Rotation
             Log.Write("EmeraldDreamcatcher = " + EmeraldDreamcatcher);
             Log.Write("StarfallMacro = " + StarfallMacro);
             Log.Write("KBW = " + KBW);
+            Log.Write("Starsurge = " + StarsurgeAsP);
 
         }
 
@@ -369,10 +408,15 @@ namespace PixelMagic.Rotation
             EmeraldDreamcatcher = EmeraldDreamcatcherBox.Checked;
             StarfallMacro = StarfallMacroBox.Checked;
             KBW = KBWBox.Checked;
+            StarsurgeAsP = (int)StarsurgeNum.Value;
             MessageBox.Show("Settings saved", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SettingsForm.Close();
         }
 
+        private void StarsurgeAsP_ValueChanged(object sender, EventArgs e)
+        {
+            StarsurgeAsP = (int)StarsurgeNum.Value;
+        }
         private void NaturesBalance_Click(object sender, EventArgs e)
         {
             NaturesBalance = NaturesBalanceBox.Checked;
@@ -1410,7 +1454,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Starsurge
-                    if (WoW.IsSpellInRange("Starsurge") && WoW.CanCast("Starsurge") && WoW.CurrentAstralPower >= 70 && (!WoW.PlayerHasBuff("SolarEmp") || WoW.PlayerBuffStacks("SolarEmp") < 3) && (!WoW.PlayerHasBuff("LunarEmp") || WoW.PlayerBuffStacks("LunarEmp") < 3))
+                    if (WoW.IsSpellInRange("Starsurge") && WoW.CanCast("Starsurge") && WoW.CurrentAstralPower >= StarsurgeAsP && (!WoW.PlayerHasBuff("SolarEmp") || WoW.PlayerBuffStacks("SolarEmp") < 3) && (!WoW.PlayerHasBuff("LunarEmp") || WoW.PlayerBuffStacks("LunarEmp") < 3))
                     {
                         WoW.CastSpell("Starsurge");
                         return;
@@ -1597,7 +1641,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Starfall");
                         return;
                     }
-                    if (WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 70)
+                    if (WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 60)
                     {
                         WoW.CastSpell("Starfall");
                         return;
@@ -1675,7 +1719,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Stellar Drift
-                    if (StellarDrift && WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 70)
+                    if (StellarDrift && WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 60)
                     {
                         WoW.CastSpell("Starfall");
                         return;
@@ -1749,7 +1793,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Stellar Drift
-                    if (StellarDrift && WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 70)
+                    if (StellarDrift && WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 60)
                     {
                         WoW.CastSpell("Starfall");
                         return;
