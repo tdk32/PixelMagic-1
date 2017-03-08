@@ -193,6 +193,29 @@ namespace PixelMagic.Rotation
             }            
         }
 
+        private const string UACountLua = @"        local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId, canApplyAura, isBossDebuff, value1, value2, value3 = UnitDebuff(""target"", auraName, nil, ""PLAYER|HARMFUL"")
+        
+            if name == ""Unstable Affliction"" and (name == auraName) then
+              count = 0
+                index = 1
+                
+                UA = true
+                while UA do
+                    name2, _, _, count2,_, duration, expirationTime2, _, _, _, spellId2, _, _, _, _, _ = UnitDebuff(""target"", index, ""PLAYER|HARMFUL"")
+                    if name2 ~= nil then
+                        index = index +1
+                        if auraId == spellId2 then
+                            UA = false
+                            expirationTime = expirationTime2
+                            count = count2
+                        end
+                    else 
+                            UA = false
+                    end
+                end
+                
+            end";
+
         #region Talents functions
         public struct char_data
         {
@@ -245,28 +268,28 @@ namespace PixelMagic.Rotation
             else
                 hastePct = (Convert.ToSingle(pixelColor.R) * 100f / 255f);
             int spec, race;
-            pixelColor = WoW.GetBlockColor(1, 21);
+            pixelColor = WoW.GetBlockColor(1, 24);
             CharInfo.T1 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
             CharInfo.T2 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
             CharInfo.T3 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) * 100 / 255));
-            pixelColor = WoW.GetBlockColor(2, 21);
+            pixelColor = WoW.GetBlockColor(2, 24);
             CharInfo.T4 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
             CharInfo.T5 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
             CharInfo.T6 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) * 100 / 255));
-            pixelColor = WoW.GetBlockColor(3, 21);
+            pixelColor = WoW.GetBlockColor(3, 24);
             CharInfo.T7 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
             spec = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
             race = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) * 100 / 255));
-            pixelColor = WoW.GetBlockColor(4, 21);
+            pixelColor = WoW.GetBlockColor(4, 24);
             CharInfo.Mana = (Convert.ToSingle(pixelColor.B) * 100 / 255);
-            postive = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) / 255));
-            if ((Convert.ToDouble(pixelColor.B) == 255))
+            postive = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) / 255));
+            if ((Convert.ToDouble(pixelColor.G) == 255))
                 hastePct = 0f;
             else
                 if (postive == 1)
-                    hastePct = (Convert.ToSingle(pixelColor.R) * 100f / 255f) * (-1);
-                else
                     hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f);
+                else
+                    hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f) * (-1);
             if (race > 13)
                 race = 0;
             if (spec > 34)
@@ -282,7 +305,7 @@ namespace PixelMagic.Rotation
         private void AoEStuff()
         {
             Color pixelColor = Color.FromArgb(0);
-            pixelColor = WoW.GetBlockColor(11, 20);
+            pixelColor = WoW.GetBlockColor(11, 23);
             npcCount = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
             if (Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) / 255)) == 1)
                 Nameplates = true;
@@ -298,10 +321,10 @@ namespace PixelMagic.Rotation
                 {
                     if (npcCount >= 4 && !WoW.TargetIsPlayer)
                         combatRoutine.ChangeType(RotationType.AOE);
-                    /* if ((npcCount == 2 || npcCount == 3) && !WoW.TargetIsPlayer)
-                         combatRoutine.ChangeType(RotationType.SingleTargetCleave); */
-                     if ((npcCount <= 1))
-                    combatRoutine.ChangeType(RotationType.SingleTarget);
+                    /*if ((npcCount == 2 || npcCount == 3) && !WoW.TargetIsPlayer)
+                        combatRoutine.ChangeType(RotationType.SingleTargetCleave);*/
+                    if ((npcCount <= 1))
+                        combatRoutine.ChangeType(RotationType.SingleTarget);
                 }
             }
         }
@@ -423,8 +446,41 @@ namespace PixelMagic.Rotation
             try
             {
                 string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
+                int start = addonlua.IndexOf("local function updateSpellCooldowns(self, event)");
+                int end = addonlua.IndexOf("local lastItemCooldownState = {");
+                addonlua = addonlua.Remove(start, end - start);
+                start = addonlua.IndexOf("local function PlayerNotMove()");
+                end = addonlua.IndexOf("local function AutoAtacking()");
+                addonlua = addonlua.Remove(start, end - start);
+                addonlua = addonlua.Insert(start, mounted);
                 Log.Write("Addon Editing in progress");
-                addonlua = addonlua.Replace("local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId, canApplyAura, isBossDebuff, value1, value2, value3 = UnitDebuff(\"target\", auraName, nil, \"PLAYER|HARMFUL\")", UACountLua);
+                start = addonlua.IndexOf("local function updateMyBuffs(self, event)");
+                end = addonlua.IndexOf("local function updateTargetDebuffs(self, event)");
+                addonlua = addonlua.Remove(start, end - start);
+
+                start = addonlua.IndexOf("local Party1Buffs = { }");
+                end = addonlua.IndexOf("local function updateRaidHealth(self, event)");
+                addonlua = addonlua.Remove(start, end - start);
+                addonlua = addonlua.Insert(start, partyvarable);
+                start = addonlua.IndexOf("local function updateParty1Buffs()");
+                end = addonlua.IndexOf("local function updateRaidSize(self, event)");
+                addonlua = addonlua.Remove(start, end - start);
+                start = addonlua.IndexOf("raidHealthFrame[i]:SetScript(\"OnUpdate\", updateRaidHealth)");
+                end = addonlua.IndexOf("local spellOverlayedFrames = {}");
+                addonlua = addonlua.Remove(start, end - start);
+                addonlua = addonlua.Insert(start, partybuff);
+                start = addonlua.IndexOf("local function PlayerNotMove()");
+                end = addonlua.IndexOf("local function AutoAtacking()");
+                addonlua = addonlua.Remove(start, end - start);
+                addonlua = addonlua.Insert(start, mounted);
+                start = addonlua.IndexOf("local function updatePlayerIsCasting(self, event)");
+                end = addonlua.IndexOf("local lastTargetCastID = 0");
+                addonlua = addonlua.Remove(start, end - start);
+                addonlua = addonlua.Insert(start, CastUpdate);
+
+                addonlua = addonlua.Replace("local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId", "local name, _, _, count, debuffType, duration, expirationTime, _, _, _, spellId");
+                addonlua = addonlua.Replace("local name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3", "local name, _, _, count, _, duration, expires, _, _, _, spellID, _, _, _, _, _, _, _, _");
+                addonlua = addonlua.Replace("local name, _, _, count, debuffType, duration, expirationTime, _, _, _, spellId, canApplyAura, isBossDebuff, value1, value2, value3", "local name, _, _, count, _, duration, expirationTime, _, _, _, spellId, _, _, _, _, _");
                 addonlua = addonlua.Replace("if name == \"Wild Imps\"", "if (name == \"Wild Imps\" or name == \"Spirit Wolf\" or name == \"Totem Mastery\")");
                 addonlua = addonlua.Replace("and(startTime + duration - GetTime() > 1.6) ", "and(startTime + duration - GetTime() > (1.5 / (1 + (GetHaste() / 100) ))) ");
                 addonlua = addonlua.Replace("end" + Environment.NewLine + Environment.NewLine + "local function InitializeTwo()", Environment.NewLine);
@@ -433,7 +489,7 @@ namespace PixelMagic.Rotation
                 // addonlua = addonlua.Replace("if (guid ~= lastTargetGUID) then", "");
                 //ddonlua = addonlua.Replace("lastTargetGUID = guid" + Environment.NewLine + "	end", "print(\"target selected\")");
                 addonlua = addonlua.Replace("local function InitializeOne()", Environment.NewLine + CustomLua + Environment.NewLine + "local function InitializeOne()");
-                addonlua = addonlua.Replace("InitializeOne()" + Environment.NewLine + "            InitializeTwo()", "InitializeOne()" + Environment.NewLine + "            InitializeTwo()" + Environment.NewLine + "            InitializeThree()");
+                addonlua = addonlua.Replace("InitializeOne()" + Environment.NewLine + "            InitializeTwo()", "InitializeOne()" + Environment.NewLine + "            InitializeTwo()" + Environment.NewLine + "            InitializeFour()");
                 addonlua = addonlua.Replace("healthFrame:SetScript(\"OnUpdate\", updateHealth)", "");
                 addonlua = addonlua.Replace("powerFrame:SetScript(\"OnUpdate\", updatePower)", "");
                 addonlua = addonlua.Replace("targetHealthFrame:SetScript(\"OnUpdate\", updateTargetHealth)", "");
@@ -476,31 +532,122 @@ namespace PixelMagic.Rotation
             Log.Write("Editing Addon Complete");
         }
 
+        public static bool IsMounted
+        {
+            get
+            {
+                var c = WoW.GetBlockColor(1, 7);
+                return (c.G == Color.Green.G && (c.B == Color.Blue.B));
+            }
+        }
         public override Form SettingsForm { get; set; }
 
-        private const string UACountLua = @"        local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId, canApplyAura, isBossDebuff, value1, value2, value3 = UnitDebuff(""target"", auraName, nil, ""PLAYER|HARMFUL"")
-        
-            if name == ""Unstable Affliction"" and (name == auraName) then
-              count = 0
-                index = 1
-                
-                UA = true
-                while UA do
-                    name2, _, _, count2,_, duration, expirationTime2, _, _, _, spellId2, _, _, _, _, _ = UnitDebuff(""target"", index, ""PLAYER|HARMFUL"")
-                    if name2 ~= nil then
-                        index = index +1
-                        if auraId == spellId2 then
-                            UA = false
-                            expirationTime = expirationTime2
-                            count = count2
-                        end
-                    else 
-                            UA = false
-                    end
-                end
-                
-            end";
+        /// <summary>
+        /// Lua strings for varies functions above
+        /// </summary>
+        private const string CastUpdate = @"
+        local function updatePlayerIsCasting(self, event)
+		spell, _, _, _, startTime, endTime, _, castID, _ = UnitCastingInfo(""player"")
+		name, _, _, _, _, _, _, _ = UnitChannelInfo(""player"")
 
+				
+			if castID ~= nil then
+		
+				if GetTime() + timeDiff <= endTime/1000  then
+					--print(""Cast time :"", timeDiff, ""Time "", GetTime())
+					--print(""Cast time :"", endTime/1000, ""Time "", GetTime()+ timeDiff)
+			
+					playerIsCastingFrame.t:SetColorTexture(1, 0, 0, alphaColor)
+				else
+					--print(""OffCast time :"", endTime/1000 - timeDiff, ""Time "", GetTime())
+					playerIsCastingFrame.t:SetColorTexture(1, 1, 1, alphaColor)
+
+                end
+            end
+		
+			if castID == nil then
+
+                playerIsCastingFrame.t:SetColorTexture(1, 1, 1, alphaColor)
+
+            end	
+		
+
+		if name ~= nil then
+			if text ~= lastChanneling then
+
+            playerIsCastingFrame.t:SetColorTexture(0, 1, 0, alphaColor)
+			--   print(text)
+
+            lastChanneling = text
+            end
+
+		else
+			if text ~= lastChanneling then
+
+            playerIsCastingFrame.t:SetColorTexture(1, 1, 1, alphaColor)
+
+            lastChanneling = text
+            end
+
+
+        end
+    end
+";
+        private const string partyvarable = @"local sentTime =0 
+local timeDiff =0
+local PartyBuffs = {}
+do
+for i = 1, 4 do
+PartyBuffs[i] ={Buffs = {} ,LastStateBuff = {} ,debuffs = {},LaststateDebuff = {} }
+end
+end
+";
+        private const string partybuff = @"	raidHealthFrame[i]:SetScript(""OnUpdate"", updateRaidHealth)
+	end
+	
+	for z =1, 4  do
+			i=0
+		for _, buffId in pairs(buffs) do
+
+			 PartyBuffs[z].Buffs[buffId] = CreateFrame(""frame"","""", parent)
+			 PartyBuffs[z].Buffs[buffId]:SetSize(size, size)
+	         PartyBuffs[z].Buffs[buffId]:SetPoint(""TOPLEFT"", i * size, -size * 11+z)                            -- column 13 [Target Buffs]
+			 PartyBuffs[z].Buffs[buffId].t = PartyBuffs[z].Buffs[buffId]:CreateTexture()
+	         PartyBuffs[z].Buffs[buffId].t:SetColorTexture(1, 1, 1, alphaColor)
+		     PartyBuffs[z].Buffs[buffId].t:SetAllPoints(  PartyBuffs[z].Buffs[buffId])
+			PartyBuffs[z].Buffs[buffId]:Show()
+			PartyBuffs[z].Buffs[buffId]:SetScript(""OnUpdate"", updatePartyBuffs)
+        i=i+1
+		end
+	end
+    i=0
+	for _, debuffId in pairs(debuffs) do
+		for z=1, 4 do 
+			PartyBuffs[z].debuffs[debuffId] = CreateFrame(""frame"","""", parent)
+			PartyBuffs[z].debuffs[debuffId]:SetSize(size, size)
+			PartyBuffs[z].debuffs[debuffId]:SetPoint(""TOPLEFT"", i * size, -size * 15+z)         -- row 4, column 1+ [Spell In Range]
+			PartyBuffs[z].debuffs[debuffId].t = PartyBuffs[z].debuffs[debuffId]:CreateTexture()        
+			PartyBuffs[z].debuffs[debuffId].t:SetColorTexture(1, 1, 1, alphaColor)
+			PartyBuffs[z].debuffs[debuffId].t:SetAllPoints(PartyBuffs[z].debuffs[debuffId])
+			PartyBuffs[z].debuffs[debuffId]:Show()		               
+			PartyBuffs[z].debuffs[debuffId]:SetScript(""OnUpdate"", updatePartyDebuffs)
+		end
+        i=i+1
+	end
+end
+";
+        private const string mounted = @"local function PlayerNotMove()
+	mountedplayer = 0
+	moveTime = 1
+	if IsMounted() then
+		mountedplayer = .5
+	end
+	if GetUnitSpeed(""Player"") == 0 then
+		moveTime = 0
+	end
+        PlayerMovingFrame.t:SetColorTexture(moveTime, mountedplayer, 1, alphaColor)
+end
+";
         private const string CustomLua = @"local Healingbuffs =  ""Riptide""
 local Race = {
 	[""Human""] = 0.01,
@@ -515,45 +662,45 @@ local Race = {
 	[""Troll""]= 0.10,
 	[""Blood Elf""]= 0.11,
 	[""Goblin""]= 0.12,
-    [""Worgen""] = 0.13,
+    [""Worgen""]= 0.13,
 }
 local Spec = {
-	[""Blood""] = 0.01,
-	[""Frost""] = 0.02,
-	[""Unholy""] =0.03,
-	[""Havoc""] = 0.04,
-	[""Vengeance""] =0.05,
-	[""Balance""] = 0.06,
-	[""Feral""] =0.07,
-	[""Guardian""] =0.08,
-	[""Restoration""] =0.09,
-	[""Beast Mastery""] = 0.10,
-	[""Marksmanship""] =0.11,
-	[""Survival""] = 0.12,
-	[""Arcane""] =0.13,
-	[""Fire""] = 0.14,
-	[""Frost""] =0.15,
-	[""Brewmaster""] = 0.16,
-	[""Mistweaver""] =0.17,
-	[""Windwalker""] = 0.18,
-	[""Holy""] = 0.19,
-	[""Protection""] = 0.20,
-	[""Retribution""] =0.21,
-	[""Discipline""] = 0.22,
-	[""HolyPriest""]=.23,
-	[""Shadow""] =0.24,
-	[""Assassination""] =0.25,
-	[""Outlaw""] =0.26,
-	[""Subtlety""] = 0.27,
-	[""Elemental""] = 0.28,
-	[""Enhancement""] = 0.29,
-	[""RestorationShaman""] = 0.30,
-	[""Affliction""] = 0.31,
-	[""Arms""] = 0.32,
-	[""Fury""] = 0.33,
-	[""Protection""] = 0.34,
-	[""Demonology""] = 0.35,
-    [""Destruction""] = 0.36,
+	[250] = 0.01,
+	[251] = 0.02,
+	[252] =0.03,
+	[577] = 0.04,
+	[581] =0.05,
+	[102] = 0.06,
+	[103] =0.07,
+	[104] =0.08,
+	[105] =0.09,
+	[253] = 0.10,
+	[254] =0.11,
+	[255] = 0.12,
+	[62] =0.13,
+	[63] = 0.14,
+	[64] =0.15,
+	[268] = 0.16,
+	[269] =0.17,
+	[270] = 0.18,
+	[65] = 0.19,
+	[66] = 0.20,
+	[70] =0.21,
+	[256] = 0.22,
+	[257]=.23,
+	[257] =0.24,
+	[259] =0.25,
+	[260] =0.26,
+	[261] = 0.27,
+	[262] = 0.28,
+    [263] = 0.29,
+	[264] = 0.30,
+	[265] = 0.31,
+	[71] = 0.32,
+	[72] = 0.33,
+	[73] = 0.34,
+	[266] = 0.35,
+    [267] = 0.36,
 }
 
 local activeUnitPlates = {}
@@ -579,7 +726,6 @@ local raidBuff = {}
 local raidBufftime = {}
 local partySize = 0
 local setBonusFrame = nil
-
 local frame = CreateFrame(""frame"", """", parent)
 frame:RegisterEvent(""NAME_PLATE_UNIT_ADDED"")
 frame:RegisterEvent(""UNIT_HEALTH_FREQUENT"")
@@ -598,6 +744,55 @@ frame:RegisterEvent(""PLAYER_ENTER_COMBAT"")
 frame:RegisterEvent(""PLAYER_LEAVE_COMBAT"")
 frame:RegisterEvent(""PLAYER_CONTROL_LOST"")
 frame:RegisterEvent(""PLAYER_CONTROL_GAINED"")
+frame:RegisterEvent(""ACTIONBAR_UPDATE_STATE"")
+frame:RegisterUnitEvent(""UNIT_SPELLCAST_START"",""player"")
+frame:RegisterEvent(""CURRENT_SPELL_CAST_CHANGED"")
+local function updateMyBuffs(self, event)
+    
+	for _, auraId in pairs(buffs) do
+        local buff = ""UnitBuff"";
+		local auraName = GetSpellInfo(auraId)
+		
+		if auraName == nil then
+			if (lastBuffState[auraId] ~= ""BuffOff"") then
+                buffFrames[auraId].t:SetColorTexture(1, 1, 1, alphaColor)
+                buffFrames[auraId].t:SetAllPoints(false)
+                lastBuffState[auraId] = ""BuffOff""
+                --print(""["" .. buff.. ""] "" .. auraName.. "" Off"")
+            end
+			return
+		end
+
+        local name, _, _, count, debuffType, duration, expirationTime, _, _, _, spellId = UnitBuff(""player"", auraName)
+		
+		if (name == auraName) then -- We have Aura up and Aura ID is matching our list
+                local getTime = GetTime()
+                local remainingTime = 0
+                if(expirationTime ~=0) then
+                     remainingTime = expirationTime - getTime + 0.5
+                end
+                remainingTime = string.format(""%00.2f"", tostring(remainingTime))
+			if (lastBuffState[auraId] ~= ""BuffOn"" .. count..remainingTime) then
+              local red = count/100;
+			    local green = tonumber(strsub(tostring(remainingTime), 1, 2)) / 100
+                local blue = tonumber(strsub(tostring(remainingTime), -2, -1)) / 100
+                --print(""expirationTime:""..expirationTime.."" remainingTime:"" .. remainingTime.. "" blue:"" .. blue.. "" strbluecount:"" ..  strbluecount)
+                buffFrames[auraId].t:SetColorTexture(red, green, blue, alphaColor)
+
+                buffFrames[auraId].t:SetAllPoints(false)
+                --print(""["" .. buff.. ""] "" .. auraName.. "" "" .. count.. "" Green: "" .. green)
+                lastBuffState[auraId] = ""BuffOn"" .. count
+            end
+        else
+            if (lastBuffState[auraId] ~= ""BuffOff"") then
+                buffFrames[auraId].t:SetColorTexture(1, 1, 1, alphaColor)
+                buffFrames[auraId].t:SetAllPoints(false)
+                lastBuffState[auraId] = ""BuffOff""
+                --print(""["" .. buff.. ""] "" .. auraName.. "" Off"")
+            end
+        end
+    end
+end
 
 local function updateFlag(self, event)
 	if event == ""PLAYER_CONTROL_GAINED"" then
@@ -607,15 +802,41 @@ local function updateFlag(self, event)
 		flagFrame.t:SetColorTexture(1,0,0,alphaColor)
 	end
 end
-
+local function updateSpellCooldowns(self, event) 
+    for _, spellId in pairs(cooldowns) do
+		-- start is the value of GetTime() at the point the spell began cooling down
+		-- duration is the total duration of the cooldown, NOT the remaining
+		local start, duration, _ = GetSpellCooldown(spellId)
+        --print("" "" .. spellId .. "" is currently active, use it and wait "" .. duration .. "" seconds for the next one."")
+        local cooldownLeft = (start + duration - GetTime())
+        local remainingTime = timeDiff > select(4, GetNetStats())/ 1000  and cooldownLeft - select(4, GetNetStats())/ 1000  or cooldownLeft - timeDiff
+        if remainingTime < 0 then
+			 remainingTime = 0
+		 end
+        
+		if remainingTime ~= 0 then -- the spell is not ready to be cast
+            	--print(""Spell with Id = "" .. spellId .. "" is on CD"")
+                --print("" "" ..spellId.. "" remaining time: "" ..math.floor(remainingTime)..  "" "")
+				remainingTime = string.format(""%00.3f"",tostring(remainingTime) )
+				local green = tonumber(strsub(tostring(remainingTime), 1, 2))/100
+				local blue = tonumber(strsub( tostring(remainingTime), -3,-2))/100
+				cooldownframes[spellId].t:SetColorTexture(1, green, blue, alphaColor)				
+				cooldownframes[spellId].t:SetAllPoints(false)
+		else
+				cooldownframes[spellId].t:SetColorTexture(0, 1, 1, alphaColor)
+				cooldownframes[spellId].t:SetAllPoints(false)
+		end						
+	end
+end
 local function HasteInfoUpdate()
 	local ratingBonus = math.floor(GetHaste())
 	if lasthaste == ratingBonus then return end
 	lastehaste = ratingBonus
-	hasteInfo[2] = 0
-	if (ratingBonus * -1) > ratingBonus then
-		HasteInfo[2] = 1
-	end
+    if ratingBonus == math.abs(ratingBonus) then
+		hasteInfo[2] = 1
+	else
+        hasteInfo[2] = 0
+    end
 	hasteInfo[1] = tonumber(""0.0"".. math.abs(ratingBonus))
 	if (math.abs(ratingBonus) >= 10) then
 		hasteInfo[1] = tonumber(""0."".. math.abs(ratingBonus))
@@ -624,8 +845,7 @@ local function HasteInfoUpdate()
 end
 local function UpdateMana()
 		charUnit[1] = UnitPower(""player"",0) / UnitPowerMax(""player"",0)
-		HasteInfoUpdate()
-		PlayerStatFrame[4].t:SetColorTexture(hasteInfo[2], hasteInfo[1],charUnit[1], alphaColor)
+	    PlayerStatFrame[4].t:SetColorTexture(hasteInfo[2], hasteInfo[1],charUnit[1], alphaColor)
 end
 
 
@@ -658,9 +878,10 @@ local function Talents()
 end
 
 local function CharRaceUpdate()
+    local specialsz =select(1, GetSpecializationInfo(GetSpecialization()))
 	charUnit[2] = Race[UnitRace(""player"")]
-	charUnit[3] = Spec[select(2, GetSpecializationInfo(GetSpecialization()))]
-	
+	charUnit[3] = Spec[specialsz]
+ 
 end
 
 
@@ -1000,7 +1221,7 @@ local function updatetargetInfoFrame()
 	--print(""Info "", targetexist, "" "", rangetargetexist )
 	targetInfoFrame.t:SetColorTexture(targetexist,rangetargetexist, 0 ,alphaColor)
 end
-local function InitializeThree()
+local function InitializeFour()
 	for i = 1, 4 do 
 		raidBuff[i] = 1
 		raidBufftime[i] =1
@@ -1009,7 +1230,7 @@ local function InitializeThree()
 	for i = 1, 20 do	
 		raidHealthFrame[i] = CreateFrame(""frame"", """", parent)
 		raidHealthFrame[i]:SetSize(size, size)
-		raidHealthFrame[i]:SetPoint(""TOPLEFT"", size*(i-1), -size *18 )   --  row 1-20,  column 19
+		raidHealthFrame[i]:SetPoint(""TOPLEFT"", size*(i-1), -size *21 )   --  row 1-20,  column 19
 		raidHealthFrame[i].t = raidHealthFrame[i]:CreateTexture()        
 		raidHealthFrame[i].t:SetColorTexture(1, 1, 1, alphaColor)
 		raidHealthFrame[i].t:SetAllPoints(raidHealthFrame[i])
@@ -1018,7 +1239,7 @@ local function InitializeThree()
 	for i = 21, 30 do		
 		raidHealthFrame[i] = CreateFrame(""frame"", """", parent)
 		raidHealthFrame[i]:SetSize(size, size)
-		raidHealthFrame[i]:SetPoint(""TOPLEFT"", size*(i-21), -size *19 )   --  row 1-10,  column 20
+		raidHealthFrame[i]:SetPoint(""TOPLEFT"", size*(i-21), -size *22 )   --  row 1-10,  column 20
 		raidHealthFrame[i].t = raidHealthFrame[i]:CreateTexture()        
 		raidHealthFrame[i].t:SetColorTexture(1, 1, 1, alphaColor)
 		raidHealthFrame[i].t:SetAllPoints(raidHealthFrame[i])
@@ -1026,7 +1247,7 @@ local function InitializeThree()
 	end
 		raidSizeFrame = CreateFrame(""frame"", """", parent)
 		raidSizeFrame:SetSize(size, size)
-		raidSizeFrame:SetPoint(""TOPLEFT"", size*(10), -size *19 )   --  row 11,  column 20
+		raidSizeFrame:SetPoint(""TOPLEFT"", size*(10), -size *22 )   --  row 11,  column 20
 		raidSizeFrame.t = raidSizeFrame:CreateTexture()        
 		raidSizeFrame.t:SetColorTexture(1, 1, 1, alphaColor)
 		raidSizeFrame.t:SetAllPoints(raidSizeFrame)
@@ -1036,7 +1257,7 @@ local function InitializeThree()
 	for i = 1, 4 do		
 		RaidBuffFrame[i] = CreateFrame(""frame"", """", parent)
 		RaidBuffFrame[i]:SetSize(size, size)
-		RaidBuffFrame[i]:SetPoint(""TOPLEFT"", size*(10 + i), -size *19 )   --  row 12-15,  column 20
+		RaidBuffFrame[i]:SetPoint(""TOPLEFT"", size*(10 + i), -size *22 )   --  row 12-15,  column 20
 		RaidBuffFrame[i].t = RaidBuffFrame[i]:CreateTexture()        
 		RaidBuffFrame[i].t:SetColorTexture(1, 1, 1, alphaColor)
 		RaidBuffFrame[i].t:SetAllPoints(RaidBuffFrame[i])
@@ -1046,7 +1267,7 @@ local function InitializeThree()
 	for i = 1, 5 do
 		PlayerStatFrame[i] = CreateFrame(""frame"", """", parent)
 		PlayerStatFrame[i]:SetSize(size, size)
-		PlayerStatFrame[i]:SetPoint(""TOPLEFT"", size*(i-1), -size *20 )   --  row 1-4,  column 21
+		PlayerStatFrame[i]:SetPoint(""TOPLEFT"", size*(i-1), -size *23 )   --  row 1-4,  column 21
 		PlayerStatFrame[i].t =PlayerStatFrame[i]:CreateTexture()        
 		PlayerStatFrame[i].t:SetColorTexture(1, 1, 1, alphaColor)
 		PlayerStatFrame[i].t:SetAllPoints(PlayerStatFrame[i])
@@ -1054,7 +1275,7 @@ local function InitializeThree()
 	end
 		timerDBMFrames = CreateFrame(""frame"", """", parent)
 		timerDBMFrames:SetSize(size, size);
-		timerDBMFrames:SetPoint(""TOPLEFT"", size * 5, -(size * 20))           -- column 6 row 21
+		timerDBMFrames:SetPoint(""TOPLEFT"", size * 5, -(size * 23))           -- column 6 row 21
 		timerDBMFrames.t = timerDBMFrames:CreateTexture()        
 		timerDBMFrames.t:SetColorTexture(0, 0, 0, alphaColor)
 		timerDBMFrames.t:SetAllPoints(timerDBMFrames)
@@ -1063,7 +1284,7 @@ local function InitializeThree()
 
 		totemsFrame = CreateFrame(""frame"", """", parent)
 		totemsFrame:SetSize(size, size);
-		totemsFrame:SetPoint(""TOPLEFT"", size * 6, -(size * 20))           -- column 7 row 21
+		totemsFrame:SetPoint(""TOPLEFT"", size * 6, -(size * 23))           -- column 7 row 21
 		totemsFrame.t = totemsFrame:CreateTexture()        
 		totemsFrame.t:SetColorTexture(0, 0, 0, alphaColor)
 		totemsFrame.t:SetAllPoints(totemsFrame)
@@ -1071,7 +1292,7 @@ local function InitializeThree()
 
 		targetInfoFrame = CreateFrame(""frame"", """", parent)
 		targetInfoFrame:SetSize(size, size);
-		targetInfoFrame:SetPoint(""TOPLEFT"", size * 7, -(size * 20))           -- column 8 row 21
+		targetInfoFrame:SetPoint(""TOPLEFT"", size * 7, -(size * 23))           -- column 8 row 21
 		targetInfoFrame.t = targetInfoFrame:CreateTexture()        
 		targetInfoFrame.t:SetColorTexture(0, 0, 0, alphaColor)
 		targetInfoFrame.t:SetAllPoints(targetInfoFrame)
@@ -1079,7 +1300,7 @@ local function InitializeThree()
 
 		setBonusFrame = CreateFrame(""frame"", """", parent)
 		setBonusFrame:SetSize(size, size);
-		setBonusFrame:SetPoint(""TOPLEFT"", size * 8, -(size * 20))           -- column 9 row 21
+		setBonusFrame:SetPoint(""TOPLEFT"", size * 8, -(size * 23))           -- column 9 row 21
 		setBonusFrame.t = setBonusFrame:CreateTexture()        
 		setBonusFrame.t:SetColorTexture(0, 0, 0, alphaColor)
 		setBonusFrame.t:SetAllPoints(setBonusFrame)
@@ -1098,6 +1319,13 @@ local function HealinEventHandler(self,event, ...)
 		end
 	end
 
+    if event == ""UNIT_SPELLCAST_START"" then
+		    timeDiff = GetTime() - sendTime
+    end
+
+	if event == ""CURRENT_SPELL_CAST_CHANGED"" then
+        sendTime = GetTime()
+	end
 	if event == ""RAID_ROSTER_UPDATE"" or event == ""GROUP_ROSTER_UPDATE"" then
 	   UdateRaidSizeFrame()
     end
@@ -1112,17 +1340,17 @@ local function HealinEventHandler(self,event, ...)
 	end
 	if event == ""PLAYER_ENTERING_WORLD""then
 		CharRaceUpdate()
+        HasteInfoUpdate()
 		Talents()
 		TurnOnPlates()
 		updateSetBonus()
 	end
 	if event == ""PLAYER_REGEN_DISABLED""then 
+        HasteInfoUpdate()
 		ClearNamePlates()
 		CharRaceUpdate()
 		Talents()
 		UpdateMana()
-        updatePower()
-        updateUnitPower()
 		updateCombat()
 		updateSetBonus()
 	end
@@ -1156,6 +1384,9 @@ local function HealinEventHandler(self,event, ...)
 		hasTarget()
 		updatetargetInfoFrame()
 	end
+    if event == ""ACTIONBAR_UPDATE_STATE"" then
+        updateSpellCharges()
+    end
 	if event == ""PLAYER_ENTER_COMBAT"" or event == ""PLAYER_LEAVE_COMBAT"" then
 		updateIsFriendly()
 		AutoAtacking()
@@ -1172,13 +1403,7 @@ end
 
 local GlobalTimer = 0
 local function onUpDateFunction(self,elapsed)
-		if GlobalTimer <= 0 then
-			GlobalTimer = .10
-		else
-			GlobalTimer = GlobalTimer - elapsed
-		end
-		
-		if GlobalTimer <= .01 then
+	
 			updateRaidBuff()
 			
 			updateDBMFrames(elapsed)
@@ -1200,7 +1425,7 @@ local function onUpDateFunction(self,elapsed)
 			updateSpellCooldowns()
 			updateSpellInRangeFrames()
 			updateTargetDebuffs()
-			updateSpellCharges()
+			
 			updateTargetBuffs()
 			PlayerNotMove()
 			updateTargetCurrentSpell()
@@ -1211,9 +1436,6 @@ local function onUpDateFunction(self,elapsed)
 			updateItemCooldowns()
 			updatePlayerDebuffs()
 			updateIsSpellOverlayedFrames()
-
-			 GlobalTimer= .10
-		end
 end	
 frame:SetScript(""OnEvent"",HealinEventHandler)
 frame:SetScript(""OnUpdate"",onUpDateFunction)";
@@ -1525,6 +1747,7 @@ LibStub.lua";
     }
 }
         #endregion
+
 
 /*
 [AddonDetails.db]
