@@ -5,8 +5,11 @@
 // Balance Druid rotation by Scotishdwarf and Daniel
 // Known Bugs / TODO :
 // - Sometimes overcapping Astral Power due PixelMagic not detecting Astral Power fast enough.
-// - Oneth's Intuition not coded in to normal rotation yet, it's coded in Emerald Dreamcatcher rotation, it's in TODO.
+// - Oneth's Intuition not yet coded to normal rotation, will do it next.
 // Changelog :
+// Version r26
+// - Improved Starfall usage under Oneth's Overconfidence buff (Oneth's Intuition legendary) while having Emerald Dreamcatcher legendary.
+// - Setting : Have Starfall Macro is now effective on all starfalls.
 // Version r25
 // - Added user configurable Starsurge Astral Power, default = 60AsP
 // Version r24
@@ -238,7 +241,7 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            MessageBox.Show("Welcome to Balance Druid by Scotishdwarf r25.\n\nMy talent build : 3,1,3,1,3,3,3.\n\nNoteworthy things :\n- If using Stellar Drift and SotF, in single target use it manually, AoE will use automatically.\n- Starsurge used at 70 AP, pooling it high to minimize dps loss while moving, you can force cast it by moving.\n- On AOE, manual Starfall usage required, you can make cast at cursor macro for this.\n\nRecommended to use addon that hides Lua Errors for now.\n\nPress OK to continue loading rotation.");
+            MessageBox.Show("Welcome to Balance Druid by Scotishdwarf r24.\n\nMy talent build : 3,1,3,1,3,3,3.\n\nNoteworthy things :\n- If using Stellar Drift and SotF, in single target use it manually, AoE will use automatically.\n- Starsurge used at 70 AP, pooling it high to minimize dps loss while moving, you can force cast it by moving.\n- On AOE, manual Starfall usage required, you can make cast at cursor macro for this.\n\nRecommended to use addon that hides Lua Errors for now.\n\nPress OK to continue loading rotation.");
             Log.Write("Welcome to Balance rotation", Color.Green);
 
             // TALENT CONFIG
@@ -321,13 +324,6 @@ namespace PixelMagic.Rotation
 
             StarsurgeNum = new NumericUpDown { Value = StarsurgeAsP, TabIndex = 6, Size = new Size(57, 20), Left = 520, Top = 89 };
             SettingsForm.Controls.Add(StarsurgeNum);
-            //StarsurgeNum.Location = new System.Drawing.Point(520, 59);
-            //StarsurgeNum.Name = "StarsurgeNum";
-            //StarsurgeNum.Size = new System.Drawing.Size(57, 20);
-            //StarsurgeNum.TabIndex = 9;
-            //StarsurgeNum.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            //StarsurgeNum.Value = StarsurgeAsP;
-            //StarsurgeNum.ValueChanged 
 
             var cmdSave = new Button { Text = "Save", Width = 65, Height = 25, Left = 462, Top = 168, Size = new Size(108, 31) };
 
@@ -604,7 +600,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // actions.ed+=/starfall,if=buff.oneths_overconfidence.up&buff.the_emerald_dreamcatcher.remains>execute_time&remains<2
-                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence") && WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1 && WoW.TargetHasDebuff("Starfall") && WoW.TargetDebuffTimeRemaining("Starfall") < 2) ;
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence") && WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1) ;
                     {
                         WoW.CastSpell("Starfall");
                         return;
@@ -646,7 +642,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // actions.ed+=/starfall,if=buff.oneths_overconfidence.up&remains<2
-                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence") && WoW.TargetDebuffTimeRemaining("Starfall") < 2) ;
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence")) ;
                     {
                         WoW.CastSpell("Starfall");
                         return;
@@ -748,8 +744,14 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("FullMoon");
                         return;
                     }
-					// Under Celestial Alignment
-					if (WoW.PlayerHasBuff("CelestialAlignment"))
+                    // Oneths progged starfall if have buff Oneth'ss Overconfidence
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence")) ;
+                    {
+                        WoW.CastSpell("Starfall");
+                        return;
+                    }
+                    // Under Celestial Alignment
+                    if (WoW.PlayerHasBuff("CelestialAlignment"))
 						{
                         // KBW if in use
                         if (KBW && !WoW.ItemOnCooldown("KBW") && WoW.IsSpellInRange("LStrike"))
@@ -1026,7 +1028,13 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Starsurge");
                         return;
                     }
-					// Solar Wrath at 3 solar empowerement
+                    // Oneths progged starfall if have buff Oneth'ss Overconfidence
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence")) ;
+                    {
+                        WoW.CastSpell("Starfall");
+                        return;
+                    }
+                    // Solar Wrath at 3 solar empowerement
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerHasBuff("SolarEmp"))
                     {
                         WoW.CastSpell("SolarW");
@@ -1143,7 +1151,13 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Starsurge");
                         return;
                     }
-					// Solar Wrath at 3 solar empowerement
+                    // Oneths progged starfall if have buff Oneth'ss Overconfidence
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence")) ;
+                    {
+                        WoW.CastSpell("Starfall");
+                        return;
+                    }
+                    // Solar Wrath at 3 solar empowerement
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerHasBuff("SolarEmp"))
                     {
                         WoW.CastSpell("SolarW");
@@ -1447,10 +1461,10 @@ namespace PixelMagic.Rotation
                         }
                         return;
                     }
-                    // Starsurge for Emerald Dreamcatcher
-                    if (WoW.IsSpellInRange("Starsurge") && WoW.CanCast("Starsurge") && WoW.PlayerSpellCharges("Starsurge") <= 2 && WoW.CurrentAstralPower >= 40)
+                    // Oneths progged starfall if have buff Oneth'ss Overconfidence
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence")) ;
                     {
-                        WoW.CastSpell("Starsurge");
+                        WoW.CastSpell("Starfall");
                         return;
                     }
                     // Starsurge
@@ -1542,6 +1556,12 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("Starsurge") && WoW.CanCast("Starsurge") && WoW.CurrentAstralPower >= 40 && (!WoW.PlayerHasBuff("SolarEmp") || WoW.PlayerBuffStacks("SolarEmp") < 3) && (!WoW.PlayerHasBuff("LunarEmp") || WoW.PlayerBuffStacks("LunarEmp") < 3))
                     {
                         WoW.CastSpell("Starsurge");
+                        return;
+                    }
+                    // Oneths progged starfall if have buff Oneth'ss Overconfidence
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence")) ;
+                    {
+                        WoW.CastSpell("Starfall");
                         return;
                     }
                     if (WoW.IsSpellInRange("Moonfire") && WoW.CanCast("Moonfire") && !WoW.TargetHasDebuff("Moonfire"))
@@ -1636,12 +1656,12 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("HalfMoon");
                         return;
                     }
-                    if (WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 40 && !WoW.TargetHasDebuff("StarfallT"))
+                    if (WoW.CanCast("Starfall") && StarfallMacro && WoW.CurrentAstralPower >= 40 && !WoW.TargetHasDebuff("StarfallT"))
                     {
                         WoW.CastSpell("Starfall");
                         return;
                     }
-                    if (WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 60)
+                    if (WoW.CanCast("Starfall") && StarfallMacro && WoW.CurrentAstralPower >= 60)
                     {
                         WoW.CastSpell("Starfall");
                         return;
@@ -1719,7 +1739,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Stellar Drift
-                    if (StellarDrift && WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 60)
+                    if (StellarDrift && StarfallMacro && WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 60)
                     {
                         WoW.CastSpell("Starfall");
                         return;
@@ -1793,7 +1813,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Stellar Drift
-                    if (StellarDrift && WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 60)
+                    if (StellarDrift && StarfallMacro && WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 60)
                     {
                         WoW.CastSpell("Starfall");
                         return;
@@ -1913,7 +1933,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Starfall
-                    if (WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 60)
+                    if (WoW.CanCast("Starfall") && StarfallMacro && WoW.CurrentAstralPower >= 60)
                     {
                         WoW.CastSpell("Starfall");
                         return;
