@@ -7,6 +7,8 @@
 // - Sometimes overcapping Astral Power due PixelMagic not detecting Astral Power fast enough.
 // - Oneth's Intuition not yet coded to normal rotation, will do it next.
 // Changelog :
+// Version r28
+// - Fixed even more things
 // Version r27
 // - Fixed several bugs within rotation.
 // Version r26
@@ -223,7 +225,6 @@ namespace PixelMagic.Rotation
             }
             set { ConfigFile.WriteValue("BalanceDruid", "StarfallMacro", value.ToString()); }
         }
-
         private static int StarsurgeAsP
         {
             get
@@ -473,14 +474,13 @@ namespace PixelMagic.Rotation
         {
             if (combatRoutine.Type == RotationType.SingleTarget)
             {
-				// Pullwatch timer
+				// Pullwatch
 				if (WoW.IsInCombat && !pullwatch.IsRunning)
 				{
 					pullwatch.Start();
 					Log.Write("Starting Combat, Starting Pullwatch.", Color.Red);
                     
                 }
-				// Pullwatch stop
 				if (!WoW.IsInCombat && pullwatch.ElapsedMilliseconds > 1000)
 				{
 					pullwatch.Reset();
@@ -687,7 +687,7 @@ namespace PixelMagic.Rotation
                     }
                 }
                 // Pull
-                if (WoW.IsInCombat && pullwatch.ElapsedMilliseconds < 10000 && UseCooldowns)
+                if (WoW.IsInCombat && pullwatch.ElapsedMilliseconds < 15000 && UseCooldowns)
                 {
                     // KBW if in use
                     if (KBW && !WoW.ItemOnCooldown("KBW") && WoW.IsSpellInRange("LStrike"))
@@ -750,7 +750,6 @@ namespace PixelMagic.Rotation
                     if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence"))
                     {
                         WoW.CastSpell("Starfall");
-                        Log.Write("Starfall 1", Color.Red);
                         return;
                     }
                     // Under Celestial Alignment
@@ -1035,7 +1034,6 @@ namespace PixelMagic.Rotation
                     if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence"))
                     {
                         WoW.CastSpell("Starfall");
-                        Log.Write("Starfall 2", Color.Red);
                         return;
                     }
                     // Solar Wrath at 3 solar empowerement
@@ -1096,42 +1094,30 @@ namespace PixelMagic.Rotation
                         && WoW.CurrentAstralPower <= 90
                         && WoW.TargetHasDebuff("Moonfire")
                         && WoW.TargetHasDebuff("Sunfire"))
-                    {
-                        if (WoW.CurrentAstralPower <= 90)
                         {
                             WoW.CastSpell("Moon");
                             return;
                         }
-                        return;
-                    }
                     // HalfMoon
                     if (WoW.IsSpellInRange("HalfMoon")
                         && WoW.CanCast("HalfMoon")
                         && WoW.CurrentAstralPower <= 80
                         && WoW.TargetHasDebuff("Moonfire")
                         && WoW.TargetHasDebuff("Sunfire"))
-                    {
-                        if (WoW.CurrentAstralPower <= 80)
                         {
                             WoW.CastSpell("HalfMoon");
                             return;
                         } 
-                        return;
-                    }
                     // FullMoon
                     if (WoW.IsSpellInRange("FullMoon")
                         && WoW.CanCast("FullMoon")
                         && WoW.CurrentAstralPower <= 60
                         && WoW.TargetHasDebuff("Moonfire")
                         && WoW.TargetHasDebuff("Sunfire"))
-                    {
-                        if (WoW.CurrentAstralPower <= 60)
                         {
                             WoW.CastSpell("FullMoon");
                             return;
                         }
-                        return;
-                    }
                     // Cast SolarWrath when nothing else to do
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW"))
                     {
@@ -1159,7 +1145,6 @@ namespace PixelMagic.Rotation
                     if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence"))
                     {
                         WoW.CastSpell("Starfall");
-                        Log.Write("Starfall 3", Color.Red);
                         return;
                     }
                     // Solar Wrath at 3 solar empowerement
@@ -1220,42 +1205,30 @@ namespace PixelMagic.Rotation
                         && WoW.CurrentAstralPower <= 90
                         && WoW.TargetHasDebuff("Moonfire")
                         && WoW.TargetHasDebuff("Sunfire"))
-                    {
-                        if(WoW.CurrentAstralPower <= 90)
                         {
                             WoW.CastSpell("Moon");
                             return;
                         }
-                        return;
-                    }
                     // HalfMoon
                     if (WoW.IsSpellInRange("HalfMoon")
                         && WoW.CanCast("HalfMoon")
                         && WoW.CurrentAstralPower <= 80
                         && WoW.TargetHasDebuff("Moonfire")
                         && WoW.TargetHasDebuff("Sunfire"))
-                    {
-                        if (WoW.CurrentAstralPower <= 80)
                         {
                             WoW.CastSpell("HalfMoon");
                             return;
                         }
-                        return;
-                    }
                     // FullMoon
                     if (WoW.IsSpellInRange("FullMoon")
                         && WoW.CanCast("FullMoon")
                         && WoW.CurrentAstralPower <= 60
                         && WoW.TargetHasDebuff("Moonfire")
                         && WoW.TargetHasDebuff("Sunfire"))
-                    {
-                        if (WoW.CurrentAstralPower <= 60)
                         {
                             WoW.CastSpell("FullMoon");
                             return;
                         }
-                        return;
-                    }
                     // Cast SolarWrath when nothing else to do
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW"))
                     {
@@ -1264,7 +1237,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
 				}
-                // Trinket prog override
+                // Fulmination Charge trinket prog
                 if (WoW.CanCast("Starsurge") && WoW.IsSpellInRange("Starsurge") && WoW.CurrentAstralPower >= 40 && WoW.PlayerHasBuff("FulminationCharge") && WoW.PlayerBuffStacks("FulminationCharge") >= 8)
                 {
                     WoW.CastSpell("Starsurge");
@@ -1421,47 +1394,34 @@ namespace PixelMagic.Rotation
                         && WoW.CurrentAstralPower <= 90
                         && WoW.TargetHasDebuff("Moonfire")
                         && WoW.TargetHasDebuff("Sunfire"))
-                    {
-                        if (WoW.CurrentAstralPower <= 90)
                         {
                             WoW.CastSpell("Moon");
                             return;
                         }
-                        return;
-                    }
                     // HalfMoon
                     if (WoW.IsSpellInRange("HalfMoon")
                         && WoW.CanCast("HalfMoon")
                         && WoW.CurrentAstralPower <= 80
                         && WoW.TargetHasDebuff("Moonfire")
                         && WoW.TargetHasDebuff("Sunfire"))
-                    {
-                        if (WoW.CurrentAstralPower <= 80)
                         {
                             WoW.CastSpell("HalfMoon");
                             return;
                         }
-                        return;
-                    }
                     // FullMoon
                     if (WoW.IsSpellInRange("FullMoon")
                         && WoW.CanCast("FullMoon")
                         && WoW.CurrentAstralPower <= 60
                         && WoW.TargetHasDebuff("Moonfire")
                         && WoW.TargetHasDebuff("Sunfire"))
-                    {
-                        if (WoW.CurrentAstralPower <= 60)
                         {
                             WoW.CastSpell("FullMoon");
                             return;
                         }
-                        return;
-                    }
                     // Oneths progged starfall if have buff Oneth'ss Overconfidence
                     if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence"))
                     {
                         WoW.CastSpell("Starfall");
-                        Log.Write("Starfall 4", Color.Red);
                         return;
                     }
                     // Starsurge
@@ -1514,7 +1474,7 @@ namespace PixelMagic.Rotation
                     return;
 
                 }
-                // Stellar Drift
+                // Stellar Drift and Moving
                 if (StellarDrift && WoW.IsMoving && WoW.PlayerHasBuff("StarfallP") && WoW.IsSpellInRange("LStrike"))
                 {
                     if (WoW.CanCast("FullMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 3)
@@ -1544,6 +1504,7 @@ namespace PixelMagic.Rotation
                     }
 
                 }
+                // While moving
                 if (WoW.IsInCombat && WoW.HasTarget&& WoW.TargetIsEnemy&&WoW.PlayerHasBuff("Moonkin")&&WoW.IsMoving)
 				{
                     if (WoW.IsSpellInRange("Starsurge") && WoW.CanCast("Starsurge") && WoW.CurrentAstralPower >= 40 && (!WoW.PlayerHasBuff("SolarEmp") || WoW.PlayerBuffStacks("SolarEmp") < 3) && (!WoW.PlayerHasBuff("LunarEmp") || WoW.PlayerBuffStacks("LunarEmp") < 3))
@@ -1555,7 +1516,6 @@ namespace PixelMagic.Rotation
                     if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence"))
                     {
                         WoW.CastSpell("Starfall");
-                        Log.Write("Starfall 5", Color.Red);
                         return;
                     }
                     if (WoW.IsSpellInRange("Moonfire") && WoW.CanCast("Moonfire") && !WoW.TargetHasDebuff("Moonfire"))
@@ -1582,10 +1542,12 @@ namespace PixelMagic.Rotation
                 // Cooldown rotation
                 if (WoW.IsInCombat && WoW.HasTarget && UseCooldowns && WoW.TargetIsEnemy && WoW.PlayerHasBuff("Moonkin"))
                 {
-                    //// Kil'jaeden's Burning Wish
-                    //if (KBW && !WoW.ItemOnCooldown("KBW"))
-
-                    // Celestial Alignment if Astral Power bigger than 40
+                    // KBW if in use
+                    if (KBW && !WoW.ItemOnCooldown("KBW") && WoW.IsSpellInRange("LStrike"))
+                    {
+                        WoW.CastSpell("KBW");
+                        return;
+                    }
                     // TODO : Configurable usage
                     if (!Incarnation && WoW.CanCast("CelestialAlignment")
                         && WoW.CurrentAstralPower >= 40)
@@ -1723,7 +1685,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                 }
-				// Under Celestial Alignment
+				// Under Celestial Alignment, no soul of the forest
 				if (!SouloftheForest && WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.PlayerHasBuff("Moonkin") && !WoW.IsMoving && WoW.PlayerHasBuff("CelestialAlignment"))
 				{
                     // KBW if in use
@@ -1797,7 +1759,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
 				}
-				// Under Incarnation
+				// Under Incarnation, no soul of the forest
 				if (!SouloftheForest && WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.PlayerHasBuff("Moonkin") && !WoW.IsMoving && WoW.PlayerHasBuff("Incarnation"))
 				{
                     // KBW if in use
@@ -1871,6 +1833,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
 				}
+                // Main rotation, no soul of the forest
                 if (!SouloftheForest && WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.PlayerHasBuff("Moonkin") && !WoW.IsMoving)
                 {
                     // KBW if in use
@@ -2087,6 +2050,7 @@ namespace PixelMagic.Rotation
                     }
 
                 }
+                // While moving and no soul of the forest
                 if (!SouloftheForest && WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.PlayerHasBuff("Moonkin") && WoW.IsMoving)
                 {
                     // KBW if in use
