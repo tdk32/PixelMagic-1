@@ -3,15 +3,18 @@
 
 
 // Changelog :
-// Version 1.05
+// Version r16
+// - Fixed bugs on SoTR and HoTP/LoTP
+// - Changed versioning
+// Version r15
 // - Fixed Lay on Hands
-// Version 1.04
+// Version r14
 // - Added suggested talent build for the rotation.
-// Version 1.03
+// Version r13
 // - Added toggle for talents Seraphim, Hand of the Protector and Blessed Hammer in Rotation settings, enable to use those talents.
-// Version 1.02
+// Version r12
 // - Removed Interupt handling for Rebuke, will enable again once interupts are fixed.
-// Version 1.01
+// Version r11
 //- Added Interupt handling for Rebuke and Avenger's Shield
 //- Consecration checks if target has Consecration debuff
 //- Blessed Hammer 1-2 stacks checks if target has Blessed Hammer debuff
@@ -36,7 +39,7 @@ namespace PixelMagic.Rotation
 
         public override Form SettingsForm { get; set; }
 
-        public override string Name => "Protection Paladin by Scotishdwarf 1.05";
+        public override string Name => "Protection Paladin by Scotishdwarf r16";
 
         public override string Class => "Paladin";
 
@@ -76,7 +79,7 @@ namespace PixelMagic.Rotation
         public override void Initialize()
         {
             MessageBox.Show(
-                "Welcome to Protection Paladin by Scotishdwarf 1.05.\n\n- Manual use of Divine Shield and Blessings\n- If using Blessed Hammer, Hand of the Protector or Seraphim talents, please enable them from Rotation settings.\n\nSuggested build 2132121\n\nPlease give feedback to Scotishdwarf at PixelMagic Discord.\n\nPress OK to continue loading.");
+                "Welcome to Protection Paladin by Scotishdwarf r16.\n\n- Manual use of Divine Shield and Blessings\n- If using Blessed Hammer, Hand of the Protector or Seraphim talents, please enable them from Rotation settings.\n\nSuggested build 2132121\n\nPlease give feedback to Scotishdwarf at PixelMagic Discord.\n\nPress OK to continue loading.");
             Log.Write("Welcome to Protection by Scotishdwarf", Color.Purple);
             Log.Write("Manual use : Divine Shield, Blessings : Protection, Sacrifice and Freedom.", Color.Purple);
             Log.Write("Automatic cooldown usage at 10-30% of health.", Color.Purple);
@@ -84,27 +87,27 @@ namespace PixelMagic.Rotation
             Log.Write("Suggested build: 2132121", Color.Green);
             Log.Write("Welcome to PixelMagic Protection Paladin");
 
-            SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 600, Height = 200, ShowIcon = false};
+            SettingsForm = new Form { Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 600, Height = 200, ShowIcon = false };
 
-            var lblSeraphimBossText = new Label {Text = "Talent : Seraphim", Size = new Size(200, 13), Left = 12, Top = 14};
+            var lblSeraphimBossText = new Label { Text = "Talent : Seraphim", Size = new Size(200, 13), Left = 12, Top = 14 };
             SettingsForm.Controls.Add(lblSeraphimBossText);
 
-            SeraphimBox = new CheckBox {Checked = SeraphimBoss, TabIndex = 2, Size = new Size(15, 14), Left = 220, Top = 14};
+            SeraphimBox = new CheckBox { Checked = SeraphimBoss, TabIndex = 2, Size = new Size(15, 14), Left = 220, Top = 14 };
             SettingsForm.Controls.Add(SeraphimBox);
 
-            var lblHotPBossText = new Label {Text = "Talent : Hand of the Protector", Size = new Size(200, 13), Left = 12, Top = 29};
+            var lblHotPBossText = new Label { Text = "Talent : Hand of the Protector", Size = new Size(200, 13), Left = 12, Top = 29 };
             SettingsForm.Controls.Add(lblHotPBossText);
 
-            HotPBox = new CheckBox {Checked = HotPBoss, TabIndex = 4, Size = new Size(15, 14), Left = 220, Top = 29};
+            HotPBox = new CheckBox { Checked = HotPBoss, TabIndex = 4, Size = new Size(15, 14), Left = 220, Top = 29 };
             SettingsForm.Controls.Add(HotPBox);
 
-            var lblBlessedHammerBossText = new Label {Text = "Talent : Blessed Hammer", Size = new Size(200, 13), Left = 12, Top = 44};
+            var lblBlessedHammerBossText = new Label { Text = "Talent : Blessed Hammer", Size = new Size(200, 13), Left = 12, Top = 44 };
             SettingsForm.Controls.Add(lblBlessedHammerBossText);
 
-            BlessedHammerBox = new CheckBox {Checked = BlessedHammerBoss, TabIndex = 6, Size = new Size(15, 14), Left = 220, Top = 44};
+            BlessedHammerBox = new CheckBox { Checked = BlessedHammerBoss, TabIndex = 6, Size = new Size(15, 14), Left = 220, Top = 44 };
             SettingsForm.Controls.Add(BlessedHammerBox);
 
-            var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 462, Top = 118, Size = new Size(108, 31)};
+            var cmdSave = new Button { Text = "Save", Width = 65, Height = 25, Left = 462, Top = 118, Size = new Size(108, 31) };
 
             SeraphimBox.Checked = SeraphimBoss;
             HotPBox.Checked = HotPBoss;
@@ -169,9 +172,15 @@ namespace PixelMagic.Rotation
                     WoW.CastSpell("Seraphim");
                     return;
                 }
-                if (WoW.PlayerSpellCharges("Shield of the Righteous") == 3 || WoW.PlayerBuffTimeRemaining("Shield of the Righteous") <= 1.5)
+                if (WoW.PlayerSpellCharges("Shield of the Righteous") == 3)
                 {
                     Log.Write("SoTR 3 Stacks, casting SoTR.", Color.Red);
+                    WoW.CastSpell("Shield of the Righteous");
+                    return;
+                }
+                if (WoW.PlayerHasBuff("Shield of the Righteous") && WoW.PlayerBuffTimeRemaining("Shield of the Righteous") <= 1.5)
+                {
+                    Log.Write("SoTR remaining under 1.5seconds on target, cast SoTR.", Color.Red);
                     WoW.CastSpell("Shield of the Righteous");
                     return;
                 }
@@ -291,9 +300,17 @@ namespace PixelMagic.Rotation
             {
                 if (WoW.HasTarget && WoW.TargetIsEnemy) //
                 {
-                    if ((WoW.CanCast("Light of the Protector") || WoW.CanCast("Hand of the Protector")) // Hand or Light of the Protector under 60% health
-                        && (!WoW.IsSpellOnCooldown("Light of the Protector") || !WoW.IsSpellOnCooldown("Hand of the Protector")) && WoW.HealthPercent <= 60)
+                    // Hand of the Protector under 60% health
+                    if (HotPBoss && WoW.CanCast("Hand of the Protector") && !WoW.IsSpellOnCooldown("Hand of the Protector") && WoW.HealthPercent <= 60)
                     {
+                        Log.Write("Health under 60%, Hand of Protector.", Color.Red);
+                        WoW.CastSpell("Hand of the Protector");
+                        return;
+                    }
+                    // Light of the Protector under 60% health
+                    if (!HotPBoss && WoW.CanCast("Light of the Protector") && !WoW.IsSpellOnCooldown("Light of the Protector") && WoW.HealthPercent <= 60)
+                    {
+                        Log.Write("Health under 60%, Light of Protector.", Color.Red);
                         WoW.CastSpell("Light of the Protector");
                         return;
                     }
