@@ -7,6 +7,8 @@
 // - Sometimes overcapping Astral Power due PixelMagic not detecting Astral Power fast enough.
 // - Oneth's Intuition not yet coded to normal rotation, will do it next.
 // Changelog :
+// Version r27
+// - Fixed several bugs within rotation.
 // Version r26
 // - Improved Starfall usage under Oneth's Overconfidence buff (Oneth's Intuition legendary) while having Emerald Dreamcatcher legendary.
 // - Setting : Have Starfall Macro is now effective on all starfalls.
@@ -476,7 +478,7 @@ namespace PixelMagic.Rotation
 				{
 					pullwatch.Start();
 					Log.Write("Starting Combat, Starting Pullwatch.", Color.Red);
-                    Thread.Sleep(100);
+                    
                 }
 				// Pullwatch stop
 				if (!WoW.IsInCombat && pullwatch.ElapsedMilliseconds > 1000)
@@ -489,20 +491,20 @@ namespace PixelMagic.Rotation
                 if (!WoW.PlayerIsCasting && WoW.IsInCombat && WoW.CanCast("Moonkin") && !WoW.PlayerHasBuff("Moonkin"))
                 {
                     WoW.CastSpell("Moonkin");
-                    Thread.Sleep(100);
+                    
                     return;
                 }
                 // If Blessing of the Ancients get it up.
                 if (BlessingOfAncients && WoW.CanCast("BlessingOfAncients") && !WoW.PlayerHasBuff("BlessingOfElune") && !WoW.PlayerHasBuff("BlessingOfAnshe") && WoW.HealthPercent >= 10)
                 {
                     WoW.CastSpell("BlessingOfAncients");
-                    Thread.Sleep(100);
+                    
                     return;
                 }
                 if (BlessingOfAncients && WoW.CanCast("BlessingOfAncients") && WoW.PlayerHasBuff("BlessingOfAnshe") && WoW.HealthPercent >= 10)
                 {
                     WoW.CastSpell("BlessingOfAncients");
-                    Thread.Sleep(100);
+                    
                     return;
                 }
                 // Restoration Affinity
@@ -572,7 +574,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // moonfire if not in target
-                    if (WoW.CanCast("Moonfire") && !WoW.TargetHasDebuff("Moonfire")) ;
+                    if (WoW.CanCast("Moonfire") && !WoW.TargetHasDebuff("Moonfire"))
                     {
                         WoW.CastSpell("Moonfire");
                         return;
@@ -580,13 +582,13 @@ namespace PixelMagic.Rotation
                     // actions.ed+=/moonfire,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
                     if (WoW.CanCast("Moonfire")
                         && ((NaturesBalance && WoW.TargetHasDebuff("Moonfire") && WoW.TargetDebuffTimeRemaining("Moonfire") < 3) || (!NaturesBalance && WoW.TargetHasDebuff("Moonfire") && WoW.TargetDebuffTimeRemaining("Moonfire") < 6.6))
-                        && (WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1 || !WoW.PlayerHasBuff("EmeraldDreamcatcherBuff"))) ;
+                        && (WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1 || !WoW.PlayerHasBuff("EmeraldDreamcatcherBuff")))
                     {
                         WoW.CastSpell("Moonfire");
                         return;
                     }
                     // sunfire if not in target
-                    if (WoW.CanCast("Sunfire") && !WoW.TargetHasDebuff("Sunfire")) ;
+                    if (WoW.CanCast("Sunfire") && !WoW.TargetHasDebuff("Sunfire"))
                     {
                         WoW.CastSpell("Sunfire");
                         return;
@@ -594,13 +596,13 @@ namespace PixelMagic.Rotation
                     // actions.ed+=/sunfire,if=((talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
                     if (WoW.CanCast("Sunfire")
                         && ((NaturesBalance && WoW.TargetHasDebuff("Sunfire") && WoW.TargetDebuffTimeRemaining("Sunfire") < 3) || (!NaturesBalance && WoW.TargetHasDebuff("Sunfire") && WoW.TargetDebuffTimeRemaining("Sunfire") < 5.4))
-                        && (WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1 || !WoW.PlayerHasBuff("EmeraldDreamcatcherBuff"))) ;
+                        && (WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1 || !WoW.PlayerHasBuff("EmeraldDreamcatcherBuff")))
                     {
                         WoW.CastSpell("Moonfire");
                         return;
                     }
                     // actions.ed+=/starfall,if=buff.oneths_overconfidence.up&buff.the_emerald_dreamcatcher.remains>execute_time&remains<2
-                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence") && WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1) ;
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence") && WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1)
                     {
                         WoW.CastSpell("Starfall");
                         return;
@@ -642,43 +644,43 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // actions.ed+=/starfall,if=buff.oneths_overconfidence.up&remains<2
-                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence")) ;
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence"))
                     {
                         WoW.CastSpell("Starfall");
                         return;
                     }
                     // actions.ed+=/new_moon,if=astral_power<=90
-                    if (WoW.CanCast("Moon") && WoW.CurrentAstralPower <= 90) ;
+                    if (WoW.CanCast("Moon") && WoW.CurrentAstralPower <= 90)
                     {
                         WoW.CastSpell("Moon");
                         return;
                     }
                     // actions.ed+=/half_moon,if=astral_power<=80
-                    if (WoW.CanCast("HalfMoon") && WoW.CurrentAstralPower <= 80) ;
+                    if (WoW.CanCast("HalfMoon") && WoW.CurrentAstralPower <= 80)
                     {
                         WoW.CastSpell("HalfMoon");
                         return;
                     }
                     // actions.ed+=/full_moon,if=astral_power<=60&((cooldown.incarnation.remains>65&cooldown.full_moon.charges>0)|(cooldown.incarnation.remains>50&cooldown.full_moon.charges>1)|(cooldown.incarnation.remains>25&cooldown.full_moon.charges>2))
-                    if (WoW.CanCast("FullMoon") && WoW.CurrentAstralPower <= 60&&((Incarnation && WoW.SpellCooldownTimeRemaining("Incarnation") > 65 && WoW.PlayerSpellCharges("FullMoon") > 0) || (WoW.SpellCooldownTimeRemaining("Incarnation") > 50 && WoW.PlayerSpellCharges("FullMoon") > 1) || (WoW.SpellCooldownTimeRemaining("Incarnation") > 25 && WoW.PlayerSpellCharges("FullMoon") > 2))) ;
+                    if (WoW.CanCast("FullMoon") && WoW.CurrentAstralPower <= 60&&((Incarnation && WoW.SpellCooldownTimeRemaining("Incarnation") > 65 && WoW.PlayerSpellCharges("FullMoon") > 0) || (WoW.SpellCooldownTimeRemaining("Incarnation") > 50 && WoW.PlayerSpellCharges("FullMoon") > 1) || (WoW.SpellCooldownTimeRemaining("Incarnation") > 25 && WoW.PlayerSpellCharges("FullMoon") > 2)))
                     {
                         WoW.CastSpell("FullMoon");
                         return;
                     }
                     // actions.ed+=/solar_wrath,if=buff.solar_empowerment.up
-                    if (WoW.CanCast("SolarW") && WoW.PlayerHasBuff("SolarEmp")) ;
+                    if (WoW.CanCast("SolarW") && WoW.PlayerHasBuff("SolarEmp")) 
                     {
                         WoW.CastSpell("SolarW");
                         return;
                     }
                     // actions.ed+=/lunar_strike,if=buff.lunar_empowerment.up
-                    if (WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp")) ;
+                    if (WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp"))
                     {
                         WoW.CastSpell("LStrike");
                         return;
                     }
                     // actions.ed+=/solar_wrath
-                    if (WoW.CanCast("SolarW")) ;
+                    if (WoW.CanCast("SolarW"))
                     {
                         WoW.CastSpell("SolarW");
                         return;
@@ -745,9 +747,10 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Oneths progged starfall if have buff Oneth'ss Overconfidence
-                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence")) ;
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence"))
                     {
                         WoW.CastSpell("Starfall");
+                        Log.Write("Starfall 1", Color.Red);
                         return;
                     }
                     // Under Celestial Alignment
@@ -769,14 +772,14 @@ namespace PixelMagic.Rotation
 						if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerHasBuff("SolarEmp"))
 						{
 							WoW.CastSpell("SolarW");
-                            Thread.Sleep(100);
+                            
                             return;
 						}
 						// Lunar Strike at 3 solar empowerement
 						if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp"))
 						{
 							WoW.CastSpell("LStrike");
-                            Thread.Sleep(100);
+                            
                             return;
 						}
 						// Solar Wrath if natures balance and betwean 5-2seconds left on sunfire
@@ -787,7 +790,7 @@ namespace PixelMagic.Rotation
 							&& WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
 						{
 							WoW.CastSpell("SolarW");
-                            Thread.Sleep(100);
+                            
                             return;
 						}
 						// Lunar Strike if natures abalnce and betwean 5-2seconds left on moonfire
@@ -798,7 +801,7 @@ namespace PixelMagic.Rotation
 							&& WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
 						{
 							WoW.CastSpell("LStrike");
-                            Thread.Sleep(100);
+                            
                             return;
 						}
 						// StellarFlare if not in target
@@ -876,14 +879,14 @@ namespace PixelMagic.Rotation
 						if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerHasBuff("SolarEmp"))
 						{
 							WoW.CastSpell("SolarW");
-                            Thread.Sleep(100);
+                            
                             return;
 						}
 						// Lunar Strike at 3 solar empowerement
 						if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp"))
 						{
 							WoW.CastSpell("LStrike");
-                            Thread.Sleep(100);
+                            
                             return;
 						}
 						// Solar Wrath if natures balance and betwean 5-2seconds left on sunfire
@@ -928,7 +931,7 @@ namespace PixelMagic.Rotation
                         if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp") && !WoW.PlayerHasBuff("SolarEmp"))
                         {
                             WoW.CastSpell("LStrike");
-                            Thread.Sleep(100);
+                            
                             return;
                         }
                         // New Moon
@@ -965,7 +968,7 @@ namespace PixelMagic.Rotation
                         if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW"))
 						{
 							WoW.CastSpell("SolarW");
-                            Thread.Sleep(100);
+                            
                             return;
 						}
                         return;
@@ -1029,23 +1032,24 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Oneths progged starfall if have buff Oneth'ss Overconfidence
-                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence")) ;
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence"))
                     {
                         WoW.CastSpell("Starfall");
+                        Log.Write("Starfall 2", Color.Red);
                         return;
                     }
                     // Solar Wrath at 3 solar empowerement
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerHasBuff("SolarEmp"))
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Lunar Strike at 3 solar empowerement
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp"))
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
 					// Solar Wrath if natures balance and betwean 5-2seconds left on sunfire
@@ -1056,7 +1060,7 @@ namespace PixelMagic.Rotation
                         && WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Lunar Strike if natures abalnce and betwean 5-2seconds left on moonfire
@@ -1067,14 +1071,14 @@ namespace PixelMagic.Rotation
                         && WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Cast LunarStrike if no SolarEmp and have LunarEmp
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp") && !WoW.PlayerHasBuff("SolarEmp"))
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // StellarFlare if no StellarFlare
@@ -1132,7 +1136,7 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW"))
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
 				}
@@ -1152,23 +1156,24 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Oneths progged starfall if have buff Oneth'ss Overconfidence
-                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence")) ;
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence"))
                     {
                         WoW.CastSpell("Starfall");
+                        Log.Write("Starfall 3", Color.Red);
                         return;
                     }
                     // Solar Wrath at 3 solar empowerement
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerHasBuff("SolarEmp"))
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Lunar Strike at 3 solar empowerement
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp"))
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
 					// Solar Wrath if natures balance and betwean 5-2seconds left on sunfire
@@ -1179,7 +1184,7 @@ namespace PixelMagic.Rotation
                         && WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Lunar Strike if natures abalnce and betwean 5-2seconds left on moonfire
@@ -1190,14 +1195,14 @@ namespace PixelMagic.Rotation
                         && WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Cast LunarStrike if no SolarEmp and have LunarEmp
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp") && !WoW.PlayerHasBuff("SolarEmp"))
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // StellarFlare if no StellarFlare
@@ -1255,7 +1260,7 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW"))
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
 				}
@@ -1283,17 +1288,10 @@ namespace PixelMagic.Rotation
                 // Main single target rotation
                 if (WoW.IsInCombat && WoW.HasTarget&& WoW.TargetIsEnemy&&WoW.PlayerHasBuff("Moonkin")&&!WoW.IsMoving)
                 {
-                    // KBW if in use
-                    if (KBW && !WoW.ItemOnCooldown("KBW") && WoW.IsSpellInRange("LStrike"))
-                    {
-                        WoW.CastSpell("KBW");
-                        return;
-                    }
                     // Owlkin Frenzy
                     if (WoW.PlayerHasBuff("OwlkinFrenzy"))
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
                         return;
                     }
                     // Priority execute order
@@ -1376,14 +1374,12 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerBuffStacks("SolarEmp") == 3)
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
                         return;
                     }
                     // Lunar Strike at 3 solar empowerement
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerBuffStacks("LunarEmp") == 3)
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
                         return;
                     }
                     // Moonfire if not on target
@@ -1462,9 +1458,10 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Oneths progged starfall if have buff Oneth'ss Overconfidence
-                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence")) ;
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence"))
                     {
                         WoW.CastSpell("Starfall");
+                        Log.Write("Starfall 4", Color.Red);
                         return;
                     }
                     // Starsurge
@@ -1477,7 +1474,7 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerBuffStacks("SolarEmp") <= 1)
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Solar Wrath if natures balance and betwean 5-2seconds left on sunfire
@@ -1488,7 +1485,6 @@ namespace PixelMagic.Rotation
                         && WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
                         return;
                     }
                     // Lunar Strike if natures abalnce and betwean 5-2seconds left on moonfire
@@ -1499,21 +1495,20 @@ namespace PixelMagic.Rotation
                         && WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
                         return;
                     }
                     // Cast LunarStrike if no SolarEmp and have LunarEmp
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp") && !WoW.PlayerHasBuff("SolarEmp"))
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Cast SolarWrath when nothing else to do
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW"))
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     return;
@@ -1530,7 +1525,6 @@ namespace PixelMagic.Rotation
                     if (WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 2.5)
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
                         return;
                     }
                     if (WoW.CanCast("Moon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 1.2)
@@ -1546,7 +1540,6 @@ namespace PixelMagic.Rotation
                     if (WoW.CanCast("SolarW") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 2)
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
                         return;
                     }
 
@@ -1559,9 +1552,10 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Oneths progged starfall if have buff Oneth'ss Overconfidence
-                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence")) ;
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence"))
                     {
                         WoW.CastSpell("Starfall");
+                        Log.Write("Starfall 5", Color.Red);
                         return;
                     }
                     if (WoW.IsSpellInRange("Moonfire") && WoW.CanCast("Moonfire") && !WoW.TargetHasDebuff("Moonfire"))
@@ -1582,7 +1576,7 @@ namespace PixelMagic.Rotation
                 if (!WoW.PlayerIsCasting && WoW.IsInCombat && WoW.CanCast("Moonkin") && !WoW.PlayerHasBuff("Moonkin"))
                 {
                     WoW.CastSpell("Moonkin");
-                    Thread.Sleep(100);
+                    
                     return;
                 }
                 // Cooldown rotation
@@ -1643,7 +1637,7 @@ namespace PixelMagic.Rotation
                     if (StellarDrift && WoW.IsMoving && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 2.5)
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     if (StellarDrift && WoW.IsMoving && WoW.CanCast("Moon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 1.2)
@@ -1694,7 +1688,7 @@ namespace PixelMagic.Rotation
                     if (WoW.CanCast("LStrike") && WoW.PlayerHasBuff("StarfallP"))
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                 }
@@ -1715,7 +1709,7 @@ namespace PixelMagic.Rotation
                     if (WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 2.5)
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     if (WoW.CanCast("Moon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 1.2)
@@ -1739,7 +1733,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Stellar Drift
-                    if (StellarDrift && StarfallMacro && WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 60)
+                    if (StellarDrift && StarfallMacro && WoW.CanCast("Starfall") && WoW.CurrentAstralPower >= 60 && WoW.CurrentAstralPower >= 60)
                     {
                         WoW.CastSpell("Starfall");
                         return;
@@ -1754,14 +1748,14 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerHasBuff("SolarEmp"))
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Lunar Strike at 3 solar empowerement
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp"))
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
 					// Solar Wrath if natures balance and betwean 5-2seconds left on sunfire
@@ -1772,7 +1766,7 @@ namespace PixelMagic.Rotation
                         && WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Lunar Strike if natures abalnce and betwean 5-2seconds left on moonfire
@@ -1783,7 +1777,7 @@ namespace PixelMagic.Rotation
                         && WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // StellarFlare if no StellarFlare
@@ -1799,7 +1793,7 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike"))
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
 				}
@@ -1828,14 +1822,14 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp"))
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
 					// Solar Wrath at 3 solar empowerement
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerHasBuff("SolarEmp"))
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
 					// Solar Wrath if natures balance and betwean 5-2seconds left on sunfire
@@ -1846,7 +1840,7 @@ namespace PixelMagic.Rotation
                         && WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Lunar Strike if natures abalnce and betwean 5-2seconds left on moonfire
@@ -1857,7 +1851,7 @@ namespace PixelMagic.Rotation
                         && WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // StellarFlare if no StellarFlare
@@ -1873,7 +1867,7 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike"))
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
 				}
@@ -1987,14 +1981,14 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerBuffStacks("LunarEmp") == 3)
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Solar Wrath at 3 solar empowerement
                     if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerBuffStacks("SolarEmp") == 3)
                     {
                         WoW.CastSpell("SolarW");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Moonfire if not on target
@@ -2070,7 +2064,7 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerBuffStacks("LunarEmp") <= 1)
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Lunar Strike if natures abalnce and betwean 5-2seconds left on moonfire
@@ -2081,14 +2075,14 @@ namespace PixelMagic.Rotation
                         && WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
                     // Cast Lunar Strike when nothing else to do
                     if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike"))
                     {
                         WoW.CastSpell("LStrike");
-                        Thread.Sleep(100);
+                        
                         return;
                     }
 
