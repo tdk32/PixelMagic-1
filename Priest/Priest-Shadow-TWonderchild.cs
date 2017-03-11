@@ -1,4 +1,8 @@
-﻿using System.Diagnostics;
+﻿//-TWonderchilds Shadow Priest
+//-ToDo:    - Cooldown Hotkeys
+//          - UseCooldown
+//          - AoE Rotation
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Threading;
@@ -121,9 +125,9 @@ namespace PixelMagic.Rotation
         public override void Pulse()
         {
             if (WoW.IsInCombat)
-            {
                 interruptwatch.Start();
-            }
+            else
+                return;
 
             if (combatRoutine.Type != RotationType.SingleTarget && combatRoutine.Type != RotationType.AOE) return;
             if (!WoW.HasTarget || !WoW.TargetIsEnemy) return;
@@ -161,31 +165,31 @@ namespace PixelMagic.Rotation
 
         private void SingleTargetRotation()
         {
-            if (!WoW.PlayerHasBuff(VOIDFORM_AURA) && WoW.Insanity >= 65 && !WoW.IsMoving)
+            if (!WoW.PlayerHasBuff(VOIDFORM_AURA) && WoW.Insanity >= 65 && !WoW.IsMoving && DotsUp())
                 SpellCast(VOID_ERUPTION);
 
-            if(WoW.PlayerHasBuff(VOIDFORM_AURA))
+            if(WoW.PlayerHasBuff(VOIDFORM_AURA) && DotsUp())
             {
                 if(!WoW.IsMoving)
                     SpellCast(VOID_TORRENT);
                 SpellCast(VOID_BOLT);
             }
-            
-            if(!WoW.IsMoving)
+
+            if (!WoW.IsMoving && DotsUp())
                 SpellCast(MIND_BLAST);
 
-            if(WoW.PlayerSpellCharges(SHADOW_WORD_DEATH) == 2 && WoW.Insanity <= 80 && WoW.TargetHealthPercent <= 20)
+            if(WoW.PlayerSpellCharges(SHADOW_WORD_DEATH) == 2 && WoW.Insanity <= 80 && WoW.TargetHealthPercent <= 20 && DotsUp())
                 SpellCast(SHADOW_WORD_DEATH);
-            if (WoW.PlayerSpellCharges(SHADOW_WORD_DEATH) == 1 && WoW.Insanity <= int.Parse(SWDText.Text) && WoW.TargetHealthPercent <= 20)
+            if (WoW.PlayerSpellCharges(SHADOW_WORD_DEATH) == 1 && WoW.Insanity <= int.Parse(SWDText.Text) && WoW.TargetHealthPercent <= 20 && DotsUp())
                 SpellCast(SHADOW_WORD_DEATH);
 
-            if ((!WoW.TargetHasDebuff(VAMPIRIC_TOUCH) || WoW.TargetDebuffTimeRemaining(VAMPIRIC_TOUCH) <= 4) && !WoW.IsMoving && WoW.LastSpell!= VAMPIRIC_TOUCH && WoW.IsSpellOnCooldown(MIND_BLAST)) //Messy workaround to fix the double VT-Cast, since addon/BLizz API is returning weird values
+            if ((!WoW.TargetHasDebuff(VAMPIRIC_TOUCH) || WoW.TargetDebuffTimeRemaining(VAMPIRIC_TOUCH) <= 4) && !WoW.IsMoving && WoW.LastSpell!= VAMPIRIC_TOUCH) //Messy workaround to fix the double VT-Cast, since addon/BLizz API is returning weird values
                 SpellCast(VAMPIRIC_TOUCH);
                 
-            if ((!WoW.TargetHasDebuff(SHADOW_WORD_PAIN) || WoW.TargetDebuffTimeRemaining(SHADOW_WORD_PAIN) <= 3) && WoW.IsSpellOnCooldown(MIND_BLAST))
+            if ((!WoW.TargetHasDebuff(SHADOW_WORD_PAIN) || WoW.TargetDebuffTimeRemaining(SHADOW_WORD_PAIN) <= 3))
                 SpellCast(SHADOW_WORD_PAIN);
             
-            if(WoW.TargetHasDebuff(SHADOW_WORD_PAIN) && WoW.TargetHasDebuff(VAMPIRIC_TOUCH) && !WoW.IsMoving)
+            if(WoW.TargetHasDebuff(SHADOW_WORD_PAIN) && WoW.TargetHasDebuff(VAMPIRIC_TOUCH) && !WoW.IsMoving && WoW.IsSpellOnCooldown(MIND_BLAST))
                 SpellCast(MIND_FLAY);
         }
 
@@ -234,6 +238,14 @@ namespace PixelMagic.Rotation
             if (WoW.PlayerHasBuff("Drums of Fury"))
                 return WoW.PlayerBuffTimeRemaining("Drums of Fury");
             return 0;
+        }
+
+        private bool DotsUp()
+        {
+            if (WoW.TargetHasDebuff(SHADOW_WORD_PAIN) && WoW.TargetHasDebuff(VAMPIRIC_TOUCH))
+                return true;
+            else
+                return false;
         }
     }
 }
