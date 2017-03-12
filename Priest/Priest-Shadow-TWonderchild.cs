@@ -1,6 +1,5 @@
 ﻿//-TWonderchilds Shadow Priest
-//-ToDo:    - Cooldown Hotkeys
-//          - UseCooldown
+//-ToDo:
 //          - AoE Rotation
 using System.Diagnostics;
 using System.Drawing;
@@ -48,10 +47,13 @@ namespace PixelMagic.Rotation
         private CheckBox SFWaitBox;
         private TextBox SFWaitText;
         private CheckBox SFPIBox;
+        private CheckBox VoidTorrentBox;
         private TextBox SWDText;
         private TextBox PWSText;
         private TextBox VEText;
         private CheckBox SilenceBox;
+        private RadioButton VoidTorrentRadio1;
+        private RadioButton VoidTorrentRadio2;
         //--------------------------//
 
         private readonly Stopwatch interruptwatch = new Stopwatch();
@@ -77,27 +79,25 @@ namespace PixelMagic.Rotation
             Log.WritePixelMagic("Surrender to Madness is not supported.", Color.Black);
             Log.WritePixelMagic("This CR is not finished yet - Check the ToDo-List before reporting bugs/requesting features", Color.Black);
 
-            SettingsForm = new Form { Text = "Shadow Priest Settings", StartPosition = FormStartPosition.CenterScreen, Height = 320, Width = 360 };
-            SettingsForm.Show();
-            SettingsForm.ControlBox = false;
+            SettingsForm = new Form { Text = "Shadow Priest Settings", StartPosition = FormStartPosition.CenterScreen, Height = 340, Width = 360 };
             var labelCooldowns = new Label { Text = "Cooldown Usage", Size = new Size(180, 20), Left = 8, Top = 10 };
             SettingsForm.Controls.Add(labelCooldowns);
-            UseCDBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(380, 20), Left = 10, Top = 30, Text = "Use Cooldowns" };
-            SettingsForm.Controls.Add(UseCDBox);
-            PIBloodlustBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(380, 20), Left = 25, Top = 50, Text = "Use Power Infusion with Bloodlust (Ignores other Conditions)" };
+            PIBloodlustBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(380, 20), Left = 25, Top = 30, Text = "Use Power Infusion with Bloodlust (Ignores other Conditions)" };
             SettingsForm.Controls.Add(PIBloodlustBox);
-            PIStacksBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(380, 20), Left = 25, Top = 70, Text = "Use Power Infusion at 20 Voidform Stacks" };
+            PIStacksBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(380, 20), Left = 25, Top = 50, Text = "Use Power Infusion at 20 Voidform Stacks" };
             SettingsForm.Controls.Add(PIStacksBox);
-            PIWaitBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(275, 20), Left = 25, Top = 90, Text = "Use PI and ignore Stacks if Shadow Fiend CD > " };
+            PIWaitBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(275, 20), Left = 25, Top = 70, Text = "Use PI and ignore Stacks if Shadow Fiend CD > " };
             SettingsForm.Controls.Add(PIWaitBox);
-            PIWaitText = new TextBox { Size = new Size(30, 20), Left = 300, Top = 90, Text = "20"};
+            PIWaitText = new TextBox { Size = new Size(30, 20), Left = 300, Top = 70, Text = "20"};
             SettingsForm.Controls.Add(PIWaitText);
-            SFPIBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(380, 20), Left = 25, Top = 110, Text = "Use Shadow Fiend at 12 Sec Bloodlust/Power Infusion"};
+            SFPIBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(380, 20), Left = 25, Top = 90, Text = "Use Shadow Fiend at 12 Sec Bloodlust/Power Infusion"};
             SettingsForm.Controls.Add(SFPIBox);
-            SFWaitBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(275, 20), Left = 25, Top = 130, Text = "Use Shadow Fiend if Power Infusion CD > " };
+            SFWaitBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(275, 20), Left = 25, Top = 110, Text = "Use Shadow Fiend if Power Infusion CD > " };
             SettingsForm.Controls.Add(SFWaitBox);
-            SFWaitText = new TextBox { Size = new Size(30, 20), Left = 300, Top = 130, Text = "20" };
+            SFWaitText = new TextBox { Size = new Size(30, 20), Left = 300, Top = 110, Text = "20" };
             SettingsForm.Controls.Add(SFWaitText);
+            VoidTorrentBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(275, 20), Left = 25, Top = 130, Text = "Use Void Torrent" };
+            SettingsForm.Controls.Add(VoidTorrentBox);
             var labelRotation = new Label { Text = "Rotation", Size = new Size(180, 20), Left = 8, Top = 150 };
             SettingsForm.Controls.Add(labelRotation);
             var labelSWD = new Label { Text = "Use 2nd SWD Stack if Insanity drops below ", Size = new Size(225, 20), Left = 8, Top = 170 };
@@ -116,6 +116,10 @@ namespace PixelMagic.Rotation
             SettingsForm.Controls.Add(VEText);
             SilenceBox = new CheckBox { Checked = true, TabIndex = 1, Size = new Size(380, 20), Left = 10, Top = 250, Text = "Auto Silence" };
             SettingsForm.Controls.Add(SilenceBox);
+            VoidTorrentRadio1 = new RadioButton { TabIndex = 1, Size = new Size(200, 20), Left=10, Top=270, Text= "Use VT as CD",};
+            SettingsForm.Controls.Add(VoidTorrentRadio1);
+            VoidTorrentRadio2 = new RadioButton { Checked = true, TabIndex = 1, Size = new Size(200, 20), Left = 210, Top = 270, Text = "Use VT in Rota" };
+            SettingsForm.Controls.Add(VoidTorrentRadio2);
         }
         //--------------------------//
         public override void Stop()
@@ -170,7 +174,7 @@ namespace PixelMagic.Rotation
 
             if(WoW.PlayerHasBuff(VOIDFORM_AURA) && DotsUp())
             {
-                if(!WoW.IsMoving)
+                if(!WoW.IsMoving && VoidTorrentRadio2.Checked)
                     SpellCast(VOID_TORRENT);
                 SpellCast(VOID_BOLT);
             }
@@ -209,7 +213,7 @@ namespace PixelMagic.Rotation
 
         private void CooldownUsage()
         {
-            if (!UseCDBox.Checked)
+            if (!UseCooldowns)
                 return;
             if (PIBloodlustBox.Checked && CheckBloodlust() >= 20)
                 SpellCast(POWER_INFUSION);
@@ -221,6 +225,8 @@ namespace PixelMagic.Rotation
                 SpellCast(SHADOW_FIEND);
             if (SFWaitBox.Checked && WoW.IsSpellOnCooldown(POWER_INFUSION) && WoW.SpellCooldownTimeRemaining(POWER_INFUSION) > int.Parse(SFWaitText.Text))
                 SpellCast(SHADOW_FIEND);
+            if (!WoW.IsMoving && VoidTorrentRadio1.Checked && DotsUp() && VoidTorrentBox.Checked)
+                SpellCast(VOID_TORRENT);
         }
 
         private int CheckBloodlust()
@@ -249,7 +255,6 @@ namespace PixelMagic.Rotation
         }
     }
 }
-
 
 /*
 [AddonDetails.db]
