@@ -77,7 +77,8 @@ namespace PixelMagic.Rotation
             Log.DrawHorizontalLine();
             Log.WritePixelMagic("Please use the following Talents: http://eu.battle.net/wow/en/tool/talent-calculator#Xba!0100000", Color.Black);
             Log.WritePixelMagic("Surrender to Madness is not supported.", Color.Black);
-            Log.WritePixelMagic("This CR is not finished yet - Check the ToDo-List before reporting bugs/requesting features", Color.Black);
+            Log.WritePixelMagic("Check the ToDo-List before reporting bugs/requesting features", Color.Black);
+            Log.WritePixelMagic("Cooldown Hotkey: F7", Color.Black);
 
             SettingsForm = new Form { Text = "Shadow Priest Settings", StartPosition = FormStartPosition.CenterScreen, Height = 340, Width = 360 };
             var labelCooldowns = new Label { Text = "Cooldown Usage", Size = new Size(180, 20), Left = 8, Top = 10 };
@@ -124,10 +125,14 @@ namespace PixelMagic.Rotation
         //--------------------------//
         public override void Stop()
         {
+            if (DetectKeyPress.GetKeyState(0x76) < 0)
+                UseCooldowns = !UseCooldowns;
         }
         //-Pulse--------------------//
         public override void Pulse()
         {
+            if (DetectKeyPress.GetKeyState(0x76) < 0)
+                UseCooldowns = !UseCooldowns;
             if (WoW.IsInCombat)
                 interruptwatch.Start();
             else
@@ -255,7 +260,6 @@ namespace PixelMagic.Rotation
         }
     }
 }
-
 /*
 [AddonDetails.db]
 AddonAuthor=TWonderchild
