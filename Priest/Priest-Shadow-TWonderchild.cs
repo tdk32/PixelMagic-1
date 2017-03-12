@@ -1,4 +1,4 @@
-﻿//-TWonderchilds Shadow Priest
+//-TWonderchilds Shadow Priest
 //-ToDo:
 //          - AoE Rotation
 using System.Diagnostics;
@@ -147,12 +147,6 @@ namespace PixelMagic.Rotation
                 SpellCast(POWER_WORD_SHIELD);
                 return;
             }
-            if (WoW.HealthPercent < int.Parse(VEText.Text) && !WoW.IsSpellOnCooldown(VAMPIRIC_EMBRACE))
-            {
-                Log.Write("Health below " + VEText.Text + "% - Using Vampiric Embrace now", Color.Red);
-                SpellCast(VAMPIRIC_EMBRACE);
-                return;
-            }
             if (SilenceBox.Checked && WoW.TargetIsCastingAndSpellIsInterruptible && interruptwatch.ElapsedMilliseconds > 900)
             {
                 if (!WoW.IsSpellOnCooldown(SILENCE))
@@ -232,6 +226,12 @@ namespace PixelMagic.Rotation
                 SpellCast(SHADOW_FIEND);
             if (!WoW.IsMoving && VoidTorrentRadio1.Checked && DotsUp() && VoidTorrentBox.Checked)
                 SpellCast(VOID_TORRENT);
+            if (WoW.HealthPercent < int.Parse(VEText.Text) && !WoW.IsSpellOnCooldown(VAMPIRIC_EMBRACE))
+            {
+                Log.Write("Health below " + VEText.Text + "% - Using Vampiric Embrace now", Color.Red);
+                SpellCast(VAMPIRIC_EMBRACE);
+                return;
+            }
         }
 
         private int CheckBloodlust()
@@ -263,12 +263,12 @@ namespace PixelMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=TWonderchild
-AddonName=PostaI
+AddonName=Pawner
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,232698,Shadowform,NumPad9
 Spell,34914,Vampiric Touch,D1
-Spell,15286,Vampiric Embrace,Numpad6
+Spell,15286,Vampiric Embrace,NumPad6
 Spell,589,Shadow Word: Pain,D2
 Spell,32379,Shadow Word: Death,X
 Spell,8092,Mind Blast,D3
