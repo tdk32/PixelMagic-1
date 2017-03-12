@@ -437,9 +437,9 @@ namespace PixelMagic.Rotation
             if (RangeLib == false)
             {
                 RangeLibCopy();
+                Thread.Sleep(350);
                 WoW.Reload();
             }
-            Thread.Sleep(350);
         }
         private void AddonEdit()
         {
