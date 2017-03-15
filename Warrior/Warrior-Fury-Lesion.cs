@@ -175,7 +175,7 @@ namespace PixelMagic.Rotation
 								&& WoW.Rage <= 85)
 							{WoW.CastSpell("Whirlwind"); return;}
 							
-							if (WoW.CanCast("Whirlwind")
+							/*if (WoW.CanCast("Whirlwind")
 								&& TFZFMint
 								&& WoW.Rage <= 99
 								&& !WoW.CanCast("Bloodthirst")
@@ -193,7 +193,7 @@ namespace PixelMagic.Rotation
 								)
 							{WoW.CastSpell("Whirlwind"); return;}
 								
-								
+								*/
 							}
 						
 						
@@ -201,17 +201,12 @@ namespace PixelMagic.Rotation
                         if (TFZFMint)
                         {
                             if (WoW.CanCast("Rampage")
-                                && WoW.Rage >= 100)
+                                && WoW.Rage > 99)
                             { WoW.CastSpell("Rampage"); return; }
 
                             if (WoW.CanCast("Bloodthirst")
                                 && !WoW.PlayerHasBuff("Enrage"))
                             { WoW.CastSpell("Bloodthirst"); return; }
-
-                            if (WoW.CanCast("Execute")
-								&& WoW.TargetHealthPercent <= 20
-                                && WoW.IsSpellOverlayed("Execute") || WoW.Rage >= 25)
-                            { WoW.CastSpell("Execute"); return; }
 
                             if (WoW.CanCast("Raging Blow")
 								&& WoW.Rage <= 85
