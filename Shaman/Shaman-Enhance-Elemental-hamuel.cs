@@ -1,5 +1,4 @@
-﻿/* * #ShowToolTip   /cast [@cursor] Earthquake *  * #ShowToolTip
-/cast [@cursor] Liquid Magma Totem
+﻿/* * #ShowToolTip   /cast [@cursor] Earthquake *  * #ShowToolTip/cast [@cursor] Liquid Magma Totem
  * 
  * 
  * 
@@ -8,14 +7,16 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using System;
+using System.Text;
 using System.Threading;
 using PixelMagic.Helpers;
+using System.Data;
 using System.IO;
-
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PixelMagic.Rotation
-{
+{//Data tables
     public struct targetinfo_data
     {
         public bool Melee;
@@ -33,7 +34,7 @@ namespace PixelMagic.Rotation
         public totem_data(bool p1, int p2)
         {
             Active = p1;
-            Duration= p2;
+            Duration = p2;
         }
     }
     public struct Tank_data
@@ -144,7 +145,6 @@ namespace PixelMagic.Rotation
             Race = race;
         }
     }
-  
     public struct dbm_data
     {
         public int Timer;
@@ -182,15 +182,14 @@ namespace PixelMagic.Rotation
         private targetinfo_data TargetInfo = new targetinfo_data();
         private totem_data Totem = new totem_data();
         public static int Alt = 1, Ctrl = 2, Shift = 3, None = 4;
-
+        private static DataTable dtColorHelper;
         private static readonly Random getrandom = new Random();
         private char_data CharInfo = new char_data();
-        public Stopwatch BoulderFist = new Stopwatch();
-        public Stopwatch BoulderFist2 = new Stopwatch();
         public Stopwatch Crash = new Stopwatch();
         public Stopwatch Pets = new Stopwatch();
-        public string[] Race = new string[]
-            {"None","Human","Dwarf", "NightElf", "Gnome", "Dreanei", "Pandaren", "Orc", "Undead", "Tauren", "Troll", "BloodElf", "Goblin","none"};
+        public Stopwatch Rotation = new Stopwatch();
+        private string[] Race = new string[]
+            {"None","Human","Dwarf", "NightElf", "Gnome", "Dreanei", "Pandaren", "Orc", "Undead", "Tauren", "Troll", "BloodElf", "Goblin", "Worgen" ,"none"};
         public string[] Spec = new string[]
          {"None","Blood", "Frost", "Unholy", "Havoc", "Vengeance", "Balance", "Feral", "Guardian", "Restoration", "Beast Mastery", "Marksmanship", "Survival", "Arcane", "Fire", "Frost", "Brewmaster", "Mistweaver", "Windwalker", "Holy", "Protection", "Retribution", "Discipline", "HolyPriest", "Shadow", "Assassination", "Outlaw", "Subtlety", "Elemental", "Enhancement", "RestorationShaman", "Affliction", "Arms", "Fury", "Protection","Demonology","Destruction","none"};
 
@@ -211,6 +210,45 @@ namespace PixelMagic.Rotation
             Log.Write("Welcome to Enhancement Shaman by Hamuel", Color.Green);
             Log.Write("Detect talents/race/spec/ST/AOE/Interrupt", Color.Green);
             Log.Write("version " + Revision, Color.Green);
+            dtColorHelper = new DataTable();
+            dtColorHelper.Columns.Add("Percent");
+            dtColorHelper.Columns.Add("Unrounded");
+            dtColorHelper.Columns.Add("Rounded");
+            dtColorHelper.Columns.Add("Value");
+
+            for (var i = 0; i <= 99; i++)
+            {
+                var drNew = dtColorHelper.NewRow();
+                drNew["Percent"] = i < 10 ? "0.0" + i : "0." + i;
+                drNew["Unrounded"] = double.Parse(drNew["Percent"].ToString()) * 255;
+                drNew["Rounded"] = Math.Round(double.Parse(drNew["Percent"].ToString()) * 255, 0);
+                drNew["Value"] = i;
+                dtColorHelper.Rows.Add(drNew);
+            }
+            {
+                var drNew = dtColorHelper.NewRow();
+                drNew["Percent"] = "1.00";
+                drNew["Unrounded"] = "255";
+                drNew["Rounded"] = "255";
+                drNew["Value"] = 100;
+                dtColorHelper.Rows.Add(drNew);
+            }
+            {
+                var drNew = dtColorHelper.NewRow();
+                drNew["Percent"] = "1.00";
+                drNew["Unrounded"] = "255";
+                drNew["Rounded"] = "77"; // Manually added from testing this color sometimes shows up 
+                drNew["Value"] = 30;
+                dtColorHelper.Rows.Add(drNew);
+            }
+            {
+                var drNew = dtColorHelper.NewRow();
+                drNew["Percent"] = "1.00";
+                drNew["Unrounded"] = "255";
+                drNew["Rounded"] = "179"; // Manually added from testing this color sometimes shows up 
+                drNew["Value"] = 70;
+                dtColorHelper.Rows.Add(drNew);
+            }
         }
         private async void AsyncPulse()
         {
@@ -232,9 +270,9 @@ namespace PixelMagic.Rotation
                 for (int i = 1; i <= players; i++)
                 {
                     if (players >= 21 && i >= 21)
-                        pixelColor = WoW.GetBlockColor(i - 20, 20);
+                        pixelColor = WoW.GetBlockColor(i - 20, 23);
                     else
-                        pixelColor = WoW.GetBlockColor(i, 19);
+                        pixelColor = WoW.GetBlockColor(i, 22);
 
                     PartyInfo[i].Hp = Convert.ToInt32(pixelColor.R) * 100 / 255;
                     PartyInfo[i].Roll = Convert.ToInt32(pixelColor.B) * 100 / 255;
@@ -293,7 +331,7 @@ namespace PixelMagic.Rotation
                         LowInfo.Hp = PartyInfo[i].Hp;
                         LowInfo.Range = true;
                         for (int b = 1; b < RipNum; b++)
-                       if (PartyRip[b].Location == i)
+                            if (PartyRip[b].Location == i)
                             {
                                 LowInfo.Riptide = true;
                                 LowInfo.Dur = PartyRip[b].Dur;
@@ -324,28 +362,28 @@ namespace PixelMagic.Rotation
                 Color pixelColor = Color.FromArgb(0);
                 int postive = 0;
                 int spec, race;
-                pixelColor = WoW.GetBlockColor(1, 21);
+                pixelColor = WoW.GetBlockColor(1, 24);
                 CharInfo.T1 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
                 CharInfo.T2 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
                 CharInfo.T3 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) * 100 / 255));
-                pixelColor = WoW.GetBlockColor(2, 21);
+                pixelColor = WoW.GetBlockColor(2, 24);
                 CharInfo.T4 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
                 CharInfo.T5 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
                 CharInfo.T6 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) * 100 / 255));
-                pixelColor = WoW.GetBlockColor(3, 21);
+                pixelColor = WoW.GetBlockColor(3, 24);
                 CharInfo.T7 = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
                 spec = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
                 race = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) * 100 / 255));
-                pixelColor = WoW.GetBlockColor(4, 21);
+                pixelColor = WoW.GetBlockColor(4, 24);
                 CharInfo.Mana = (Convert.ToSingle(pixelColor.B) * 100 / 255);
-                postive = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) / 255));
-                if ((Convert.ToDouble(pixelColor.B) == 255))
+                postive = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) / 255));
+                if ((Convert.ToDouble(pixelColor.G) == 255))
                     hastePct = 0f;
                 else
                 if (postive == 1)
-                    hastePct = (Convert.ToSingle(pixelColor.R) * 100f / 255f) * (-1);
-                else
                     hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f);
+                else
+                    hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f)*(-1);
                 if (race > 13)
                     race = 0;
                 if (spec > 34)
@@ -354,6 +392,7 @@ namespace PixelMagic.Rotation
                 CharInfo.Race = Race[race];
                 CharInfo.Spec = Spec[spec];
                 //Log.Write(" T1 " + CharInfo.T1 + " T2 " + CharInfo.T2 + " T3 " + CharInfo.T3 + " T4 " + CharInfo.T4 + " T5 " + CharInfo.T5 + " T6 " + CharInfo.T6 + " T7 " + CharInfo.T7);
+                //Log.Write("4,24 R: " + (Convert.ToSingle(pixelColor.G) * 100f / 255f));
                 //Log.Write("Char Haste " + hastePct + " Mana :" + CharInfo.Mana + " Race : " +CharInfo.Race + " Spec : "  +CharInfo.Spec ) ;
             });
         }
@@ -363,7 +402,7 @@ namespace PixelMagic.Rotation
             await Task.Run(() =>
             {
                 Color pixelColor = Color.FromArgb(0);
-                pixelColor = WoW.GetBlockColor(11, 20);
+                pixelColor = WoW.GetBlockColor(11, 23);
                 players = 1;
 
                 if (Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R)) * 100 / 255) > 0)
@@ -374,7 +413,7 @@ namespace PixelMagic.Rotation
                     players = 30;
                 if (players <= 5)
                     players = players - 1;
-         
+
                 npcCount = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255));
                 if (Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.B) / 255)) == 1)
                     Nameplates = true;
@@ -390,7 +429,7 @@ namespace PixelMagic.Rotation
             await Task.Run(() =>
             {
                 Color pixelColor = Color.FromArgb(0);
-                pixelColor = WoW.GetBlockColor(6, 21);
+                pixelColor = WoW.GetBlockColor(6, 24);
                 //Log.Write("Block 6,21 R: "+Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R ) / 255)) +" block 7,21 G " + Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.G) * 100 / 255)));
                 if (Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) / 255)) == 1)
                 {
@@ -412,12 +451,12 @@ namespace PixelMagic.Rotation
             await Task.Run(() =>
             {
                 Color pixelColor = Color.FromArgb(0);
-                pixelColor = WoW.GetBlockColor(7, 21);
+                pixelColor = WoW.GetBlockColor(7, 24);
                 if (Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) / 255)) == 1)
                 {
                     Totem.Active = true;
                     Totem.Duration = Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) * 100 / 255));
-                } 
+                }
                 else
                 {
                     Totem.Active = false;
@@ -431,7 +470,7 @@ namespace PixelMagic.Rotation
             await Task.Run(() =>
             {
                 Color pixelColor = Color.FromArgb(0);
-                pixelColor = WoW.GetBlockColor(8, 21);
+                pixelColor = WoW.GetBlockColor(8, 24);
                 if (Convert.ToInt32(Math.Round(Convert.ToSingle(pixelColor.R) / 255)) == 1)
                     TargetInfo.Melee = true;
                 else
@@ -441,12 +480,12 @@ namespace PixelMagic.Rotation
                 else
                     TargetInfo.Range = false;
                 //Log.Write("Target Melee : " + TargetInfo.Melee + "Mouse over :" + TargetInfo.Range);
-        
+
 
 
             });
         }
-        
+
 
         private void Totems()
         {
@@ -463,7 +502,7 @@ namespace PixelMagic.Rotation
                 return;
             }
 
-            if (CharInfo.T6 == 2 &&WoW.CanCast("Cloudburst Totem") && !WoW.PlayerIsChanneling) //drop cloudburst in combat
+            if (CharInfo.T6 == 2 && WoW.CanCast("Cloudburst Totem") && !WoW.PlayerIsChanneling) //drop cloudburst in combat
             {
                 WoW.CastSpell("Cloudburst Totem");
                 return;
@@ -654,7 +693,7 @@ namespace PixelMagic.Rotation
                 default:
                     break;
             }
-    
+
 
         }
         private void Riptide_Update()
@@ -662,7 +701,7 @@ namespace PixelMagic.Rotation
             Color pixelColor = Color.FromArgb(0);
             for (int i = 0; i < RipNum; i++)
             {
-                pixelColor = WoW.GetBlockColor(12 + i, 20);
+                pixelColor = WoW.GetBlockColor(12 + i, 23);
                 if ((Convert.ToDouble(pixelColor.R) * 100 / 255) <= 30)
                 {
                     PartyRip[i].Active = true;
@@ -684,7 +723,7 @@ namespace PixelMagic.Rotation
         {
             if (!WoW.IsSpellOnCooldown("Riptide"))
             {
-                if (WoW.HealthPercent + TankLow < RiptidePct && (WoW.PlayerHasBuff("Riptide") || WoW.PlayerBuffTimeRemaining("Riptide") < 4.2))
+                if (WoW.HealthPercent + TankLow < RiptidePct && (PlayerHasBuff("Riptide") || PlayerBuffTimeRemaining("Riptide") < 420))
                 {
                     CastByLocation(LocationPlayer, Alt);
                     WoW.CastSpell("Riptide");
@@ -694,7 +733,7 @@ namespace PixelMagic.Rotation
 
                 for (int b = 0; b < TankNum; b++)
                 {
-                    if (TanksInfo[b].Active && TanksInfo[b].Hp < RiptidePct && (TanksInfo[b].Riptide && TanksInfo[b].Dur < 4.2))
+                    if (TanksInfo[b].Active && TanksInfo[b].Hp < RiptidePct && (TanksInfo[b].Riptide && TanksInfo[b].Dur < 420))
                     {
                         Log.Write("Player Cast riptide On tank" + b);
                         CastByLocation(TanksInfo[b].Location, Alt);
@@ -815,17 +854,17 @@ namespace PixelMagic.Rotation
         }
         private void RestoDMG()
         {
-            if (WoW.CanCast("Flame Shock") && !WoW.IsSpellOnCooldown("Flame Shock") && (!WoW.PlayerHasBuff("Flame Shock") || WoW.TargetDebuffTimeRemaining("Flame Shock") <= GCD)) //interupt every spell, not a boss.
+            if (WoW.CanCast("Flame Shock") && !WoW.IsSpellOnCooldown("Flame Shock") && (!PlayerHasBuff("Flame Shock") || TargetDebuffTimeRemaining("Flame Shock") <= GCD)) //interupt every spell, not a boss.
             {
                 WoW.CastSpell("Flame Shock");
                 return;
             }
-            if (WoW.CanCast("Lava Burst") && !WoW.IsSpellOnCooldown("Lava Burst") && (WoW.PlayerHasBuff("Flame Shock") || WoW.TargetDebuffTimeRemaining("Flame Shock") <= GCD)) //interupt every spell, not a boss.
+            if (WoW.CanCast("Lava Burst") && !WoW.IsSpellOnCooldown("Lava Burst") && (PlayerHasBuff("Flame Shock") || TargetDebuffTimeRemaining("Flame Shock") <= GCD)) //interupt every spell, not a boss.
             {
                 WoW.CastSpell("Lava Burst");
                 return;
             }
-            if (WoW.CanCast("Lightning Bolt") && !WoW.IsSpellOnCooldown("Lightning Bolt") && (WoW.PlayerHasBuff("Flame Shock") || WoW.TargetDebuffTimeRemaining("Flame Shock") <= GCD)) //interupt every spell, not a boss.
+            if (WoW.CanCast("Lightning Bolt") && !WoW.IsSpellOnCooldown("Lightning Bolt") && (PlayerHasBuff("Flame Shock") || TargetDebuffTimeRemaining("Flame Shock") <= GCD)) //interupt every spell, not a boss.
             {
                 WoW.CastSpell("Lightning Bolt");
                 return;
@@ -859,45 +898,17 @@ namespace PixelMagic.Rotation
         {
             get
             {
-                if (Convert.ToSingle(1.5f / (1 + (hastePct / 100f))) > .75f)
+                if (Convert.ToSingle(150f / (1 + (hastePct / 100f))) > 75f)
                 {
-                    return Convert.ToSingle(1.5f / (1 + (hastePct / 100f)));
+                    return Convert.ToSingle(150f / (1 + (hastePct / 100f)));
                 }
                 else
                 {
-                    return .75f;
+                    return 75f;
                 }
             }
         }
-       private static bool setBonus2Pc
-        {
-            get
-            {
-                var control = WoW.GetBlockColor(9, 21);
-                if (Convert.ToInt32(Math.Round(Convert.ToSingle(control.G))) == 0 && Convert.ToInt32(Math.Round(Convert.ToSingle(control.R) * 100 / 255)) >= 2)
-                {
 
-                    return true;
-                }
-                else
-                    return false;
-            }
-        }
-        private static bool setBonus4Pc
-        {
-            get
-            {
-                var control = WoW.GetBlockColor(9, 21);
-                //Log.Write("Bonus location: " + Convert.ToInt32(Math.Round(Convert.ToSingle(control.R) * 100 / 255)));
-                if (Convert.ToInt32(Math.Round(Convert.ToSingle(control.G))) == 0 && Convert.ToInt32(Math.Round(Convert.ToSingle(control.R) * 100 / 255)) >= 4)
-                {
-                    
-                    return true;
-                }
-                else
-                    return false;
-            }
-        }
         private void interruptcast()
         {
             Random random = new Random();
@@ -921,19 +932,10 @@ namespace PixelMagic.Rotation
                 }
             }
         }
-        private void Feral_spirit()
-        {
-            if (WoW.CanCast("Feral Spirit", true, true, false, false, true) && WoW.Maelstrom >= 20 && (WoW.CanCast("Crash Lightning", true, true, false, false, true) || WoW.SpellCooldownTimeRemaining("Crash Lightning") < GCD)) //feral spirit on boss - normally cast manually
-            {
-                Pets.Start();
-                Log.Write("Using Feral Spirit", Color.Red);
-                WoW.CastSpell("Feral Spirit");
-                 return;
-            }
-        }
+
         private void DBMPrePull()
         {
-            if (DBM.On && DBM.Timer <= 18 && DBM.Timer > 0 && WoW.HasTarget) 
+            if (DBM.On && DBM.Timer <= 18 && DBM.Timer > 0 && WoW.HasTarget)
             {
                 if (!WoW.ItemOnCooldown("Prolonged Power"))
                 {
@@ -956,7 +958,7 @@ namespace PixelMagic.Rotation
         }
         private void Defensive()
         {
-            if (CharInfo.T2 == 1 && WoW.CanCast("Rainfall") && !WoW.PlayerHasBuff("Rainfall") && !WoW.IsSpellOnCooldown("Rainfall")) //ASTRAL SHIFT - DMG REDUCTION if we are below 60% of HP
+            if (CharInfo.T2 == 1 && WoW.CanCast("Rainfall") && !PlayerHasBuff("Rainfall") && !WoW.IsSpellOnCooldown("Rainfall")) //ASTRAL SHIFT - DMG REDUCTION if we are below 60% of HP
             {
                 WoW.CastSpell("Rainfall");
                 return;
@@ -966,11 +968,11 @@ namespace PixelMagic.Rotation
                  WoW.CastSpell("Healing Surge");
                  return;
              }*/
-                if (WoW.CanCast("Astral Shift") && WoW.HealthPercent < 60 && !WoW.IsSpellOnCooldown("Astral Shift")) //ASTRAL SHIFT - DMG REDUCTION if we are below 60% of HP
-                {
-                    WoW.CastSpell("Astral Shift");
-                    return;
-                }
+            if (WoW.CanCast("Astral Shift") && WoW.HealthPercent < 60 && !WoW.IsSpellOnCooldown("Astral Shift")) //ASTRAL SHIFT - DMG REDUCTION if we are below 60% of HP
+            {
+                WoW.CastSpell("Astral Shift");
+                return;
+            }
             if (CharInfo.Race == "Dreanei" && WoW.HealthPercent < 80 && !WoW.IsSpellOnCooldown("Gift Naaru"))
             {
                 WoW.CastSpell("Gift Naaru");
@@ -978,19 +980,19 @@ namespace PixelMagic.Rotation
         }
         private void Stuns()
         {
-               if ( !WoW.PlayerIsCasting)
+            if (!WoW.PlayerIsCasting)
+            {
+                if (WoW.CanCast("Lightning Surge") && !WoW.IsSpellOnCooldown("Lightning Surge") && CharInfo.T3 == 1)
                 {
-                    if (WoW.CanCast("Lightning Surge") && !WoW.IsSpellOnCooldown("Lightning Surge") && CharInfo.T3 == 1)
-                    {
-                        WoW.CastSpell("Lightning Surge");
-                        return;
-                    }
-                    if (CharInfo.Race == "Tauren​" && !WoW.IsMoving && WoW.CanCast("War Stomp") && !WoW.IsSpellOnCooldown("War Stomp") && (CharInfo.T3 != 1 || (WoW.IsSpellOnCooldown("Lightning Surge") && CharInfo.T3 == 1)))
-                    {
-                        WoW.CastSpell("War Stomp");
-                        return;
-                    }
+                    WoW.CastSpell("Lightning Surge");
+                    return;
                 }
+                if (CharInfo.Race == "Tauren​" && !IsMoving && WoW.CanCast("War Stomp") && !WoW.IsSpellOnCooldown("War Stomp") && (CharInfo.T3 != 1 || (WoW.IsSpellOnCooldown("Lightning Surge") && CharInfo.T3 == 1)))
+                {
+                    WoW.CastSpell("War Stomp");
+                    return;
+                }
+            }
         }
         private void DPSRacial()
         {
@@ -998,14 +1000,14 @@ namespace PixelMagic.Rotation
             {
                 // actions +=/ berserking,if= buff.ascendance.up | !talent.ascendance.enabled | level < 100
                 // actions +=/ blood_fury
-                if (CharInfo.Race == "Troll" && WoW.CanCast("Berserking") && !WoW.IsSpellOnCooldown("Berserking") && (CharInfo.T7 != 1 || WoW.PlayerHasBuff("Ascendance")))
+                if (CharInfo.Race == "Troll" && WoW.CanCast("Berserking") && !WoW.IsSpellOnCooldown("Berserking") && (CharInfo.T7 != 1 || PlayerHasBuff("Ascendance")))
                 {
                     WoW.CastSpell("Berserking");
                     return;
                 }
                 // actions +=/ blood_fury,if= !talent.ascendance.enabled | buff.ascendance.up | cooldown.ascendance.remains > 50
                 if (CharInfo.Race == "Orc" && WoW.CanCast("Blood Fury") && !WoW.IsSpellOnCooldown("Blood Fury")
-               && (CharInfo.T7 != 1 || WoW.PlayerHasBuff("Ascendance") | WoW.SpellCooldownTimeRemaining("Ascendance") > 50))
+               && (CharInfo.T7 != 1 || PlayerHasBuff("Ascendance") | GetCooldownTimeRemaining("Ascendance") > 5000))
                 {
                     WoW.CastSpell("Blood Fury");
                     return;
@@ -1016,7 +1018,7 @@ namespace PixelMagic.Rotation
         //actions +=/ potion,name = prolonged_power,if= feral_spirit.remains > 5 | target.time_to_die <= 60
         private void UsePotion()
         {
-            if (Pets.Elapsed.Seconds < 5 && !WoW.ItemOnCooldown("Prolonged Power") )
+            if (Pets.Elapsed.Seconds < 5 && !WoW.ItemOnCooldown("Prolonged Power"))
             {
                 WoW.CastSpell("Prolonged Power");
                 return;
@@ -1027,17 +1029,7 @@ namespace PixelMagic.Rotation
         }
         private void TimerReset()
         {
-             if (BoulderFist.ElapsedMilliseconds > 6f * (1 + hastePct / 100f) *.75 * 1000)
-            {
-                BoulderFist.Reset();
-                Log.Write("Timer 1 reset");
-            }
-            if (BoulderFist2.ElapsedMilliseconds > 6f * (1 + hastePct / 100f) *.75 * 1000)
-            {
-                BoulderFist2.Reset();
-                Log.Write("Timer 2 reset");
-            }
-
+           
             if (Healstream.Elapsed.Seconds > 15)
             {
                 Healstream.Reset();
@@ -1060,6 +1052,10 @@ namespace PixelMagic.Rotation
                     combatRoutine.ChangeType(RotationType.SingleTarget);
             }
         }
+        /// <summary>
+        /// elemental rotation stuff
+        /// </summary>
+        /// <returns></returns>
         private async Task ElementalConsistantUse()
         {
             if (CharInfo.Spec == "Elemental")
@@ -1072,7 +1068,7 @@ namespace PixelMagic.Rotation
                     WoW.CastSpell("Totem Mastery");
                     return;
                 }*/
-                if (CharInfo.T1 == 3 &&WoW.CanCast("Totem Mastery") && (!Totem.Active || Totem.Duration < 2))
+                if (CharInfo.T1 == 3 && WoW.CanCast("Totem Mastery") && (!Totem.Active || Totem.Duration < 2))
                 {
                     WoW.CastSpell("Totem Mastery");
                     return;
@@ -1084,7 +1080,7 @@ namespace PixelMagic.Rotation
                     return;
                 }
                 //ations +=/ storm_elemental
-                if (CharInfo.T6 == 2 && WoW.CanCast("Storm Elemental", true, true, false, false, true)&& UseCooldowns)
+                if (CharInfo.T6 == 2 && WoW.CanCast("Storm Elemental", true, true, false, false, true) && UseCooldowns)
                 {
                     WoW.CastSpell("Storm Elemental");
                     return;
@@ -1101,7 +1097,7 @@ namespace PixelMagic.Rotation
                 RotationType[1] = Elemental_Icefury();
                 RotationType[2] = Elemental_LightRod();
                 await Task.WhenAll(RotationType);
-                
+
             }
         }
         private async Task Elemental_Icefury()
@@ -1109,144 +1105,147 @@ namespace PixelMagic.Rotation
             await Task.Run(() =>
             {
 
-                if (CharInfo.T7 == 3) { 
+                if (CharInfo.T7 == 3)
+                {
                     //actions.single_if=flame_shock,if=!ticking
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true) && !WoW.TargetHasDebuff("Flame Shock"))
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
                     }
-                //actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up&maelstrom>=86
-                if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great")
-                && WoW.Maelstrom >= 86)
-                {
-                    WoW.CastSpell("Earthquake");
-                    return;
-                }
-                //actions.single_if+=/frost_shock,if=buff.Icefury.up&maelstrom>=86
-                if (WoW.CanCast("Frost Shock", true, true, true, false, true) && WoW.PlayerHasBuff("Icefury") && WoW.Maelstrom >= 86)
-                {
-                    WoW.CastSpell("Frost Shock");
-                    return;
-                }
-                //actions.single_if+=/earth_shock,if=maelstrom>=92
-                if (WoW.CanCast("Earth Shock", true, true, true, false, true) && WoW.Maelstrom >= 92)
-                {
-                    WoW.CastSpell("Earth Shock");
-                    return;
-                }
-                //actions.single_if +=/ stormkeeper,if= raid_event.adds.count < 3 | raid_event.adds.in> 50
-                if (WoW.CanCast("Stormkeeper", true, true, false, false, true)&& !WoW.PlayerHasBuff("Icefury") && !WoW.IsMoving)
+                    //actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up&maelstrom>=86
+                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great")
+                    && WoW.Maelstrom >= 86)
+                    {
+                        WoW.CastSpell("Earthquake");
+                        return;
+                    }
+                    //actions.single_if+=/frost_shock,if=buff.Icefury.up&maelstrom>=86
+                    if (WoW.CanCast("Frost Shock", true, true, true, false, true) && PlayerHasBuff("Icefury") && WoW.Maelstrom >= 86)
+                    {
+                        WoW.CastSpell("Frost Shock");
+                        return;
+                    }
+                    //actions.single_if+=/earth_shock,if=maelstrom>=92
+                    if (WoW.CanCast("Earth Shock", true, true, true, false, true) && WoW.Maelstrom >= 92)
+                    {
+                        WoW.CastSpell("Earth Shock");
+                        return;
+                    }
+                    //actions.single_if +=/ stormkeeper,if= raid_event.adds.count < 3 | raid_event.adds.in> 50
+                    if (WoW.CanCast("Stormkeeper", true, true, false, false, true) && !PlayerHasBuff("Icefury") && !IsMoving)
 
-                {
-                    WoW.CastSpell("Stormkeeper");
-                    return;
-                }
+                    {
+                        WoW.CastSpell("Stormkeeper");
+                        return;
+                    }
 
-                //actions.single_if+=/elemental_blast
-                if (WoW.CanCast("Elemental Blast", true, true, true, false, true) && CharInfo.T5 == 3 && !WoW.IsMoving)
-                {
-                    WoW.CastSpell("Elemental Blast");
-                    return;
-                }
-                //actions.single_if+=/Icefury,if=raid_event.movement.in<5|maelstrom<=76
-                if (WoW.CanCast("Icefury", true, true, true, false, true) && CharInfo.T7 == 3 && WoW.Maelstrom <= 76 && !WoW.IsMoving && !WoW.PlayerHasBuff("Stormkeeper"))
-                {
-                    WoW.CastSpell("Icefury");
-                    return;
-                }
-                //actions.single_if+=/liquid_magma_totem,if=raid_event.adds.count<3|raid_event.adds.in>50
-                if (WoW.CanCast("Liquid Magma", true, true, false, false, true) && CharInfo.T6 == 1 && TargetInfo.Range)
-                {
-                    WoW.CastSpell("Liquid Magma");
-                    return;
-                }
-                //actions.single_if+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&buff.stormkeeper.up&spell_targets.chain_lightning<3
-                if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && (WoW.PlayerHasBuff("Power of the Maelstrom")
-                || WoW.PlayerHasBuff("Stormkeeper")) && combatRoutine.Type != RotationType.AOE && !WoW.IsMoving)
-                {
-                    WoW.CastSpell("Lightning Bolt");
-                    return;
-                }
-                //actions.single_if+=/lava_burst,if=dot.flame_shock.remains>cast_time&cooldown_react
-                if (WoW.CanCast("Lava Burst", true, true, true, false, true) && WoW.TargetDebuffTimeRemaining("Flame Shock") > 2.0f / (1 + (hastePct / 100f)) && (!WoW.IsMoving || WoW.IsMoving && WoW.PlayerHasBuff("Lava Surge")))
-                {
-                    WoW.CastSpell("Lava Burst");
-                    return;
-                }
-                //actions.single_if+=/frost_shock,
-                //if=buff.Icefury.up&( (maelstrom>=20&raid_event.movement.in>buff.Icefury.remains)
-                //|buff.Icefury.remains<(1.5*spell_haste*buff.Icefury.stack+1))
-                if (WoW.CanCast("Frost Shock", true, true, true, false, true)
-                && (WoW.PlayerHasBuff("Icefury") && WoW.Maelstrom >= 20&& WoW.IsMoving) || WoW.PlayerHasBuff("Icefury") && WoW.PlayerBuffTimeRemaining("Icefury") < GCD * WoW.PlayerSpellCharges("Icefury") + 1)
-                {
-                    WoW.CastSpell("Frost Shock");
-                    return;
-                }
-                //actions.single_if+=/flame_shock,if=maelstrom>=20&buff.elemental_focus.up,target_if=refreshable
-                if (WoW.CanCast("Flame Shock", true, true, true, false, true) && WoW.Maelstrom >= 20 && WoW.TargetDebuffTimeRemaining("Flame Shock") < 4.5 && WoW.PlayerHasBuff("Elemental Focus"))
-                {
-                    WoW.CastSpell("Flame Shock");
-                    return;
-                }
-                //actions.single_if+=/frost_shock,moving=1,if=buff.Icefury.up
-                if (WoW.CanCast("Frost Shock", true, true, true, false, true)
-                && (WoW.PlayerHasBuff("Icefury") && WoW.PlayerHasBuff("Icefury") && WoW.IsMoving))
-                {
-                    WoW.CastSpell("Frost Shock");
-                    return;
-                }
-                //actions.single_if+=/earth_shock,if=maelstrom>=86
-                if (WoW.CanCast("Earth Shock", true, true, true, false, true)
-                 && WoW.Maelstrom >= 86)
-                {
-                    WoW.CastSpell("Earth Shock");
-                    return;
-                }
+                    //actions.single_if+=/elemental_blast
+                    if (WoW.CanCast("Elemental Blast", true, true, true, false, true) && CharInfo.T5 == 3 && !IsMoving)
+                    {
+                        WoW.CastSpell("Elemental Blast");
+                        return;
+                    }
+                    //actions.single_if+=/Icefury,if=raid_event.movement.in<5|maelstrom<=76
+                    if (WoW.CanCast("Icefury", true, true, true, false, true) && CharInfo.T7 == 3 && WoW.Maelstrom <= 76 && !IsMoving && !PlayerHasBuff("Stormkeeper"))
+                    {
+                        WoW.CastSpell("Icefury");
+                        return;
+                    }
+                    //actions.single_if+=/liquid_magma_totem,if=raid_event.adds.count<3|raid_event.adds.in>50
+                    if (WoW.CanCast("Liquid Magma", true, true, false, false, true) && CharInfo.T6 == 1 && TargetInfo.Range)
+                    {
+                        WoW.CastSpell("Liquid Magma");
+                        return;
+                    }
+                    //actions.single_if+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&buff.stormkeeper.up&spell_targets.chain_lightning<3
+                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && (PlayerHasBuff("Power of the Maelstrom")
+                    || PlayerHasBuff("Stormkeeper")) && combatRoutine.Type != RotationType.AOE && !IsMoving)
+                    {
+                        WoW.CastSpell("Lightning Bolt");
+                        return;
+                    }
+                    //actions.single_if+=/lava_burst,if=dot.flame_shock.remains>cast_time&cooldown_react
+                    if (WoW.CanCast("Lava Burst", true, true, true, false, true) && TargetDebuffTimeRemaining("Flame Shock") > 200f / (1 + (hastePct / 100f)) && (!IsMoving || IsMoving && PlayerHasBuff("Lava Surge")))
+                    {
+                        WoW.CastSpell("Lava Burst");
+                        return;
+                    }
+                    //actions.single_if+=/frost_shock,
+                    //if=buff.Icefury.up&( (maelstrom>=20&raid_event.movement.in>buff.Icefury.remains)
+                    //|buff.Icefury.remains<(1.5*spell_haste*buff.Icefury.stack+1))
+                    if (WoW.CanCast("Frost Shock", true, true, true, false, true)
+                    && (PlayerHasBuff("Icefury") && WoW.Maelstrom >= 20 && IsMoving) || PlayerHasBuff("Icefury") && PlayerBuffTimeRemaining("Icefury") < GCD * WoW.PlayerSpellCharges("Icefury") + 1)
+                    {
+                        WoW.CastSpell("Frost Shock");
+                        return;
+                    }
+                    //actions.single_if+=/flame_shock,if=maelstrom>=20&buff.elemental_focus.up,target_if=refreshable
+                    if (WoW.CanCast("Flame Shock", true, true, true, false, true) && WoW.Maelstrom >= 20 && TargetDebuffTimeRemaining("Flame Shock") < 450 && PlayerHasBuff("Elemental Focus"))
+                    {
+                        WoW.CastSpell("Flame Shock");
+                        return;
+                    }
+                    //actions.single_if+=/frost_shock,moving=1,if=buff.Icefury.up
+                    if (WoW.CanCast("Frost Shock", true, true, true, false, true)
+                    && (PlayerHasBuff("Icefury") && PlayerHasBuff("Icefury") && IsMoving))
+                    {
+                        WoW.CastSpell("Frost Shock");
+                        return;
+                    }
+                    //actions.single_if+=/earth_shock,if=maelstrom>=86
+                    if (WoW.CanCast("Earth Shock", true, true, true, false, true)
+                     && WoW.Maelstrom >= 86)
+                    {
+                        WoW.CastSpell("Earth Shock");
+                        return;
+                    }
                     //actions.single_if+=/totem_mastery,if=buff.resonance_totem.remains<10
                     //actions.single_asc+=/totem_mastery,if=buff.resonance_totem.remains<10|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15)
-                    if (CharInfo.T1== 3&&WoW.CanCast("Totem Mastery") && (!Totem.Active || Totem.Duration < 10))
+                    if (CharInfo.T1 == 3 && WoW.CanCast("Totem Mastery") && (!Totem.Active || Totem.Duration < 10))
                     {
                         WoW.CastSpell("Totem Mastery");
                         return;
                     }
                     //actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up
-                    if (WoW.CanCast("Earthquake", true, true, false, false, true)  && WoW.TargetHasDebuff("Echoes of the Great"))
-                {
-                    WoW.CastSpell("Earthquake");
-                    return;
+                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great"))
+                    {
+                        WoW.CastSpell("Earthquake");
+                        return;
+                    }
+                    //actions.single_if+=/chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1
+                    if (WoW.CanCast("Chain Lightning", true, true, true, false, true) && combatRoutine.Type != RotationType.SingleTarget
+                     && !IsMoving)
+                    {
+                        WoW.CastSpell("Chain Lightning");
+                        return;
+                    }
+                    // actions.single_if +=/ lightning_bolt
+                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && !IsMoving)
+                    {
+                        WoW.CastSpell("Lightning Bolt");
+                        return;
+                    }
+                    //actions.single_if+=/flame_shock,moving=1,target_if=refreshable
+                    if (WoW.CanCast("Flame Shock", true, true, true, false, true)
+                    && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")) && IsMoving)
+                    {
+                        WoW.CastSpell("Flame Shock");
+                        return;
+                    }
+                    if (WoW.CanCast("Earth Shock", true, true, false, false, true) && IsMoving && WoW.Maelstrom >= 10)
+                    {
+                        WoW.CastSpell("Earth Shock");
+                        return;
+                    }
                 }
-                //actions.single_if+=/chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1
-                if (WoW.CanCast("Chain Lightning", true, true, true, false, true) && combatRoutine.Type != RotationType.SingleTarget
-                 && !WoW.IsMoving)
-                {
-                    WoW.CastSpell("Chain Lightning");
-                    return;
-                }
-                // actions.single_if +=/ lightning_bolt
-                if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && !WoW.IsMoving)
-                {
-                    WoW.CastSpell("Lightning Bolt");
-                    return;
-                }
-                //actions.single_if+=/flame_shock,moving=1,target_if=refreshable
-                if (WoW.CanCast("Flame Shock", true, true, true, false, true)
-                && (WoW.TargetDebuffTimeRemaining("Flame Shock") < 4.5 || !WoW.TargetHasDebuff("Flame Shock")) && WoW.IsMoving)
-                {
-                    WoW.CastSpell("Flame Shock");
-                    return;
-                }
-                if (WoW.CanCast("Earth Shock", true, true, false, false, true) && WoW.IsMoving && WoW.Maelstrom >= 10)
-                {
-                    WoW.CastSpell("Earth Shock");
-                    return;
-                }
-            }});
+            });
         }
         private async Task Elemental_LightRod()
         {
             await Task.Run(() =>
-            {if (CharInfo.T7 == 2)
+            {
+                if (CharInfo.T7 == 2)
                 {
                     //actions.single_lr+=/flame_shock,if=maelstrom>=20
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true)
@@ -1274,7 +1273,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     //actions.single_asc+=/elemental_blast
-                    if (WoW.CanCast("Elemental Blast", true, true, true, false, true) && CharInfo.T5 == 3 && !WoW.IsMoving)
+                    if (WoW.CanCast("Elemental Blast", true, true, true, false, true) && CharInfo.T5 == 3 && !IsMoving)
                     {
                         WoW.CastSpell("Elemental Blast");
                         return;
@@ -1287,14 +1286,14 @@ namespace PixelMagic.Rotation
                     }
                     //actions.single_lr+=/lava_burst,if=dot.flame_shock.remains>cast_time&cooldown_react
                     if (WoW.CanCast("Lava Burst", true, true, true, false, true)
-                    && (WoW.TargetDebuffTimeRemaining("Flame Shock") > 2f / (1 + (hastePct / 100f))))
+                    && (TargetDebuffTimeRemaining("Flame Shock") > 200f / (1 + (hastePct / 100f))))
                     {
                         WoW.CastSpell("Lava Burst");
                         return;
                     }
                     //actions.single_Lr+=/flame_shock,if=maelstrom>=20&buff.elemental_focus.up,target_if=refreshable
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true) && WoW.Maelstrom >= 20
-                    && (WoW.TargetDebuffTimeRemaining("Flame Shock") < 4.5 || !WoW.TargetHasDebuff("Flame Shock")) && WoW.PlayerHasBuff("Elemental Focus"))
+                    && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")) && PlayerHasBuff("Elemental Focus"))
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
@@ -1307,15 +1306,15 @@ namespace PixelMagic.Rotation
                     }
 
                     //actions.single_asc+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&buff.stormkeeper.up&spell_targets.chain_lightning<3
-                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && WoW.PlayerHasBuff("Power of the Maelstrom")
-                    && WoW.PlayerHasBuff("Stormkeeper") && !WoW.IsMoving)
+                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && PlayerHasBuff("Power of the Maelstrom")
+                    && PlayerHasBuff("Stormkeeper") && !IsMoving)
                     {
                         WoW.CastSpell("Lightning Bolt");
                         return;
                     }
                     //actions.single_asc+=/lava_burst,if=dot.flame_shock.remains>cast_time
                     if (WoW.CanCast("Lava Burst", true, true, true, false, true)
-                    && (WoW.TargetDebuffTimeRemaining("Flame Shock") > 2f / (1 + (hastePct / 100f))))
+                    && (TargetDebuffTimeRemaining("Flame Shock") > 200f / (1 + (hastePct / 100f))))
                     {
                         WoW.CastSpell("Lava Burst");
                         return;
@@ -1327,7 +1326,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     //actions.single_asc+=/totem_mastery,if=buff.resonance_totem.remains<10|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15)
-                    if (CharInfo.T1==3&&WoW.CanCast("Totem Mastery") && (!Totem.Active || Totem.Duration < 10))
+                    if (CharInfo.T1 == 3 && WoW.CanCast("Totem Mastery") && (!Totem.Active || Totem.Duration < 10))
                     {
                         WoW.CastSpell("Totem Mastery");
                         return;
@@ -1340,36 +1339,36 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Earthquake");
                         return;
                     }
-                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && WoW.PlayerHasBuff("Power of the Maelstrom")
-                    && combatRoutine.Type != RotationType.AOE && !WoW.IsMoving)
+                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && PlayerHasBuff("Power of the Maelstrom")
+                    && combatRoutine.Type != RotationType.AOE && !IsMoving)
                     {
                         WoW.CastSpell("Lightning Bolt");
                         return;
                     }
 
                     //actions.single_lr+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&spell_targets.chain_lightning<3,target_if=debuff.lightning_rod.down
-                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && WoW.PlayerHasBuff("Power of the Maelstrom")
-                    && combatRoutine.Type != RotationType.AOE && !WoW.IsMoving)
+                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && PlayerHasBuff("Power of the Maelstrom")
+                    && combatRoutine.Type != RotationType.AOE && !IsMoving)
                     { //change target
                         WoW.CastSpell("Lightning Bolt");
                         return;
                     }
                     //actions.single_if+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&spell_targets.chain_lightning<3
-                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && WoW.PlayerHasBuff("Power of the Maelstrom")
-                    && combatRoutine.Type != RotationType.AOE && !WoW.IsMoving && combatRoutine.Type != RotationType.AOE)
+                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && PlayerHasBuff("Power of the Maelstrom")
+                    && combatRoutine.Type != RotationType.AOE && !IsMoving && combatRoutine.Type != RotationType.AOE)
                     {
                         WoW.CastSpell("Lightning Bolt");
                         return;
                     }
                     //actions.single_lr+=/chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1,target_if=debuff.lightning_rod.down
                     if (WoW.CanCast("Chain Lightning", true, true, true, false, true) && combatRoutine.Type != RotationType.SingleTarget
-                        && !WoW.TargetHasDebuff("Lightning Rod") && !WoW.IsMoving)
+                        && !WoW.TargetHasDebuff("Lightning Rod") && !IsMoving)
                     {
                         //change target need to add
                     }
                     //actions.single_lr+=/chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1
                     if (WoW.CanCast("Chain Lightning", true, true, true, false, true) && combatRoutine.Type != RotationType.SingleTarget
-                    && !WoW.IsMoving)
+                    && !IsMoving)
                     {
                         WoW.CastSpell("Chain Lightning");
                         return;
@@ -1377,27 +1376,27 @@ namespace PixelMagic.Rotation
 
                     //actions.single_lr+=/lightning_bolt,target_if=debuff.lightning_rod.down
                     if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && !WoW.TargetHasBuff("Lightning Rod")
-                    && !WoW.IsMoving)
+                    && !IsMoving)
                     {
                         //change target
                     }
                     // actions.single_lr +=/ lightning_bolt
-                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && !WoW.IsMoving)
+                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && !IsMoving)
                     {
                         WoW.CastSpell("Lightning Bolt");
                         return;
                     }
-                    
+
                     //actions.single_lr+=/flame_shock,moving=1,target_if=refreshable
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true)
-                    && (WoW.TargetDebuffTimeRemaining("Flame Shock") < 4.5 || !WoW.TargetHasDebuff("Flame Shock")) && WoW.IsMoving)
+                    && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")) && IsMoving)
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
                     }
 
-                    if (WoW.CanCast("Earth Shock", true, true, true, false, true) && WoW.Maelstrom >= 50   && WoW.IsMoving)
-              
+                    if (WoW.CanCast("Earth Shock", true, true, true, false, true) && WoW.Maelstrom >= 50 && IsMoving)
+
                     {
                         WoW.CastSpell("Earth Shock");
                         return;
@@ -1408,14 +1407,15 @@ namespace PixelMagic.Rotation
         private async Task Elemental_MeatBall()
         {
             await Task.Run(() =>
-            {if (CharInfo.T7 == 1)
+            {
+                if (CharInfo.T7 == 1)
                 {
                     //actions.single_asc=ascendance,if=dot.flame_shock.remains>buff.ascendance.duration
                     //&(time >= 60 | buff.bloodlust.up) 
                     // & cooldown.lava_burst.remains > 0 & !buff.stormkeeper.up
                     if (WoW.CanCast("AscendanceEle", true, true, false, false, true)
-                     && (WoW.TargetDebuffTimeRemaining("Flame Shock") > 15)
-                     && (WoW.IsSpellOnCooldown("Lava Burst") && !WoW.PlayerHasBuff("Stormkeeper")) && UseCooldowns)
+                     && (TargetDebuffTimeRemaining("Flame Shock") > 1500)
+                     && (WoW.IsSpellOnCooldown("Lava Burst") && !PlayerHasBuff("Stormkeeper")) && UseCooldowns)
                     {
                         WoW.CastSpell("AscendanceEle");
                         return;
@@ -1424,33 +1424,33 @@ namespace PixelMagic.Rotation
                     //actions.single_asc+=/flame_shock,if=maelstrom>=20
 
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true)
-                    && (WoW.TargetDebuffTimeRemaining("Flame Shock") < 4.5 || !WoW.TargetHasDebuff("Flame Shock")) && WoW.Maelstrom >= 20)
+                    && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")) && WoW.Maelstrom >= 20)
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
                     }
                     //&remains<=buff.ascendance.duration&cooldown.ascendance.remains+buff.ascendance.duration<=duration
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true) && WoW.Maelstrom >= 20
-                        && ( WoW.TargetDebuffTimeRemaining("Flame Shock") <=  WoW.PlayerBuffTimeRemaining("AscendanceEle") && WoW.PlayerHasBuff("AscendanceEle")
-                        || WoW.PlayerBuffTimeRemaining("AscendanceEle") + WoW.SpellCooldownTimeRemaining("AscendanceEle") <= WoW.TargetDebuffTimeRemaining("Flame Shock")))
+                        && (TargetDebuffTimeRemaining("Flame Shock") <= PlayerBuffTimeRemaining("AscendanceEle") && PlayerHasBuff("AscendanceEle")
+                        || PlayerBuffTimeRemaining("AscendanceEle") + GetCooldownTimeRemaining("AscendanceEle") <= TargetDebuffTimeRemaining("Flame Shock")))
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
                     }
                     //actions.single_asc+=/earth_shock,if=maelstrom>=92&!buff.ascendance.up
-                    if (WoW.CanCast("Earth Shock", true, true, true, false, true) && WoW.Maelstrom >= 92 && !WoW.PlayerHasBuff("AscendanceEle"))
+                    if (WoW.CanCast("Earth Shock", true, true, true, false, true) && WoW.Maelstrom >= 92 && !PlayerHasBuff("AscendanceEle"))
                     {
                         WoW.CastSpell("Earth Shock");
                         return;
                     }
                     //actions.single_if +=/ stormkeeper,if= raid_event.adds.count < 3 | raid_event.adds.in> 50
-                    if (WoW.CanCast("Stormkeeper", true, true, false, false, true) && !WoW.PlayerHasBuff("AscendanceEle"))
+                    if (WoW.CanCast("Stormkeeper", true, true, false, false, true) && !PlayerHasBuff("AscendanceEle"))
                     {
                         WoW.CastSpell("Stormkeeper");
                         return;
                     }
                     //actions.single_asc+=/elemental_blast
-                    if (WoW.CanCast("Elemental Blast", true, true, true, false, true) && CharInfo.T5 == 3 && !WoW.IsMoving)
+                    if (WoW.CanCast("Elemental Blast", true, true, true, false, true) && CharInfo.T5 == 3 && !IsMoving)
                     {
                         WoW.CastSpell("Elemental Blast");
                         return;
@@ -1462,21 +1462,21 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     //actions.single_asc+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&buff.stormkeeper.up&spell_targets.chain_lightning<3
-                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && WoW.PlayerHasBuff("Power of the Maelstrom")
-                    && WoW.PlayerHasBuff("Stormkeeper") && combatRoutine.Type != RotationType.AOE && !WoW.IsMoving)
+                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && PlayerHasBuff("Power of the Maelstrom")
+                    && PlayerHasBuff("Stormkeeper") && combatRoutine.Type != RotationType.AOE && !IsMoving)
                     {
                         WoW.CastSpell("Lightning Bolt");
                         return;
                     }
                     //actions.single_asc+=/lava_burst,if=dot.flame_shock.remains>cast_time
                     if (WoW.CanCast("Lava Burst", true, true, true, false, true)
-                    && (WoW.TargetDebuffTimeRemaining("Flame Shock") > 2f / (1 + (hastePct / 100f))))
+                    && (TargetDebuffTimeRemaining("Flame Shock") > 200f / (1 + (hastePct / 100f))))
                     {
                         WoW.CastSpell("Lava Burst");
                         return;
                     }
                     //actions.single_if+=/flame_shock,if=maelstrom>=20&buff.elemental_focus.up,target_if=refreshable
-                    if (WoW.CanCast("Flame Shock", true, true, true, false, true) && WoW.Maelstrom >= 20 && WoW.PlayerHasBuff("Elemental Focus") && (WoW.TargetDebuffTimeRemaining("Flame Shock") < 4.5 || !WoW.TargetHasDebuff("Flame Shock")))
+                    if (WoW.CanCast("Flame Shock", true, true, true, false, true) && WoW.Maelstrom >= 20 && PlayerHasBuff("Elemental Focus") && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")))
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
@@ -1488,7 +1488,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     //actions.single_asc+=/totem_mastery,if=buff.resonance_totem.remains<10|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15)
-                    if (CharInfo.T1 == 3 &&WoW.CanCast("Totem Mastery") && (!Totem.Active || Totem.Duration < 10))
+                    if (CharInfo.T1 == 3 && WoW.CanCast("Totem Mastery") && (!Totem.Active || Totem.Duration < 10))
                     {
                         WoW.CanCast("Totem Mastery");
                         return;
@@ -1503,40 +1503,40 @@ namespace PixelMagic.Rotation
                     }
                     //actions.single_asc+=/lava_beam,if=active_enemies>1&spell_targets.lava_beam>1
                     if (WoW.CanCast("Lava Beam", true, true, true, false, true) && combatRoutine.Type != RotationType.SingleTarget
-                    && WoW.PlayerHasBuff("AscendanceEle"))
+                    && PlayerHasBuff("AscendanceEle"))
                     {
                         WoW.CastSpell("Lava Beam");
                         return;
                     }
 
                     //actions.single_if+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&spell_targets.chain_lightning<3
-                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && WoW.PlayerHasBuff("Power of the Maelstrom")
-                    && combatRoutine.Type != RotationType.AOE && !WoW.IsMoving)
+                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && PlayerHasBuff("Power of the Maelstrom")
+                    && combatRoutine.Type != RotationType.AOE && !IsMoving)
                     {
                         WoW.CastSpell("Lightning Bolt");
                         return;
                     }
                     //actions.single_if+=/chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1
                     if (WoW.CanCast("Chain Lightning", true, true, true, false, true) && combatRoutine.Type != RotationType.SingleTarget
-                    && !WoW.IsMoving)
+                    && !IsMoving)
                     {
                         WoW.CastSpell("Chain Lightning");
                         return;
                     }
                     // actions.single_if +=/ lightning_bolt
-                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && !WoW.IsMoving)
+                    if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && !IsMoving)
                     {
                         WoW.CastSpell("Lightning Bolt");
                         return;
                     }
                     //actions.single_if+=/flame_shock,moving=1,target_if=refreshable
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true)
-                    && (WoW.TargetDebuffTimeRemaining("Flame Shock") < 4.5 || !WoW.TargetHasDebuff("Flame Shock")))
+                    && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")))
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
                     }
-                    if (WoW.CanCast("Earth Shock", true, true, true, false, true) && WoW.IsMoving)
+                    if (WoW.CanCast("Earth Shock", true, true, true, false, true) && IsMoving)
                     {
                         WoW.CastSpell("Earth Shock");
                         return;
@@ -1544,12 +1544,11 @@ namespace PixelMagic.Rotation
                 }
             });
         }
-
         private void Elemental_AOE()
         {
             if (combatRoutine.Type == RotationType.AOE)
             {
-                if (!WoW.IsMoving)
+                if (!IsMoving)
                 {
                     //actions.aoe = stormkeeper
                     if (WoW.CanCast("Stormkeeper", true, true, false, false, true))
@@ -1573,13 +1572,13 @@ namespace PixelMagic.Rotation
                     //& !talent.lightning_rod.enabled,target_if = refreshable
                     if (CharInfo.T7 != 2 && WoW.CanCast("Flame Shock", true, true, true, false, true)
                      && combatRoutine.Type == RotationType.AOE && WoW.Maelstrom >= 20
-                     && (WoW.TargetDebuffTimeRemaining("Flame Shock") < 4.5 || !WoW.TargetHasDebuff("Flame Shock")))
+                     && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")))
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
                     }
                     //actions.aoe +=/ earthquake
-                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.Maelstrom >=50 && TargetInfo.Range)
+                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.Maelstrom >= 50 && TargetInfo.Range)
                     {
                         WoW.CastSpell("Earthquake");
                         return;
@@ -1587,22 +1586,22 @@ namespace PixelMagic.Rotation
                     // actions.aoe +=/ lava_burst,if= dot.flame_shock.remains > cast_time 
                     //& buff.lava_surge.up & !talent.lightning_rod.enabled & spell_targets.chain_lightning < 4
                     if (WoW.CanCast("Lava Burst", true, true, true, false, true)
-                    && (WoW.TargetDebuffTimeRemaining("Flame Shock") > GCD || !WoW.TargetHasDebuff("Flame Shock"))
-                    && WoW.PlayerHasBuff("Lava Surge") && CharInfo.T7 != 2 && combatRoutine.Type == RotationType.AOE)
-            
+                    && (TargetDebuffTimeRemaining("Flame Shock") > GCD || !WoW.TargetHasDebuff("Flame Shock"))
+                    && PlayerHasBuff("Lava Surge") && CharInfo.T7 != 2 && combatRoutine.Type == RotationType.AOE)
+
                     {
                         WoW.CastSpell("Lava Burst");
                         return;
                     }
                     //actions.aoe +=/ elemental_blast,if= !talent.lightning_rod.enabled & spell_targets.chain_lightning < 5
                     if (WoW.CanCast("Elemental Blast", true, true, true, false, true)
-                    && CharInfo.T7 != 7 && CharInfo.T5 == 3 && combatRoutine.Type == RotationType.AOE && npcCount <5)
+                    && CharInfo.T7 != 7 && CharInfo.T5 == 3 && combatRoutine.Type == RotationType.AOE && npcCount < 5)
                     {
                         WoW.CastSpell("Elemental Blast");
                         return;
                     }
                     // actions.aoe +=/ lava_beam
-                    if (WoW.CanCast("Lava Beam", true, true, true, false, true) && WoW.PlayerHasBuff("AscendanceEle"))
+                    if (WoW.CanCast("Lava Beam", true, true, true, false, true) && PlayerHasBuff("AscendanceEle"))
                     {
                         WoW.CastSpell("Lava Beam");
                         return;
@@ -1622,145 +1621,125 @@ namespace PixelMagic.Rotation
                         return;
                     }
                 }
-                if (WoW.IsMoving)
+                if (IsMoving)
                 {
-                   //actions.aoe +=/ lava_burst,moving = 1
+                    //actions.aoe +=/ lava_burst,moving = 1
                     if (WoW.CanCast("Lava Burst", true, true, true, false, true)
-                       && WoW.PlayerHasBuff("Lava Surge"))
-                        {
-                            WoW.CastSpell("Lava Burst");
-                            return;
-                        }
-                        // actions.aoe +=/ flame_shock,moving = 1,target_if = refreshable
-                        if (WoW.CanCast("Flame Shock", true, true, true, false, true)
-                            && (WoW.TargetDebuffTimeRemaining("Flame Shock") < 4.5 || !WoW.TargetHasDebuff("Flame Shock")))
-                        {
-                            WoW.CastSpell("Flame Shock");
-                            return;
-                        }
+                       && PlayerHasBuff("Lava Surge"))
+                    {
+                        WoW.CastSpell("Lava Burst");
+                        return;
+                    }
+                    // actions.aoe +=/ flame_shock,moving = 1,target_if = refreshable
+                    if (WoW.CanCast("Flame Shock", true, true, true, false, true)
+                        && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")))
+                    {
+                        WoW.CastSpell("Flame Shock");
+                        return;
                     }
                 }
+            }
         }
-       
+        private void Feral_spirit()
+        {
+            if (WoW.CanCast("Feral Spirit", true, true, false, false, true) && WoW.Maelstrom >= 20 && (WoW.CanCast("Crash Lightning", true, true, false, false, true) || GetCooldownTimeRemaining("Crash Lightning") < GCD)) //feral spirit on boss - normally cast manually
+            {
+                Pets.Start();
+                Log.Write("Using Feral Spirit", Color.Red);
+                WoW.CastSpell("Feral Spirit");
+                return;
+            }
+        }
         private async Task EnhancementDps()
         {
             await Task.Run(() =>
             {
-            if (CharInfo.Spec == "Enhancement")
-            {
-                 Feral_spirit();
-                //actions +=/ crash_lightning,if= artifact.alpha_wolf.rank & prev_gcd.1.feral_spirit
-                if (WoW.CanCast("Crash Lightning", true, true, false, false, false) && WoW.IsSpellInRange("Stormstrike")
-                    //&& WoW.WildImpsCount > 1
-                    && Pets.IsRunning
-                    && WoW.Maelstrom >= 20
-                    && (Crash.Elapsed.Seconds <= 10 && Crash.IsRunning && Crash.Elapsed.Seconds >= 6 || !Crash.IsRunning))
+                if (CharInfo.Spec == "Enhancement")
                 {
-                    if (!Crash.IsRunning)
-                        Crash.Start();
-                    WoW.CastSpell("Crash Lightning");
-                    return;
-                }
-                
-                // actions +=/ berserking,if= buff.ascendance.up | !talent.ascendance.enabled | level < 100
-                // actions +=/ blood_fury
-                DPSRacial();
+                    Feral_spirit();
+                    //actions +=/ crash_lightning,if= artifact.alpha_wolf.rank & prev_gcd.1.feral_spirit
+                    if (WoW.CanCast("Crash Lightning", true, true, false, false, false) && WoW.IsSpellInRange("Stormstrike")
+                        //&& WoW.WildImpsCount > 1
+                        && Pets.IsRunning
+                        && WoW.Maelstrom >= 20
+                        && (Crash.Elapsed.Seconds <= 10 && Crash.IsRunning && Crash.Elapsed.Seconds >= 6 || !Crash.IsRunning))
+                    {
+                        if (!Crash.IsRunning)
+                            Crash.Start();
+                        WoW.CastSpell("Crash Lightning");
+                        return;
+                    }
+
+                    // a    ctions +=/ berserking,if= buff.ascendance.up | !talent.ascendance.enabled | level < 100
+                    // actions +=/ blood_fury
+                    DPSRacial();
                     //actions +=/ potion,name = prolonged_power,if= feral_spirit.remains > 5 | target.time_to_die <= 60
                     //x UsePotion();
-              /* if (WoW.CanCast("Stormstrike", true, true, true, false, true)
-               && (WoW.Maelstrom >= 135 || WoW.Maelstrom >= 100 && (WoW.PlayerHasBuff("Doom Winds") || Pets.IsRunning)))
-               {
-                        Log.Write("Maelstrom overflow protection", Color.Blue);
-                        WoW.CastSpell("Stormstrike");
-                        return;
-               }
+                    /* if (WoW.CanCast("Stormstrike", true, true, true, false, true)
+                     && (WoW.Maelstrom >= 135 || WoW.Maelstrom >= 100 && (PlayerHasBuff("Doom Winds") || Pets.IsRunning)))
+                     {
+                              Log.Write("Maelstrom overflow protection", Color.Blue);
+                              WoW.CastSpell("Stormstrike");
+                              return;
+                     }
 
-                if (WoW.CanCast("Lava Lash", true, true, true, false, true)
-                && (WoW.Maelstrom >= 135 || WoW.Maelstrom >= 100 && (WoW.PlayerHasBuff("Doom Winds") || Pets.IsRunning)))
-                {
-                   Log.Write("Maelstrom overflow protection",Color.Blue);
-                   WoW.CastSpell("Lava Lash");
-                   return;
-                }*/
-                    
+                      if (WoW.CanCast("Lava Lash", true, true, true, false, true)
+                      && (WoW.Maelstrom >= 135 || WoW.Maelstrom >= 100 && (PlayerHasBuff("Doom Winds") || Pets.IsRunning)))
+                      {
+                         Log.Write("Maelstrom overflow protection",Color.Blue);
+                         WoW.CastSpell("Lava Lash");
+                         return;
+                      }*/
+                    // Log.Write("Buff Time :" +  PlayerBuffTimeRemaining("Flametongue") + " GCD: " + GCD + "Has buff :" + PlayerHasBuff("Flametongue"));
                     // actions +=/ boulderfist,if= buff.boulderfist.remains < gcd | (maelstrom <= 50 & active_enemies >= 3)
-                    //actions +=/ boulderfist,if= buff.boulderfist.remains < gcd | (charges_fractional > 1.75 & maelstrom <= 100 & active_enemies <= 2)
-                    if (CharInfo.T1 == 3 && WoW.CanCast("Boulderfist", true, true, true, false, true)
-                      && (WoW.PlayerBuffTimeRemaining("Boulderfist") <= GCD || !WoW.PlayerHasBuff("Boulderfist"))
+                    if (CharInfo.T1 == 3 && WoW.CanCast("Boulderfist", true, true, true, false, true) && WoW.Maelstrom <= 50
+                      && (PlayerBuffTimeRemaining("Boulderfist") <= GCD || !PlayerHasBuff("Boulderfist"))
                    || (WoW.Maelstrom <= 50 && combatRoutine.Type == RotationType.AOE))
-                   {
-                        if (!BoulderFist.IsRunning && BoulderFist2.IsRunning)
-                        {
-                            BoulderFist.Start();
-                            
-                        }
-                        if (!BoulderFist2.IsRunning && BoulderFist.IsRunning)
-                        {
-                            BoulderFist2.Start();
-                            
-                        }
-                        if (!BoulderFist.IsRunning && !BoulderFist2.IsRunning)
-                        {
-                            BoulderFist.Start();
-                            
-                        }
-                        WoW.CastSpell("Boulderfist"); //boulderfist it to not waste a charge
-                        return;
-                 }
-                    //actions +=/ boulderfist,if= buff.boulderfist.remains < gcd | (charges_fractional > 1.75 & maelstrom <= 100 & active_enemies <= 2)
-                    if (CharInfo.T1 == 3 && WoW.CanCast("Boulderfist", true, true, true, false, true)
-                    && (WoW.Maelstrom <= 100 && (WoW.PlayerSpellCharges("Boulderfist") >= 2
-                    || WoW.PlayerSpellCharges("Boulderfist") >= 1 && (BoulderFist.IsRunning && BoulderFist.ElapsedMilliseconds > (6f * (1 + hastePct / 100f)) * .60 * 100 || BoulderFist2.IsRunning && BoulderFist2.ElapsedMilliseconds > (6f * (1 + hastePct / 100f)) * .60 * 100))
-                    && (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave)))
                     {
-                     
-                        if (!BoulderFist.IsRunning && BoulderFist2.IsRunning)
-                        {
-                            BoulderFist.Start();
-                        }
-                        if (!BoulderFist2.IsRunning && BoulderFist.IsRunning)
-                        { 
-                            BoulderFist2.Start();
-                        }
-                        if (!BoulderFist.IsRunning && !BoulderFist2.IsRunning)
-                        {
-                            BoulderFist.Start();
-                       
-                        }
-
+                        Log.Write("Buff Time :" + PlayerBuffTimeRemaining("Boulderfist") + " GCD: " + GCD+"Has buff :"+ PlayerHasBuff("Boulderfist"));
+                        Log.Write("Boulder fist cast 1");
                         WoW.CastSpell("Boulderfist"); //boulderfist it to not waste a charge
                         return;
                     }
-                   //actions +=/ rockbiter,if=talent.landslide.enabled & buff.landslide.remains < gcd
-                   if (CharInfo.T1 != 3 && CharInfo.T7 == 2 && (!WoW.PlayerHasBuff("Landslide") || WoW.PlayerBuffTimeRemaining("Landslide") < GCD)
-                    && WoW.CanCast("Rockbiter", true, true, true, false, true))
+                    //actions +=/ boulderfist,if= buff.boulderfist.remains < gcd | (charges_fractional > 1.75 & maelstrom <= 100 & active_enemies <= 2)
+                    if (CharInfo.T1 == 3 && WoW.CanCast("Boulderfist", true, true, true, false, true)
+                    && WoW.Maelstrom <= 100 && (WoW.PlayerSpellCharges("Boulderfist") >= 2
+                    || WoW.PlayerSpellCharges("Boulderfist") + (((600 / (1 + hastePct / 100)) - (GetCooldownTimeRemaining("Boulderfist"))) / (600 / (1 + hastePct / 100))) > 1.75)
+                    && combatRoutine.Type != RotationType.AOE)
+                    {
+                        WoW.CastSpell("Boulderfist"); //boulderfist it to not waste a charge
+                        return;
+                    }
+                    //actions +=/ rockbiter,if=talent.landslide.enabled & buff.landslide.remains < gcd
+                    if (CharInfo.T1 != 3 && CharInfo.T7 == 2 && (!PlayerHasBuff("Landslide") || PlayerBuffTimeRemaining("Landslide") < GCD)
+                     && WoW.CanCast("Rockbiter", true, true, true, false, true))
                     {
                         WoW.CastSpell("Rockbiter");
                         return;
                     }
                     //actions +=/ fury_of_air,if= !ticking & maelstrom > 22
-                    if (CharInfo.T6 == 2 && WoW.Maelstrom > 22 && !WoW.PlayerHasBuff("Fury Air") && WoW.CanCast("Fury Air", true, true, false, false, true))
+                    if (CharInfo.T6 == 2 && WoW.Maelstrom >= 22 && !PlayerHasBuff("Fury Air") && WoW.CanCast("Fury Air", true, true, false, false, true))
                     {
                         WoW.CastSpell("Fury Air");
                         return;
                     }
                     //actions +=/ frostbrand,if= talent.hailstorm.enabled & buff.frostbrand.remains < gcd
-                    if (CharInfo.T4 == 3 && WoW.Maelstrom > 20 && WoW.CanCast("Hailstorm", true, true, true, false, true)
-                        && (!WoW.PlayerHasBuff("Frostbrand") || WoW.PlayerBuffTimeRemaining("Frostbrand") < GCD))
+                    if (CharInfo.T4 == 3 && WoW.Maelstrom >= 20 && WoW.CanCast("Hailstorm", true, true, true, false, true)
+                        && (!PlayerHasBuff("Frostbrand") || PlayerBuffTimeRemaining("Frostbrand") < GCD))
                     {
                         WoW.CastSpell("Hailstorm");
                         return;
                     }
 
                     // actions +=/ flametongue,if= buff.flametongue.remains < gcd | (cooldown.doom_winds.remains < 6 & buff.flametongue.remains < 4)
-                    if (((!WoW.PlayerHasBuff("Flametongue") || WoW.PlayerBuffTimeRemaining("Flametongue") < GCD) || (WoW.PlayerBuffTimeRemaining("Flametongue") < 4 && WoW.IsSpellOnCooldown("Doom Winds") && WoW.SpellCooldownTimeRemaining("Doom Winds") < 6))
+                    if (((!PlayerHasBuff("Flametongue") || PlayerBuffTimeRemaining("Flametongue") < GCD) || (PlayerBuffTimeRemaining("Flametongue") < 400 && WoW.IsSpellOnCooldown("Doom Winds") && GetCooldownTimeRemaining("Doom Winds") < 600))
                          && WoW.CanCast("Flametongue", true, true, true, false, true))
                     {
                         WoW.CastSpell("Flametongue");
                         return;
                     }
                     //actions +=/ doom_winds
-                    if (WoW.CanCast("Doom Winds", true, true, false, false, true) && WoW.IsSpellInRange("Stormstrike") && WoW.PlayerHasBuff("Flametongue"))
+                    if (WoW.CanCast("Doom Winds", true, true, false, false, true) && WoW.IsSpellInRange("Stormstrike") && PlayerHasBuff("Flametongue"))
                     {
                         WoW.CastSpell("Doom Winds");
                         return;
@@ -1768,7 +1747,7 @@ namespace PixelMagic.Rotation
                     //actions +=/ crash_lightning,if= talent.crashing_storm.enabled & active_enemies >= 3 
                     //&& (!talent.hailstorm.enabled | buff.frostbrand.remains > gcd)
                     if (CharInfo.T6 == 3 && combatRoutine.Type == RotationType.AOE
-                        && (CharInfo.T4 != 3 || WoW.PlayerBuffTimeRemaining("Frostbrand") > GCD)
+                        && (CharInfo.T4 != 3 || PlayerBuffTimeRemaining("Frostbrand") > GCD)
                         && WoW.IsSpellInRange("Stormstrike") && WoW.CanCast("Crash Lightning", true, true, false, false, true) && WoW.Maelstrom > 20)
 
                     {
@@ -1787,14 +1766,14 @@ namespace PixelMagic.Rotation
                     //if= (talent.overcharge.enabled & maelstrom >= 40 & !talent.fury_of_air.enabled) 
                     //| (talent.overcharge.enabled & talent.fury_of_air.enabled & maelstrom > 46)
                     if (WoW.CanCast("Lightning Bolt", true, true, true, false, true)
-                    && ( (CharInfo.T5 == 2 && WoW.Maelstrom >= 40 && CharInfo.T6 != 2)
-                    || (CharInfo.T5 == 2 && WoW.Maelstrom >= 46 && CharInfo.T6 == 2) ) )
+                    && ((CharInfo.T5 == 2 && WoW.Maelstrom >= 40 && CharInfo.T6 != 2)
+                    || (CharInfo.T5 == 2 && WoW.Maelstrom >= 46 && CharInfo.T6 == 2)))
                     {
                         WoW.CastSpell("Lightning Bolt");
                         return;
                     }
                     // actions +=/ crash_lightning,if= buff.crash_lightning.remains < gcd & active_enemies >= 2
-                    if ((!WoW.PlayerHasBuff("Crash Lightning") || WoW.PlayerBuffTimeRemaining("Crash Lightning") < GCD)
+                    if ((!PlayerHasBuff("Crash Lightning") || PlayerBuffTimeRemaining("Crash Lightning") < GCD)
                         && (combatRoutine.Type == RotationType.AOE || combatRoutine.Type == RotationType.SingleTargetCleave)
                         && WoW.IsSpellInRange("Stormstrike") && WoW.CanCast("Crash Lightning", true, true, false, false, true) && WoW.Maelstrom > 20)
                     {
@@ -1803,30 +1782,30 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // actions +=/ windsong
-                    if (CharInfo.T1 == 1 && !WoW.PlayerHasBuff("Windsong") && WoW.CanCast("Windsong", true, true, false, false, true))
+                    if (CharInfo.T1 == 1 && !PlayerHasBuff("Windsong") && WoW.CanCast("Windsong", true, true, false, false, true))
                     {
                         WoW.CastSpell("Windsong");
                         return;
                     }// actions +=/ Ascendance
-                    if (CharInfo.T7 == 1 && !WoW.PlayerHasBuff("Ascendance") && WoW.CanCast("Ascendance", true, true, false, false, true))
+                    if (CharInfo.T7 == 1 && !PlayerHasBuff("Ascendance") && WoW.CanCast("Ascendance", true, true, false, false, true))
                     {
                         WoW.CastSpell("Ascendance");
                         return;
                     }
-                   /* Log.Write("Temptation deuff: " + WoW.PlayerHasDebuff("Temptation"));
-                    if (!WoW.PlayerHasDebuff("Temptation"))
-                        WoW.CastSpell("Collapsing Futures");*/
+                    /* Log.Write("Temptation deuff: " + WoW.PlayerHasDebuff("Temptation"));
+                     if (!WoW.PlayerHasDebuff("Temptation"))
+                         WoW.CastSpell("Collapsing Futures");*/
                     // actions +=/ stormstrike,if= buff.stormbringer.react & ((talent.fury_of_air.enabled & maelstrom >= 26) | (!talent.fury_of_air.enabled))
-                    if (WoW.CanCast("Stormstrike", true, true, true, false, true) && WoW.PlayerHasBuff("Stormbringer")
+                    if (WoW.CanCast("Stormstrike", true, true, true, false, true) && PlayerHasBuff("Stormbringer")
                         && (CharInfo.T6 == 2 && WoW.Maelstrom >= 26 || CharInfo.T6 != 2 && WoW.Maelstrom >= 20))
                     {
-                       // Log.Write("Stormstrike react Current Maelstrom :" + WoW.Maelstrom + " Stormbringer ?:" + WoW.PlayerHasBuff("Stormbringer"));
+                        // Log.Write("Stormstrike react Current Maelstrom :" + WoW.Maelstrom + " Stormbringer ?:" + PlayerHasBuff("Stormbringer"));
                         WoW.CastSpell("Stormstrike");
                         return;
 
                     }
                     //actions +=/ lava_lash,if= talent.hot_hand.enabled & buff.hot_hand.react
-                    if (WoW.PlayerHasBuff("Hot hands") && WoW.CanCast("Lava Lash", true, true, true, false, true))
+                    if (PlayerHasBuff("Hot hands") && WoW.CanCast("Lava Lash", true, true, true, false, true))
                     {
                         WoW.CastSpell("Lava Lash");
                         return;
@@ -1840,9 +1819,9 @@ namespace PixelMagic.Rotation
                     }
                     //actions +=/ stormstrike,if= talent.overcharge.enabled & cooldown.lightning_bolt.remains < gcd & maelstrom > 80
                     if (WoW.CanCast("Stormstrike", true, true, true, false, true)
-                        && CharInfo.T5 == 2 && WoW.SpellCooldownTimeRemaining("Lightning Bolt") < GCD && WoW.Maelstrom >= 80)
+                        && CharInfo.T5 == 2 && GetCooldownTimeRemaining("Lightning Bolt") < GCD && WoW.Maelstrom >= 80)
                     {
-                        Log.Write("Stormstrike OC Current Maelstrom :" + WoW.Maelstrom + " Stormbringer ?:" + WoW.PlayerHasBuff("Stormbringer"));
+                        Log.Write("Stormstrike OC Current Maelstrom :" + WoW.Maelstrom + " Stormbringer ?:" + PlayerHasBuff("Stormbringer"));
                         WoW.CastSpell("Stormstrike");
                         return;
                     }
@@ -1850,29 +1829,29 @@ namespace PixelMagic.Rotation
                     // actions +=/ stormstrike,if= talent.fury_of_air.enabled & maelstrom > 46 & (cooldown.lightning_bolt.remains > gcd | !talent.overcharge.enabled)
                     if (WoW.CanCast("Stormstrike", true, true, true, false, true)
                      && CharInfo.T6 == 2 && WoW.Maelstrom >= 46
-                     && (WoW.SpellCooldownTimeRemaining("Lightning Bolt") < GCD || CharInfo.T5 != 2))
+                     && (GetCooldownTimeRemaining("Lightning Bolt") < GCD || CharInfo.T5 != 2))
                     {
-                        Log.Write("Storm strike no OC basic Current Maelstrom :" + WoW.Maelstrom +" Stormbringer ?:" + WoW.PlayerHasBuff("Stormbringer"));
+                        Log.Write("Storm strike no OC basic Current Maelstrom :" + WoW.Maelstrom + " Stormbringer ?:" + PlayerHasBuff("Stormbringer"));
                         WoW.CastSpell("Stormstrike");
                         return;
                     }
                     //actions +=/ stormstrike,if= !talent.overchage.enabled & !talent.fury_of_air.enabled
                     if (WoW.CanCast("Stormstrike", true, true, true, false, true)
                     && CharInfo.T5 != 2 && CharInfo.T6 != 2
-                    && (WoW.PlayerHasBuff("Stormbringer") && WoW.Maelstrom >= 20 || WoW.Maelstrom >= 40))
+                    && (PlayerHasBuff("Stormbringer") && WoW.Maelstrom >= 20 || WoW.Maelstrom >= 40))
                     {
-                       // Log.Write("Storm strike no OC/FoA Current Maelstrom :" + WoW.Maelstrom + " Stormbringer ?:" + WoW.PlayerHasBuff("Stormbringer"));
+                        // Log.Write("Storm strike no OC/FoA Current Maelstrom :" + WoW.Maelstrom + " Stormbringer ?:" + PlayerHasBuff("Stormbringer"));
 
                         WoW.CastSpell("Stormstrike");
                         return;
                     }
                     //actions +=/ stormstrike,if= active_enemies >= 3 & !talent.hailstorm.enabled
                     if (WoW.CanCast("Stormstrike", true, true, true, false, true)
-                    && (WoW.Maelstrom >= 40 || WoW.PlayerHasBuff("Stormbringer") && WoW.Maelstrom >= 20)
+                    && (WoW.Maelstrom >= 40 || PlayerHasBuff("Stormbringer") && WoW.Maelstrom >= 20)
                     && combatRoutine.Type == RotationType.AOE & CharInfo.T4 != 3)
                     {
 
-                        Log.Write("Storm strike basic Current Maelstrom :" + WoW.Maelstrom + " Stormbringer ?:" + WoW.PlayerHasBuff("Stormbringer"));
+                        Log.Write("Storm strike basic Current Maelstrom :" + WoW.Maelstrom + " Stormbringer ?:" + PlayerHasBuff("Stormbringer"));
 
                         WoW.CastSpell("Stormstrike");
                         return;
@@ -1881,8 +1860,8 @@ namespace PixelMagic.Rotation
                     //if= ((active_enemies > 1 
                     //| talent.crashing_storm.enabled 
                     //| talent.boulderfist.enabled) & !set_bonus.tier19_4pc) | feral_spirit.remains > 5
-                    if (WoW.CanCast("Crash Lightning", true, true, true, false, true)  && WoW.IsSpellInRange("Stormstrike") && WoW.Maelstrom >= 20
-                    && ((combatRoutine.Type == RotationType.AOE || combatRoutine.Type == RotationType.SingleTargetCleave || CharInfo.T6 == 1  || CharInfo.T1 == 3 ) && !setBonus4Pc || Pets.IsRunning && Pets.Elapsed.Seconds > 0 && Pets.Elapsed.Seconds <= 10))
+                    if (WoW.CanCast("Crash Lightning", true, true, true, false, true) && WoW.IsSpellInRange("Stormstrike") && WoW.Maelstrom >= 20
+                    && ((combatRoutine.Type == RotationType.AOE || combatRoutine.Type == RotationType.SingleTargetCleave || CharInfo.T6 == 1 || CharInfo.T1 == 3) && !setBonus4Pc || Pets.IsRunning && Pets.Elapsed.Seconds > 0 && Pets.Elapsed.Seconds <= 10))
                     {
                         Log.Write("This is the problem");
                         //Log.Write("T6=1 : " + CharInfo.T6 + "or T1 ==3: " + CharInfo.T1 + " or Pet timer : " + Pets.Elapsed.Seconds);
@@ -1891,14 +1870,14 @@ namespace PixelMagic.Rotation
                     }
                     //   actions +=/ frostbrand,if= talent.hailstorm.enabled & buff.frostbrand.remains < 4.8
 
-                    if (CharInfo.T4 == 3 && (!WoW.PlayerHasBuff("Frostbrand") || WoW.PlayerBuffTimeRemaining("Frostbrand") < 4.8)
-                      && WoW.CanCast("Hailstorm", true, true, true, false, true) && WoW.Maelstrom > 20)
+                    if (CharInfo.T4 == 3 && (!PlayerHasBuff("Frostbrand") || PlayerBuffTimeRemaining("Frostbrand") < 480)
+                      && WoW.CanCast("Hailstorm", true, true, true, false, true) && WoW.Maelstrom >= 20)
                     {
                         WoW.CastSpell("Hailstorm");
                         return;
                     }
                     // actions +=/ flametongue,if= buff.flametongue.remains < 4.8
-                    if ((!WoW.PlayerHasBuff("Flametongue") || WoW.PlayerBuffTimeRemaining("Flametongue") <= 4.8)
+                    if ((!PlayerHasBuff("Flametongue") || PlayerBuffTimeRemaining("Flametongue") <= 300)
                          && WoW.CanCast("Flametongue", true, true, true, false, true))
                     {
                         WoW.CastSpell("Flametongue");
@@ -1945,16 +1924,18 @@ namespace PixelMagic.Rotation
 
                     if (WoW.CanCast("Flametongue", true, true, true, false, true))
                     {
+                        Log.Write("Nothing to due");
                         WoW.CastSpell("Flametongue");
                         return;
                     }
                     //actions +=/ boulderfist
                     if (CharInfo.T1 == 3 && WoW.CanCast("Boulderfist", true, true, true, false, true))
                     {
+                        Log.Write("Nothing to due");
                         WoW.CastSpell("Boulderfist");
                         return;
                     }
-                    if (WoW.CanCast("Ghost Wolf", true, true, false, false, true) && WoW.IsMoving && !WoW.PlayerHasBuff("Ghost Wolf") && !WoW.IsSpellInRange("Stormstrike"))
+                    if (WoW.CanCast("Ghost Wolf", true, true, false, false, true) && IsMoving && !PlayerHasBuff("Ghost Wolf") && !WoW.IsSpellInRange("Stormstrike"))
                     {
                         WoW.CastSpell("Ghost Wolf");
                         return;
@@ -1962,6 +1943,9 @@ namespace PixelMagic.Rotation
                 }
             });
         }
+        /// <summary>
+        /// addon edditting stuff 
+        /// </summary>
         private static string AddonName = ConfigFile.ReadValue("PixelMagic", "AddonName");
         private static string AddonEmbedName = "embeded.xml";// Initialization variables		
         private bool AddonEdited = false;
@@ -1972,10 +1956,10 @@ namespace PixelMagic.Rotation
                 try
                 {
                     Log.Write("Adding Lib Spell range");
-                
+
                     string targetPath = string.Concat("" + WoW.AddonPath + "\\" + AddonName + "\\lib\\LibSpellRange-1.0\\");
                     string targetPathSub = string.Concat("" + WoW.AddonPath + "\\" + AddonName + "\\lib\\LibSpellRange-1.0\\lib\\LibStub\\");
-                
+
                     // To copy a folder's contents to a new location:
                     // Create a new target folder, if necessary.
                     if (!Directory.Exists(targetPath))
@@ -1993,16 +1977,16 @@ namespace PixelMagic.Rotation
                     {
                         if (!File.Exists(Path.Combine(targetPath, LibSpellToc)))
                         {
-                           
-                                File.WriteAllText(Path.Combine(targetPath, LibSpellToc),LibSpellTocContent);
+
+                            File.WriteAllText(Path.Combine(targetPath, LibSpellToc), LibSpellTocContent);
                         }
                         if (!File.Exists(Path.Combine(targetPath, LibSpellLua)))
                         {
-                                File.WriteAllText(Path.Combine(targetPath, LibSpellLua), LibSpellLuaContent);
+                            File.WriteAllText(Path.Combine(targetPath, LibSpellLua), LibSpellLuaContent);
                         }
                         if (!File.Exists(Path.Combine(targetPath, LibXml)))
                         {
-                                File.WriteAllText(Path.Combine(targetPath, LibXml), LibXmlContent);
+                            File.WriteAllText(Path.Combine(targetPath, LibXml), LibXmlContent);
                         }
                     }
 
@@ -2010,11 +1994,11 @@ namespace PixelMagic.Rotation
                     {
                         if (!File.Exists(Path.Combine(targetPathSub, LibStubLua)))
                         {
-                                File.WriteAllText(Path.Combine(targetPathSub, LibStubLua), LibStubLuaContent);
+                            File.WriteAllText(Path.Combine(targetPathSub, LibStubLua), LibStubLuaContent);
                         }
                         if (!File.Exists(Path.Combine(targetPathSub, LibStubToc)))
                         {
-                                File.WriteAllText(Path.Combine(targetPathSub, LibStubToc), LibStubTocContent);
+                            File.WriteAllText(Path.Combine(targetPathSub, LibStubToc), LibStubTocContent);
                         }
 
                     }
@@ -2024,7 +2008,7 @@ namespace PixelMagic.Rotation
                     MessageBox.Show("" + ex, "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 Log.Write("Spell Range Complete");
-                 RangeLib = true;
+                RangeLib = true;
             });
         }
         private async Task AddonEmbedEdit()
@@ -2037,7 +2021,7 @@ namespace PixelMagic.Rotation
                     Log.Write("Addon emedding Editing in progress");
                     if (!File.Exists(Path.Combine("" + WoW.AddonPath + "\\" + AddonName + "\\", AddonEmbedName)))
                     {
-                        string addonlua = " < Ui xmlns = \"http://www.blizzard.com/wow/ui/\" xmlns: xsi = \"http://www.w3.org/2001/XMLSchema-instance \" xsi: schemaLocation = \"http://www.blizzard.com/wow/ui/ ..\\FrameXML\\UI.xsd\" >" +Environment.NewLine
+                        string addonlua = " < Ui xmlns = \"http://www.blizzard.com/wow/ui/\" xmlns: xsi = \"http://www.w3.org/2001/XMLSchema-instance \" xsi: schemaLocation = \"http://www.blizzard.com/wow/ui/ ..\\FrameXML\\UI.xsd\" >" + Environment.NewLine
                     + "< Script file = \"lib\\LibSpellRange-1.0\\LibSpellRange-1.0.lua\" />" + Environment.NewLine
                     + "</ Ui >" + Environment.NewLine;
                         File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonEmbedName, addonlua);
@@ -2046,10 +2030,11 @@ namespace PixelMagic.Rotation
                     }
                     AddonEmbeded = true;
                 }
-            catch (Exception ex)
-            {
-                MessageBox.Show("" + ex, "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            } });
+                catch (Exception ex)
+                {
+                    MessageBox.Show("" + ex, "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            });
         }
         private async Task AddonEdit()
         {
@@ -2057,51 +2042,87 @@ namespace PixelMagic.Rotation
             {
                 try
                 {
-                             string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
-                        Log.Write("Addon Editing in progress");
-                        addonlua = addonlua.Replace("if name == \"Wild Imps\"", "if (name == \"Wild Imps\" or name == \"Spirit Wolf\" or name == \"Totem Mastery\")");
-                        addonlua = addonlua.Replace("and(startTime + duration - GetTime() > 1.6) ", "and(startTime + duration - GetTime() > (1.5 / (1 + (GetHaste() / 100) ))) ");
-                        addonlua = addonlua.Replace("end" + Environment.NewLine + Environment.NewLine + "local function InitializeTwo()", Environment.NewLine);
-                        addonlua = addonlua.Replace("	--print (\"Initialising Spell Charges Frames\")", "end" + Environment.NewLine + "local function InitializeTwo()" + Environment.NewLine + "	--print (\"Initialising Spell Charges Frames\")" + Environment.NewLine);
-                        addonlua = addonlua.Replace("IsSpellInRange(name, \"target\")", "LibStub(\"SpellRange-1.0\").IsSpellInRange(name, \"target\")");
-                       // addonlua = addonlua.Replace("if (guid ~= lastTargetGUID) then", "");
-                        //ddonlua = addonlua.Replace("lastTargetGUID = guid" + Environment.NewLine + "	end", "print(\"target selected\")");
-                        addonlua = addonlua.Replace("local function InitializeOne()", Environment.NewLine + CustomLua + Environment.NewLine + "local function InitializeOne()");
-                        addonlua = addonlua.Replace("InitializeOne()" + Environment.NewLine + "            InitializeTwo()", "InitializeOne()" + Environment.NewLine + "            InitializeTwo()" + Environment.NewLine + "            InitializeThree()");
-                        addonlua = addonlua.Replace("healthFrame:SetScript(\"OnUpdate\", updateHealth)", "");
-                        addonlua = addonlua.Replace("powerFrame:SetScript(\"OnUpdate\", updatePower)", "");
-                        addonlua = addonlua.Replace("targetHealthFrame:SetScript(\"OnUpdate\", updateTargetHealth)", "");
-                        addonlua = addonlua.Replace("unitCombatFrame:SetScript(\"OnUpdate\", updateCombat)", "");
-                        addonlua = addonlua.Replace("unitPowerFrame:SetScript(\"OnUpdate\", updateUnitPower)", "");
-                        addonlua = addonlua.Replace("isTargetFriendlyFrame:SetScript(\"OnUpdate\", updateIsFriendly)", "");
-                        addonlua = addonlua.Replace("playerIsCastingFrame:SetScript(\"OnUpdate\", updatePlayerIsCasting)", "");
-                        addonlua = addonlua.Replace("hasTargetFrame: SetScript(\"OnUpdate\", hasTarget)", "");
-                        addonlua = addonlua.Replace("targetIsCastingFrame:SetScript(\"OnUpdate\", updateTargetIsCasting)", "");
-                        addonlua = addonlua.Replace("hasteFrame:SetScript(\"OnUpdate\", updateHaste)", "");
-                        addonlua = addonlua.Replace("unitIsVisibleFrame:SetScript(\"OnUpdate\", updateUnitIsVisible)", "");
-                        addonlua = addonlua.Replace("unitPetFrame:SetScript(\"OnUpdate\", updateUnitPet)", "");
-                        addonlua = addonlua.Replace("petHealthFrame:SetScript(\"OnUpdate\", updatePetHealth)", "");
-                        addonlua = addonlua.Replace("wildPetsFrame:SetScript(\"OnUpdate\", updateWildPetsFrame)", "");
-                        addonlua = addonlua.Replace("petBuffFrames[buffId]:SetScript(\"OnUpdate\", updateMyPetBuffs)", "");
-                        addonlua = addonlua.Replace("cooldownframes[spellId]:SetScript(\"OnUpdate\", updateSpellCooldowns)", "");
-                        addonlua = addonlua.Replace("spellInRangeFrames[spellId]:SetScript(\"OnUpdate\", updateSpellInRangeFrames)", "");
-                        addonlua = addonlua.Replace("targetDebuffFrames[debuffId]:SetScript(\"OnUpdate\", updateTargetDebuffs)", "");
-                        addonlua = addonlua.Replace("updateSpellChargesFrame[spellId]:SetScript(\"OnUpdate\", updateSpellCharges)", "");
-                        addonlua = addonlua.Replace("TargetBuffs[buffId]:SetScript(\"OnUpdate\", updateTargetBuffs)", "");
-                        addonlua = addonlua.Replace("PlayerMovingFrame:SetScript(\"OnUpdate\", PlayerNotMove)", "");
-                        addonlua = addonlua.Replace("AutoAtackingFrame:SetScript(\"OnUpdate\", AutoAtacking)", "");
-                        addonlua = addonlua.Replace("targetIsPlayerFrame:SetScript(\"OnUpdate\", updateIsPlayer)", "");
-                        addonlua = addonlua.Replace("flagFrame:SetScript(\"OnUpdate\", updateFlag)", "");
-                        addonlua = addonlua.Replace("targetLastSpellFrame[i]:SetScript(\"OnUpdate\", updateTargetCurrentSpell)", "");
-                        addonlua = addonlua.Replace("targetArena1Frame[i]:SetScript(\"OnUpdate\", updateArena1Spell)", "");
-                        addonlua = addonlua.Replace("targetArena2Frame[i]:SetScript(\"OnUpdate\", updateArena2Spell)", "");
-                        addonlua = addonlua.Replace("targetArena3Frame[i]:SetScript(\"OnUpdate\", updateArena3Spell)", "");
-                        addonlua = addonlua.Replace("buffFrames[buffId]:SetScript(\"OnUpdate\", updateMyBuffs)", "");
-                        addonlua = addonlua.Replace("itemframes[itemId]:SetScript(\"OnUpdate\", updateItemCooldowns)", "");
-                        addonlua = addonlua.Replace("spellOverlayedFrames[spellId]:SetScript(\"OnUpdate\", updateIsSpellOverlayedFrames)", "");
-                        addonlua = addonlua.Replace("playerDebuffFrames[debuffId]:SetScript(\"OnUpdate\", updatePlayerDebuffs)", "");
-                        File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
-                        AddonEdited = true;
+                    string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
+                    int start = addonlua.IndexOf("local function updateSpellCooldowns(self, event)");
+                    int end = addonlua.IndexOf("local lastItemCooldownState = {");
+                    addonlua = addonlua.Remove(start, end - start);
+                    start = addonlua.IndexOf("local function PlayerNotMove()");
+                    end = addonlua.IndexOf("local function AutoAtacking()");
+                    addonlua = addonlua.Remove(start, end - start);
+                    addonlua = addonlua.Insert(start, mounted);
+                    Log.Write("Addon Editing in progress");
+                    start = addonlua.IndexOf("local function updateMyBuffs(self, event)");
+                    end = addonlua.IndexOf("local function updateTargetDebuffs(self, event)");
+                    addonlua = addonlua.Remove(start, end - start);
+                    addonlua = addonlua.Insert(start, partybuffdebuff);
+                    start = addonlua.IndexOf("local Party1Buffs = { }");
+                    end = addonlua.IndexOf("local function updateRaidHealth(self, event)");
+                    addonlua = addonlua.Remove(start, end - start);
+                    addonlua = addonlua.Insert(start, partyvarable);
+                    start = addonlua.IndexOf("local function updateParty1Buffs()");
+                    end = addonlua.IndexOf("local function updateRaidSize(self, event)");
+                    addonlua = addonlua.Remove(start, end - start);
+                    start = addonlua.IndexOf("raidHealthFrame[i]:SetScript(\"OnUpdate\", updateRaidHealth)");
+                    end = addonlua.IndexOf("local spellOverlayedFrames = {}");
+                    addonlua = addonlua.Remove(start, end - start);
+                    addonlua = addonlua.Insert(start, partybuff);
+                    start = addonlua.IndexOf("local function PlayerNotMove()");
+                    end = addonlua.IndexOf("local function AutoAtacking()");
+                    addonlua = addonlua.Remove(start, end - start);
+                    addonlua = addonlua.Insert(start, mounted);
+                    start = addonlua.IndexOf("local function updatePlayerIsCasting(self, event)");
+                    end = addonlua.IndexOf("local lastTargetCastID = 0");
+                    addonlua = addonlua.Remove(start, end - start);
+                    addonlua = addonlua.Insert(start, CastUpdate);
+                    start = addonlua.IndexOf("local function updateTargetDebuffs(self, event)");
+                    end = addonlua.IndexOf("local lastSpellInRange = {}");
+                    addonlua = addonlua.Remove(start, end - start);
+                    addonlua = addonlua.Replace("local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId", "local name, _, _, count, debuffType, duration, expirationTime, _, _, _, spellId");
+                    addonlua = addonlua.Replace("local name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3", "local name, _, _, count, _, duration, expires, _, _, _, spellID, _, _, _, _, _, _, _, _");
+                    addonlua = addonlua.Replace("local name, _, _, count, debuffType, duration, expirationTime, _, _, _, spellId, canApplyAura, isBossDebuff, value1, value2, value3", "local name, _, _, count, _, duration, expirationTime, _, _, _, spellId, _, _, _, _, _");
+                    addonlua = addonlua.Replace("if name == \"Wild Imps\"", "if (name == \"Wild Imps\" or name == \"Spirit Wolf\" or name == \"Totem Mastery\")");
+                    addonlua = addonlua.Replace("and(startTime + duration - GetTime() > 1.6) ", "and(startTime + duration - GetTime() > (1.5 / (1 + (GetHaste() / 100) ))) ");
+                    addonlua = addonlua.Replace("end" + Environment.NewLine + Environment.NewLine + "local function InitializeTwo()", Environment.NewLine);
+                    addonlua = addonlua.Replace("	--print (\"Initialising Spell Charges Frames\")", "end" + Environment.NewLine + "local function InitializeTwo()" + Environment.NewLine + "	--print (\"Initialising Spell Charges Frames\")" + Environment.NewLine);
+                    addonlua = addonlua.Replace("IsSpellInRange(name, \"target\")", "LibStub(\"SpellRange-1.0\").IsSpellInRange(name, \"target\")");
+                    // addonlua = addonlua.Replace("if (guid ~= lastTargetGUID) then", "");
+                    //ddonlua = addonlua.Replace("lastTargetGUID = guid" + Environment.NewLine + "	end", "print(\"target selected\")");
+                    addonlua = addonlua.Replace("local function InitializeOne()", Environment.NewLine + CustomLua + Environment.NewLine + "local function InitializeOne()");
+                    addonlua = addonlua.Replace("InitializeOne()" + Environment.NewLine + "            InitializeTwo()", "InitializeOne()" + Environment.NewLine + "            InitializeTwo()" + Environment.NewLine + "            InitializeFour()");
+                    addonlua = addonlua.Replace("healthFrame:SetScript(\"OnUpdate\", updateHealth)", "");
+                    addonlua = addonlua.Replace("powerFrame:SetScript(\"OnUpdate\", updatePower)", "");
+                    addonlua = addonlua.Replace("targetHealthFrame:SetScript(\"OnUpdate\", updateTargetHealth)", "");
+                    addonlua = addonlua.Replace("unitCombatFrame:SetScript(\"OnUpdate\", updateCombat)", "");
+                    addonlua = addonlua.Replace("unitPowerFrame:SetScript(\"OnUpdate\", updateUnitPower)", "");
+                    addonlua = addonlua.Replace("isTargetFriendlyFrame:SetScript(\"OnUpdate\", updateIsFriendly)", "");
+                    addonlua = addonlua.Replace("playerIsCastingFrame:SetScript(\"OnUpdate\", updatePlayerIsCasting)", "");
+                    addonlua = addonlua.Replace("hasTargetFrame: SetScript(\"OnUpdate\", hasTarget)", "");
+                    addonlua = addonlua.Replace("targetIsCastingFrame:SetScript(\"OnUpdate\", updateTargetIsCasting)", "");
+                    addonlua = addonlua.Replace("hasteFrame:SetScript(\"OnUpdate\", updateHaste)", "");
+                    addonlua = addonlua.Replace("unitIsVisibleFrame:SetScript(\"OnUpdate\", updateUnitIsVisible)", "");
+                    addonlua = addonlua.Replace("unitPetFrame:SetScript(\"OnUpdate\", updateUnitPet)", "");
+                    addonlua = addonlua.Replace("petHealthFrame:SetScript(\"OnUpdate\", updatePetHealth)", "");
+                    addonlua = addonlua.Replace("wildPetsFrame:SetScript(\"OnUpdate\", updateWildPetsFrame)", "");
+                    addonlua = addonlua.Replace("petBuffFrames[buffId]:SetScript(\"OnUpdate\", updateMyPetBuffs)", "");
+                    addonlua = addonlua.Replace("cooldownframes[spellId]:SetScript(\"OnUpdate\", updateSpellCooldowns)", "");
+                    addonlua = addonlua.Replace("spellInRangeFrames[spellId]:SetScript(\"OnUpdate\", updateSpellInRangeFrames)", "");
+                    addonlua = addonlua.Replace("targetDebuffFrames[debuffId]:SetScript(\"OnUpdate\", updateTargetDebuffs)", "");
+                    addonlua = addonlua.Replace("updateSpellChargesFrame[spellId]:SetScript(\"OnUpdate\", updateSpellCharges)", "");
+                    addonlua = addonlua.Replace("TargetBuffs[buffId]:SetScript(\"OnUpdate\", updateTargetBuffs)", "");
+                    addonlua = addonlua.Replace("PlayerMovingFrame:SetScript(\"OnUpdate\", PlayerNotMove)", "");
+                    addonlua = addonlua.Replace("AutoAtackingFrame:SetScript(\"OnUpdate\", AutoAtacking)", "");
+                    addonlua = addonlua.Replace("targetIsPlayerFrame:SetScript(\"OnUpdate\", updateIsPlayer)", "");
+                    addonlua = addonlua.Replace("flagFrame:SetScript(\"OnUpdate\", updateFlag)", "");
+                    addonlua = addonlua.Replace("targetLastSpellFrame[i]:SetScript(\"OnUpdate\", updateTargetCurrentSpell)", "");
+                    addonlua = addonlua.Replace("targetArena1Frame[i]:SetScript(\"OnUpdate\", updateArena1Spell)", "");
+                    addonlua = addonlua.Replace("targetArena2Frame[i]:SetScript(\"OnUpdate\", updateArena2Spell)", "");
+                    addonlua = addonlua.Replace("targetArena3Frame[i]:SetScript(\"OnUpdate\", updateArena3Spell)", "");
+                    addonlua = addonlua.Replace("buffFrames[buffId]:SetScript(\"OnUpdate\", updateMyBuffs)", "");
+                    addonlua = addonlua.Replace("itemframes[itemId]:SetScript(\"OnUpdate\", updateItemCooldowns)", "");
+                    addonlua = addonlua.Replace("spellOverlayedFrames[spellId]:SetScript(\"OnUpdate\", updateIsSpellOverlayedFrames)", "");
+                    addonlua = addonlua.Replace("playerDebuffFrames[debuffId]:SetScript(\"OnUpdate\", updatePlayerDebuffs)", "");
+                    File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
+                    AddonEdited = true;
                 }
                 catch (Exception ex)
                 {
@@ -2119,25 +2140,25 @@ namespace PixelMagic.Rotation
                 addon[1] = RangeLibCopy();
                 addon[2] = AddonEmbedEdit();
                 await Task.WhenAll(addon);
-                if(AddonEmbeded && RangeLib && AddonEdited)
-                 WoW.Reload();
+                if (AddonEmbeded && RangeLib && AddonEdited)
+                    WoW.Reload();
             }
         }
         private async void DpsRotationSelection()
         {
-            Task [] RotationType = new Task[4];
+            Task[] RotationType = new Task[4];
             RotationType[0] = ChangeTarget();
             RotationType[1] = ElementalConsistantUse();
             RotationType[2] = EnhancementDps();
             RotationType[3] = RestoRotation();
             await Task.WhenAll(RotationType);
 
-    }
+        }
         private async Task ChangeTarget()
         {
             await Task.Run(() => {
-            if (CharInfo.Spec == "Enhancement" && !TargetInfo.Melee)
-                WoW.KeyPressRelease(WoW.Keys.Tab);
+                if (CharInfo.Spec == "Enhancement" && !TargetInfo.Melee)
+                    WoW.KeyPressRelease(WoW.Keys.Tab);
                 if (CharInfo.Spec == "Elemental " && !TargetInfo.Range)
                     WoW.KeyPressRelease(WoW.Keys.Tab);
             });
@@ -2150,17 +2171,468 @@ namespace PixelMagic.Rotation
             {
                 /* DBMPrePull();*/
                 TimerReset();
-               if (WoW.IsInCombat && WoW.HasTarget && !WoW.PlayerHasBuff("Mount"))
+                if (WoW.IsInCombat && WoW.HasTarget && !IsMounted)
                 {
-                    SelectRotation();
-                    interruptcast();
-                    //Stuns();
-                    Defensive();
-                    DpsRotationSelection();
+                    for(int i=1; i<2;i++)
+                    {
+                        SelectRotation();
+                        interruptcast();
+                        //Stuns();
+                        Defensive();
+                        DpsRotationSelection();
+                      Thread.Sleep((int.Parse(ConfigFile.Pulse.ToString())/3));
+                    }
                 }
             }
         }
+        /// <summary>
+        /// Cooldown function/mount/Buff/stack/Remaining time
+        /// </summary>
+        /// 
+        /// 
+        private static bool setBonus2Pc
+        {
+            get
+            {
+                var control = WoW.GetBlockColor(9, 24);
+                if (Convert.ToInt32(Math.Round(Convert.ToSingle(control.G))) == 0 && Convert.ToInt32(Math.Round(Convert.ToSingle(control.R) * 100 / 255)) >= 2)
+                {
 
+                    return true;
+                }
+                else
+                    return false;
+            }
+        }
+        private static bool setBonus4Pc
+        {
+    get
+    {
+        var control = WoW.GetBlockColor(9, 24);
+        //Log.Write("Bonus location: " + Convert.ToInt32(Math.Round(Convert.ToSingle(control.R) * 100 / 255)));
+        if (Convert.ToInt32(Math.Round(Convert.ToSingle(control.G))) == 0 && Convert.ToInt32(Math.Round(Convert.ToSingle(control.R) * 100 / 255)) >= 4)
+        {
+
+            return true;
+        }
+        else
+            return false;
+    }
+}
+
+public static bool IsMoving
+        {
+            get
+            {
+                var c = WoW.GetBlockColor(1, 7);
+                return (c.R == Color.Red.R) && (c.B == Color.Blue.B);
+            }
+        }
+        public static bool IsMounted
+        {
+            get
+            {
+                var c = WoW.GetBlockColor(1, 7);
+                return (c.G == Color.Green.G && (c.B == Color.Blue.B));
+            }
+        }
+        public static int GetCooldownTimeRemaining(int spellNoInArrayOfSpells)
+        {
+            var c = WoW.GetBlockColor(spellNoInArrayOfSpells, 2);
+
+            try
+            {
+                Log.WriteDirectlyToLogFile($"Green = {c.G} Blue = {c.B}");
+                if (c.G == 255)
+                    return 0;
+                return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
+
+            }
+            catch (Exception ex)
+            {
+                Log.Write($"Red = {c.R} Green = {c.G}");
+                Log.Write(ex.Message, Color.Red);
+            }
+
+            return 0;
+        }
+        public static int GetCooldownTimeRemaining(string spellBookSpellName)
+        {
+            foreach (var spell in SpellBook.Spells)
+            {
+                if (spell.SpellName == spellBookSpellName)
+                    return GetCooldownTimeRemaining(spell.InternalSpellNo);
+            }
+            Log.Write($"[IsSpellOnCooldown] Unable to find spell with name '{spellBookSpellName}' in Spell Book");
+            return 0;
+        }
+        private static int PlayerBuffStacks(int auraNoInArrayOfAuras)
+        {
+            var c = WoW.GetBlockColor(auraNoInArrayOfAuras, 8);
+
+            try
+            {
+                // ReSharper disable once PossibleNullReferenceException
+                var stacks = dtColorHelper.Select($"[Rounded] = '{c.R}'").ToString();
+
+                return int.Parse(stacks);
+            }
+            catch (Exception ex)
+            {
+                Log.Write("Failed to find buff stacks for color G = " + c.R, Color.Red);
+                Log.Write("Error: " + ex.Message, Color.Red);
+            }
+
+            return 0;
+        }
+        private static int PlayerBuffStacks(string auraName)
+        {
+            foreach (var aura in SpellBook.Auras)
+            {
+                if (aura.AuraName == auraName)
+                    return PlayerBuffStacks(aura.InternalAuraNo);
+            }
+            Log.Write($"[PlayerBuffTimeRemaining] Unable to find buff with name '{auraName}' in Spell Book");
+            return -1;
+        }
+        public static int PlayerBuffTimeRemaining(int auraNoInArrayOfAuras)
+        {
+            var c = WoW.GetBlockColor(auraNoInArrayOfAuras, 8);
+            if (PlayerHasBuff(auraNoInArrayOfAuras) == false)
+                return 0;
+            try
+            {
+                // ReSharper disable once PossibleNullReferenceException
+               Log.WriteDirectlyToLogFile($"Green = {c.G} Blue = {c.B}");
+               return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
+            }
+            catch (Exception ex)
+            {
+                Log.Write("Failed to find buff stacks for color G = " + c.B, Color.Red);
+                Log.Write("Error: " + ex.Message, Color.Red);
+            }
+
+            return 0;
+        }
+        public static int PlayerBuffTimeRemaining(string buffName)
+        {
+            foreach (var aura in SpellBook.Auras)
+            {
+                if (aura.AuraName == buffName)
+                    return PlayerBuffTimeRemaining(aura.InternalAuraNo);
+            }
+            Log.Write($"[PlayerBuffTimeRemaining] Unable to find buff with name '{buffName}' in Spell Book");
+            return -1;
+
+        }
+        public static bool PlayerHasBuff(int auraNoInArrayOfAuras)
+        {
+            var c = WoW.GetBlockColor(auraNoInArrayOfAuras, 8);
+            return (c.R != 255);
+        }
+
+        public static bool PlayerHasBuff(string buffName)
+        {
+            foreach (var aura in SpellBook.Auras)
+            {
+                if (aura.AuraName == buffName)
+                    return PlayerHasBuff(aura.InternalAuraNo);
+            }
+            Log.Write($"[PlayerHasBuff] Unable to find buff with name '{buffName}' in Spell Book");
+            return false;
+            
+        }
+        public static int TargetDebuffTimeRemaining(int auraNoInArrayOfAuras)
+        {
+            var c = WoW.GetBlockColor(auraNoInArrayOfAuras, 4);
+
+            try
+            {
+                Log.WriteDirectlyToLogFile($"Green = {c.G}");
+                if (c.G == 255)
+                    return 0;
+                return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
+            }
+            catch (Exception ex)
+            {
+                Log.Write("Failed to find debuff target stacks for color G = " + c.B, Color.Red);
+                Log.Write("Error: " + ex.Message, Color.Red);
+            }
+            return 0;
+        }
+
+        public static int TargetDebuffTimeRemaining(string debuffName)
+        {
+            foreach (var aura in SpellBook.Auras)
+            {
+                if (aura.AuraName == debuffName)
+                    return TargetDebuffStacks(aura.InternalAuraNo);
+            }
+            Log.Write($"[TargetDebuffTimeRemaining] Unable to find buff with name '{debuffName}' in Spell Book");
+            return -1;
+        }
+        public static int TargetDebuffStacks(int auraNoInArrayOfAuras)
+        {
+            var c = WoW.GetBlockColor(auraNoInArrayOfAuras, 4);
+
+            try
+            {
+                Log.WriteDirectlyToLogFile($"Green = {c.G}");
+                if (c.R == 255)
+                    return 0;
+
+                // ReSharper disable once PossibleNullReferenceException
+                return Convert.ToInt32(Math.Round(Convert.ToSingle(c.R) * 100 / 255));
+            }
+            catch (Exception ex)
+            {
+                Log.Write("Failed to find debuff stacks for color G = " + c.G, Color.Red);
+                Log.Write("Error: " + ex.Message, Color.Red);
+            }
+
+            return 0;
+        }
+
+        public static int TargetDebuffStacks(string debuffName)
+        {
+            foreach (var aura in SpellBook.Auras)
+            {
+                if (aura.AuraName == debuffName)
+                    return TargetDebuffStacks(aura.InternalAuraNo);
+            }
+            Log.Write($"[TargetDebuffTimeRemaining] Unable to find buff with name '{debuffName}' in Spell Book");
+            return -1;
+        }
+
+
+        /// <summary>
+        /// Lua strings for varies functions above
+        /// </summary>
+        private const string CastUpdate = @"
+        local function updatePlayerIsCasting(self, event)
+		spell, _, _, _, startTime, endTime, _, castID, _ = UnitCastingInfo(""player"")
+		name, _, _, _, _, _, _, _ = UnitChannelInfo(""player"")
+
+				
+			if castID ~= nil then
+		
+				if GetTime() + timeDiff <= endTime/1000  then
+					--print(""Cast time :"", timeDiff, ""Time "", GetTime())
+					--print(""Cast time :"", endTime/1000, ""Time "", GetTime()+ timeDiff)
+					playerIsCastingFrame.t:SetColorTexture(1, 0, 0, alphaColor)
+				else
+					--print(""OffCast time :"", endTime/1000 - timeDiff, ""Time "", GetTime())
+					playerIsCastingFrame.t:SetColorTexture(1, 1, 1, alphaColor)
+
+                end
+            end
+		
+			if castID == nil then
+
+                playerIsCastingFrame.t:SetColorTexture(1, 1, 1, alphaColor)
+
+            end	
+		
+
+		if name ~= nil then
+			if text ~= lastChanneling then
+
+            playerIsCastingFrame.t:SetColorTexture(0, 1, 0, alphaColor)
+			--   print(text)
+
+            lastChanneling = text
+            end
+
+		else
+			if text ~= lastChanneling then
+
+            playerIsCastingFrame.t:SetColorTexture(1, 1, 1, alphaColor)
+
+            lastChanneling = text
+            end
+
+
+        end
+    end
+";
+        private const string partyvarable = @"local sentTime =0 
+local timeDiff =0
+local PartyBuffs = {}
+do
+for i = 1, 4 do
+PartyBuffs[i] ={Buffs = {} ,LastStateBuff = {} ,debuffs = {},LaststateDebuff = {} }
+end
+end
+";
+        private const string partybuffdebuff = @"local function updatePartyBuffs()
+	for _, auraId in pairs(buffs) do
+        local buff = ""Unitbuff"";
+        local auraName = GetSpellInfo(auraId)
+    for i = 1, 4 do
+        if auraName == nil then
+            if ( PartyBuffs[z].BuffLast[auraId] ~= ""BuffOff"") then
+                 PartyBuffs[z].BuffLast[auraId].t:SetColorTexture(1, 1, 1, alphaColor)
+                 PartyBuffs[z].BuffLast[auraId].t:SetAllPoints(false)
+                 PartyBuffs[z].BuffLast[auraId] = ""BuffOff""          
+            end    
+            return
+        end
+
+        local name, _,_, count, _, duration, expires, _, _, _, spellID, _, _, _, _, _, _, _, _ = UnitBuff(""party""..i, auraName)
+
+		if (name == auraName) then -- We have Aura up and Aura ID is matching our list
+            local getTime = GetTime()
+
+            local remainingTime = math.floor(expires - getTime + timeDiff)
+
+			if (PartyBuffs[z].BuffLast[auraId] ~= ""BuffOn"" .. count..remainingTime) then
+                    local green = 0
+					local blue = 0
+
+                    local strcount = ""0.0""..count;
+                    local strbluecount = ""0.0""..remainingTime;
+						
+				if(remainingTime <= 0 or remainingTime <= -0 or remainingTime == 0) then
+                    blue = 0
+                    strbluecount = 0
+				end
+
+				if (count >= 10) then
+                    strcount = ""0.""..count;
+                end
+
+				if(remainingTime >= 10) then
+                   strbluecount = ""0.""..remainingTime;
+                end
+
+                green = tonumber(strcount)
+                blue = tonumber(strbluecount)
+
+
+                PartyBuffs[z].Buff[auraId].t:SetColorTexture(0, green, blue, alphaColor)
+                PartyBuffs[z].BuffLast[auraId].t:SetAllPoints(false)
+
+                PartyBuffs[z].BuffLast[auraId] = ""BuffOn"" .. count..remainingTime
+            end
+        else
+            if (PartyBuffs[z].BuffLast[auraId] ~= ""BuffOff"") then
+                PartyBuffs[z].Buff[auraId].t:SetColorTexture(1, 1, 1, alphaColor)
+                PartyBuffs[z].Buff[auraId].t:SetAllPoints(false)
+                PartyBuffs[z].BuffLast[auraId] = ""BuffOff""              
+            end
+        end
+    end
+    end
+end
+
+local function updatePartyDebuffs(self, event)
+    
+	for _, debuffId in pairs(debuffs) do
+    for i =1, 4 do
+        local buff = ""UnitDebuff"";
+        local auraName = GetSpellInfo(auraId)
+   
+        if auraName == nil then
+            if (PartyBuffs[z].debuffs[debuffId] ~= ""DebuffOff"") then
+                 PartyBuffs[z].debuffs[debuffId].t:SetColorTexture(1, 1, 1, alphaColor)
+                 PartyBuffs[z].debuffs[debuffId].t:SetAllPoints(false)
+                PartyBuffs[z].debuffs[debuffId] = ""DebuffOff""               
+            end
+    
+            return
+        end
+        
+		--print(""Getting debuff for Id = "" .. auraName)
+
+
+        local name, _, _, _, _, _, expirationTime, _, _, _, spellId, _, _, _, _, _ = UnitDebuff(""party""..i, auraName, nil, ""PLAYER|HARMFUL"")
+
+		if (name == auraName) then -- We have Aura up and Aura ID is matching our list
+            local getTime = GetTime()
+            local remainingTime = math.floor(expirationTime - getTime + 0.5)
+
+			if (PartyBuffs[z].debuffs[debuffId] ~= ""DebuffOn"" .. count..remainingTime) then
+                local green = 0
+                local blue = 0
+                local strcount = ""0.0""..count;
+                local strbluecount = ""0.0""..remainingTime;
+                
+                if (count >= 10) then
+                    strcount = ""0.""..count;
+                end
+
+                if(remainingTime >= 10) then
+                   strbluecount = ""0.""..remainingTime
+                end
+
+                green = tonumber(strcount)
+                blue = tonumber(strbluecount)
+
+                PartyBuffs[z].debuffs[debuffId].t:SetColorTexture(0, green, blue, alphaColor)
+
+                PartyBuffs[z].debuffs[debuffId].t:SetAllPoints(false)
+                --print(""["" .. buff.. ""] "" .. auraName.. "" "" .. count.. "" Green: "" .. green.. "" Blue: "" .. blue)
+               PartyBuffs[z].debuffslast[debuffId] = ""DebuffOn"" .. count..remainingTime
+            end
+        else
+            if ( PartyBuffs[z].debuffslast[debuffId] ~= ""DebuffOff"") then
+                PartyBuffs[z].debuffs[debuffId].t:SetColorTexture(1, 1, 1, alphaColor)
+                PartyBuffs[z].debuffs[debuffId].t:SetAllPoints(false)
+                PartyBuffs[z].debuffslast[debuffId] = ""DebuffOff""
+                --print(""["" .. buff.. ""] "" .. auraName.. "" Off"")
+            end
+        end
+    end
+    end
+end
+
+";
+        private const string partybuff = @"	raidHealthFrame[i]:SetScript(""OnUpdate"", updateRaidHealth)
+	end
+	
+	for z =1, 4  do
+			i=0
+		for _, buffId in pairs(buffs) do
+
+			 PartyBuffs[z].Buffs[buffId] = CreateFrame(""frame"","""", parent)
+			 PartyBuffs[z].Buffs[buffId]:SetSize(size, size)
+	         PartyBuffs[z].Buffs[buffId]:SetPoint(""TOPLEFT"", i * size, -size * 11+z)                            -- column 13 [Target Buffs]
+			 PartyBuffs[z].Buffs[buffId].t = PartyBuffs[z].Buffs[buffId]:CreateTexture()
+	         PartyBuffs[z].Buffs[buffId].t:SetColorTexture(1, 1, 1, alphaColor)
+		     PartyBuffs[z].Buffs[buffId].t:SetAllPoints(  PartyBuffs[z].Buffs[buffId])
+			PartyBuffs[z].Buffs[buffId]:Show()
+			PartyBuffs[z].Buffs[buffId]:SetScript(""OnUpdate"", updatePartyBuffs)
+        i=i+1
+		end
+	end
+    i=0
+	for _, debuffId in pairs(debuffs) do
+		for z=1, 4 do 
+			PartyBuffs[z].debuffs[debuffId] = CreateFrame(""frame"","""", parent)
+			PartyBuffs[z].debuffs[debuffId]:SetSize(size, size)
+			PartyBuffs[z].debuffs[debuffId]:SetPoint(""TOPLEFT"", i * size, -size * 15+z)         -- row 4, column 1+ [Spell In Range]
+			PartyBuffs[z].debuffs[debuffId].t = PartyBuffs[z].debuffs[debuffId]:CreateTexture()        
+			PartyBuffs[z].debuffs[debuffId].t:SetColorTexture(1, 1, 1, alphaColor)
+			PartyBuffs[z].debuffs[debuffId].t:SetAllPoints(PartyBuffs[z].debuffs[debuffId])
+			PartyBuffs[z].debuffs[debuffId]:Show()		               
+			PartyBuffs[z].debuffs[debuffId]:SetScript(""OnUpdate"", updatePartyDebuffs)
+		end
+        i=i+1
+	end
+end
+";
+        private const string mounted = @"local function PlayerNotMove()
+	mountedplayer = 0
+	moveTime = 1
+	if IsMounted() then
+		mountedplayer = .5
+	end
+	if GetUnitSpeed(""Player"") == 0 then
+		moveTime = 0
+	end
+        PlayerMovingFrame.t:SetColorTexture(moveTime, mountedplayer, 1, alphaColor)
+end
+";
         private const string CustomLua = @"local Healingbuffs =  ""Riptide""
 local Race = {
 	[""Human""] = 0.01,
@@ -2175,44 +2647,45 @@ local Race = {
 	[""Troll""]= 0.10,
 	[""Blood Elf""]= 0.11,
 	[""Goblin""]= 0.12,
+    [""Worgen""] = .13,
 }
 local Spec = {
-	[""Blood""] = 0.01,
-	[""Frost""] = 0.02,
-	[""Unholy""] =0.03,
-	[""Havoc""] = 0.04,
-	[""Vengeance""] =0.05,
-	[""Balance""] = 0.06,
-	[""Feral""] =0.07,
-	[""Guardian""] =0.08,
-	[""Restoration""] =0.09,
-	[""Beast Mastery""] = 0.10,
-	[""Marksmanship""] =0.11,
-	[""Survival""] = 0.12,
-	[""Arcane""] =0.13,
-	[""Fire""] = 0.14,
-	[""Frost""] =0.15,
-	[""Brewmaster""] = 0.16,
-	[""Mistweaver""] =0.17,
-	[""Windwalker""] = 0.18,
-	[""Holy""] = 0.19,
-	[""Protection""] = 0.20,
-	[""Retribution""] =0.21,
-	[""Discipline""] = 0.22,
-	[""HolyPriest""]=.23,
-	[""Shadow""] =0.24,
-	[""Assassination""] =0.25,
-	[""Outlaw""] =0.26,
-	[""Subtlety""] = 0.27,
-	[""Elemental""] = 0.28,
-	[""Enhancement""] = 0.29,
-	[""RestorationShaman""] = 0.30,
-	[""Affliction""] = 0.31,
-	[""Arms""] = 0.32,
-	[""Fury""] = 0.33,
-	[""Protection""] = 0.34,
-	[""Demonology""] = 0.35,
-    [""Destruction""] = 0.36,
+	[250] = 0.01,
+	[251] = 0.02,
+	[252] =0.03,
+	[577] = 0.04,
+	[581] =0.05,
+	[102] = 0.06,
+	[103] =0.07,
+	[104] =0.08,
+	[105] =0.09,
+	[253] = 0.10,
+	[254] =0.11,
+	[255] = 0.12,
+	[62] =0.13,
+	[63] = 0.14,
+	[64] =0.15,
+	[268] = 0.16,
+	[269] =0.17,
+	[270] = 0.18,
+	[65] = 0.19,
+	[66] = 0.20,
+	[70] =0.21,
+	[256] = 0.22,
+	[257]=.23,
+	[257] =0.24,
+	[259] =0.25,
+	[260] =0.26,
+	[261] = 0.27,
+	[262] = 0.28,
+    [263] = 0.29,
+	[264] = 0.30,
+	[265] = 0.31,
+	[71] = 0.32,
+	[72] = 0.33,
+	[73] = 0.34,
+	[266] = 0.35,
+    [267] = 0.36,
 }
 
 local activeUnitPlates = {}
@@ -2238,6 +2711,85 @@ local raidBuff = {}
 local raidBufftime = {}
 local partySize = 0
 local setBonusFrame = nil
+local debufftarget = {locX = 0,locY = 30, debufftargetframes = {},dispellType = {
+	[250] = {type1= 'Magic'},
+	[251] = {type1= 'Magic'},
+	[252] = {type1= 'Magic'},
+	[577] = {type1= 'Magic'},
+	[581] = {type1= 'Magic'},
+	[102] = {type1= 'Magic'},
+	[103] = {type1= 'Magic'},
+	[104] = {type1= 'Magic'},
+	[105] = {type1= 'Magic'},
+	[253] =  {type1= 'Magic'},
+	[254] = {type1= 'Magic'},
+	[255] =  {type1= 'Magic'},
+	[62] = {type1= 'Magic'},
+	[63] =  {type1= 'Magic'},
+	[64] = {type1= 'Magic'},
+	[268] = {type1= 'Magic'},
+	[269] = {type1= 'Magic'},
+	[270] = {type1= 'Magic'},
+	[65] = {type1= 'Magic'},
+	[66] = {type1= 'Magic'},
+	[70] = {type1= 'Magic'},
+	[256] = {type1= 'Magic'},
+	[257]= {type1= 'Magic'},
+	[257] = {type1= 'Magic'},
+	[259] = {type1= 'Magic'},
+	[260] = {type1= 'Magic'},
+	[261] =  {type1= 'Magic'},
+	[262] =  {type1= 'Magic'},
+    [263] = {type1= 'Magic'},
+	[264] = {type1= 'Magic'},
+	[265] =  {type1= 'Magic'},
+	[71] = {type1= 'Magic'},
+	[72] = {type1= 'Magic'},
+	[73] = {type1= 'Magic'},
+	[266] = {type1= 'Magic'},
+    [267] = {type1= 'Magic'}},
+	debuff = {targetdebuff}}
+local debuffraid = {locX = 0,locY = 30, debuffraidframes = {},
+dispellType = {
+	[250] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[251] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[252] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[577] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[581] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[102] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[103] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[104] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[105] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[253] =  {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[254] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[255] =  {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[62] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[63] =  {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[64] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[268] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[269] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[270] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[65] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[66] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[70] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[256] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[257]= {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[257] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[259] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[260] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[261] =  {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[262] =  {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+    [263] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[264] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[265] =  {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[71] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[72] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[73] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+	[266] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""},
+    [267] = {type1= 'Magic', type2 = 'Curse', type3= "", type4 = ""}},
+	debuff = {}}
+
+
 
 local frame = CreateFrame(""frame"", """", parent)
 frame:RegisterEvent(""NAME_PLATE_UNIT_ADDED"")
@@ -2257,6 +2809,113 @@ frame:RegisterEvent(""PLAYER_ENTER_COMBAT"")
 frame:RegisterEvent(""PLAYER_LEAVE_COMBAT"")
 frame:RegisterEvent(""PLAYER_CONTROL_LOST"")
 frame:RegisterEvent(""PLAYER_CONTROL_GAINED"")
+frame:RegisterEvent(""ACTIONBAR_UPDATE_STATE"")
+frame:RegisterUnitEvent(""UNIT_SPELLCAST_START"",""player"")
+frame:RegisterEvent(""CURRENT_SPELL_CAST_CHANGED"")
+frame:RegisterUnitEvent(""UNIT_SPELLCAST_SUCCEEDED"",""player"")
+
+local function updateTargetDebuffs(self, event)
+    
+	for _, auraId in pairs(debuffs) do
+        local buff = ""UnitDebuff"";
+        local auraName = GetSpellInfo(auraId)
+
+        if auraName == nil then
+            if (lastDebuffState[auraId] ~= ""DebuffOff"") then
+                targetDebuffFrames[auraId].t:SetColorTexture(1, 1, 1, alphaColor)
+                targetDebuffFrames[auraId].t:SetAllPoints(false)
+                lastDebuffState[auraId] = ""DebuffOff""               
+            end
+    
+            return
+        end
+        
+		--print(""Getting debuff for Id = "" .. auraName)
+
+
+        local name, _, _, count, _, duration, expirationTime, _, _, _, spellId, _, _, _, _, _ = UnitDebuff(""target"", auraName, nil, ""PLAYER|HARMFUL"")
+
+		if (name == auraName) then -- We have Aura up and Aura ID is matching our list
+                local getTime = GetTime()
+                local remainingTime = 0
+                if(expirationTime ~=0) then
+                     remainingTime = expirationTime - getTime + (timeDiff)
+                end
+                remainingTime = string.format(""%00.2f"", tostring(remainingTime))
+
+			if (lastDebuffState[auraId] ~= ""DebuffOn"" .. count..remainingTime) then
+                local red = count/100;
+    			local green = tonumber(strsub(tostring(remainingTime), 1, 2)) / 100
+                local blue = tonumber(strsub(tostring(remainingTime), -2, -1)) / 100
+
+
+                targetDebuffFrames[auraId].t:SetColorTexture(red, green, blue, alphaColor)
+                targetDebuffFrames[auraId].t:SetAllPoints(false)
+                --print(""["" .. buff.. ""] "" .. auraName.. "" "" .. count.. "" Green: "" .. green.. "" Blue: "" .. blue)
+                lastDebuffState[auraId] = ""DebuffOn"" .. count..remainingTime
+            end
+        else
+            if (lastDebuffState[auraId] ~= ""DebuffOff"") then
+                targetDebuffFrames[auraId].t:SetColorTexture(1, 1, 1, alphaColor)
+                targetDebuffFrames[auraId].t:SetAllPoints(false)
+                lastDebuffState[auraId] = ""DebuffOff""
+                --print(""["" .. buff.. ""] "" .. auraName.. "" Off"")
+            end
+        end
+
+    end
+end
+local function updateMyBuffs(self, event)
+    
+	for _, auraId in pairs(buffs) do
+		local auraName = GetSpellInfo(auraId)
+		
+		if auraName == nil then
+			if (lastBuffState[auraId] ~= ""BuffOff"") then
+                buffFrames[auraId].t:SetColorTexture(1, 1, 1, alphaColor)
+                buffFrames[auraId].t:SetAllPoints(false)
+                lastBuffState[auraId] = ""BuffOff""
+                --print(""["" .. buff.. ""] "" .. auraName.. "" Off"")
+            end
+			return
+		end
+
+        local name, _, _, count, debuffType, duration, expirationTime, _, _, _, spellId = UnitBuff(""player"", auraName)
+
+		if (name == auraName) then -- We have Aura up and Aura ID is matching our list
+                local getTime = GetTime()
+                local remainingTime = 0
+                if(expirationTime ~=0) then
+                     remainingTime = expirationTime - getTime + 0.5
+                end
+                remainingTime = string.format(""%00.2f"", tostring(remainingTime))
+                local red = count/100;
+			    local green = tonumber(strsub(tostring(remainingTime), 1, 2)) / 100
+                local blue = tonumber(strsub(tostring(remainingTime), -2, -1)) / 100
+
+               
+              --  if spellId == 194084 then
+                --    print(""Remaining CD: "",remainingTime,"" Count : "",red, "" Seconds :"",green,"" tenths : "",blue)
+                --end
+			if (lastBuffState[auraId] ~= ""BuffOn"" .. count..remainingTime) then
+                
+                --print(""expirationTime:""..expirationTime.."" remainingTime:"" .. remainingTime.. "" blue:"" .. blue.. "" strbluecount:"" ..  strbluecount)
+                buffFrames[auraId].t:SetColorTexture(red, green, blue, alphaColor)
+
+                buffFrames[auraId].t:SetAllPoints(false)
+                --print(""["" .. buff.. ""] "" .. auraName.. "" "" .. count.. "" Green: "" .. green)
+                lastBuffState[auraId] = ""BuffOn"" .. count
+            end
+        else
+            if (lastBuffState[auraId] ~= ""BuffOff"") then
+                buffFrames[auraId].t:SetColorTexture(1, 1, 1, alphaColor)
+                buffFrames[auraId].t:SetAllPoints(false)
+                lastBuffState[auraId] = ""BuffOff""
+                --print(""["" .. buff.. ""] "" .. auraName.. "" Off"")
+            end
+        end
+    end
+end
 
 local function updateFlag(self, event)
 	if event == ""PLAYER_CONTROL_GAINED"" then
@@ -2266,15 +2925,41 @@ local function updateFlag(self, event)
 		flagFrame.t:SetColorTexture(1,0,0,alphaColor)
 	end
 end
-
+local function updateSpellCooldowns(self, event) 
+    for _, spellId in pairs(cooldowns) do
+		-- start is the value of GetTime() at the point the spell began cooling down
+		-- duration is the total duration of the cooldown, NOT the remaining
+		local start, duration, _ = GetSpellCooldown(spellId)
+        --print("" "" .. spellId .. "" is currently active, use it and wait "" .. duration .. "" seconds for the next one."")
+        local cooldownLeft = (start + duration - GetTime())
+        local remainingTime = cooldownLeft - (timeDiff)
+        if remainingTime < 0 then
+			 remainingTime = 0
+		 end
+        
+		if remainingTime ~= 0 then -- the spell is not ready to be cast
+            	--print(""Spell with Id = "" .. spellId .. "" is on CD"")
+                --print("" "" ..spellId.. "" remaining time: "" ..math.floor(remainingTime)..  "" "")
+				remainingTime = string.format(""%00.3f"",tostring(remainingTime) )
+				local green = tonumber(strsub(tostring(remainingTime), 1, 2))/100
+				local blue = tonumber(strsub( tostring(remainingTime), -3,-2))/100
+				cooldownframes[spellId].t:SetColorTexture(1, green, blue, alphaColor)				
+				cooldownframes[spellId].t:SetAllPoints(false)
+		else
+				cooldownframes[spellId].t:SetColorTexture(0, 1, 1, alphaColor)
+				cooldownframes[spellId].t:SetAllPoints(false)
+		end						
+	end
+end
 local function HasteInfoUpdate()
 	local ratingBonus = math.floor(GetHaste())
 	if lasthaste == ratingBonus then return end
 	lastehaste = ratingBonus
-	hasteInfo[2] = 0
-	if (ratingBonus * -1) > ratingBonus then
-		HasteInfo[2] = 1
-	end
+    if ratingBonus == math.abs(ratingBonus) then
+		hasteInfo[2] = 1
+	else
+        hasteInfo[2] = 0
+    end
 	hasteInfo[1] = tonumber(""0.0"".. math.abs(ratingBonus))
 	if (math.abs(ratingBonus) >= 10) then
 		hasteInfo[1] = tonumber(""0."".. math.abs(ratingBonus))
@@ -2283,7 +2968,6 @@ local function HasteInfoUpdate()
 end
 local function UpdateMana()
 		charUnit[1] = UnitPower(""player"",0) / UnitPowerMax(""player"",0)
-		HasteInfoUpdate()
 		PlayerStatFrame[4].t:SetColorTexture(hasteInfo[2], hasteInfo[1],charUnit[1], alphaColor)
 end
 
@@ -2317,9 +3001,10 @@ local function Talents()
 end
 
 local function CharRaceUpdate()
+    local specialsz =select(1, GetSpecializationInfo(GetSpecialization()))
 	charUnit[2] = Race[UnitRace(""player"")]
-	charUnit[3] = Spec[select(2, GetSpecializationInfo(GetSpecialization()))]
-	
+	charUnit[3] = Spec[specialsz]
+ 
 end
 
 
@@ -2383,7 +3068,6 @@ local function UpdateRaidIndicators(unit)
 					HealthChangedEvent(unit)
 					RangeCheck(unit)
 					RaidRoleCheck(unit)
-				
 					--print(unit, ""is at :"", raidheal_cache[unit], "" and At : "", i)
 					raidHealthFrame[i].t:SetColorTexture(raidheal_cache[unit], RaidRange[unit], RaidRole[unit], alphaColor)
 				end	
@@ -2629,6 +3313,8 @@ local function DBMPull(prefix,msg,sender)
    	and tonumber ( select(3, strsplit(""\t"", msg) ) ) == instanceMapID  then
 		local time = select(2,strsplit(""\t"", msg) )
 		time =  tonumber(time)
+	    print(""DBM Time"",time,"" Msg :"",msg)
+
 		if time ~= 0 then
 			print(""DBM pull timer"")
 			tickerdbm = time
@@ -2659,7 +3345,7 @@ local function updatetargetInfoFrame()
 	--print(""Info "", targetexist, "" "", rangetargetexist )
 	targetInfoFrame.t:SetColorTexture(targetexist,rangetargetexist, 0 ,alphaColor)
 end
-local function InitializeThree()
+local function InitializeFour()
 	for i = 1, 4 do 
 		raidBuff[i] = 1
 		raidBufftime[i] =1
@@ -2668,7 +3354,7 @@ local function InitializeThree()
 	for i = 1, 20 do	
 		raidHealthFrame[i] = CreateFrame(""frame"", """", parent)
 		raidHealthFrame[i]:SetSize(size, size)
-		raidHealthFrame[i]:SetPoint(""TOPLEFT"", size*(i-1), -size *18 )   --  row 1-20,  column 19
+		raidHealthFrame[i]:SetPoint(""TOPLEFT"", size*(i-1), -size *21 )   --  row 1-20,  column 19
 		raidHealthFrame[i].t = raidHealthFrame[i]:CreateTexture()        
 		raidHealthFrame[i].t:SetColorTexture(1, 1, 1, alphaColor)
 		raidHealthFrame[i].t:SetAllPoints(raidHealthFrame[i])
@@ -2677,7 +3363,7 @@ local function InitializeThree()
 	for i = 21, 30 do		
 		raidHealthFrame[i] = CreateFrame(""frame"", """", parent)
 		raidHealthFrame[i]:SetSize(size, size)
-		raidHealthFrame[i]:SetPoint(""TOPLEFT"", size*(i-21), -size *19 )   --  row 1-10,  column 20
+		raidHealthFrame[i]:SetPoint(""TOPLEFT"", size*(i-21), -size *22 )   --  row 1-10,  column 20
 		raidHealthFrame[i].t = raidHealthFrame[i]:CreateTexture()        
 		raidHealthFrame[i].t:SetColorTexture(1, 1, 1, alphaColor)
 		raidHealthFrame[i].t:SetAllPoints(raidHealthFrame[i])
@@ -2685,7 +3371,7 @@ local function InitializeThree()
 	end
 		raidSizeFrame = CreateFrame(""frame"", """", parent)
 		raidSizeFrame:SetSize(size, size)
-		raidSizeFrame:SetPoint(""TOPLEFT"", size*(10), -size *19 )   --  row 11,  column 20
+		raidSizeFrame:SetPoint(""TOPLEFT"", size*(10), -size *22 )   --  row 11,  column 20
 		raidSizeFrame.t = raidSizeFrame:CreateTexture()        
 		raidSizeFrame.t:SetColorTexture(1, 1, 1, alphaColor)
 		raidSizeFrame.t:SetAllPoints(raidSizeFrame)
@@ -2695,7 +3381,7 @@ local function InitializeThree()
 	for i = 1, 4 do		
 		RaidBuffFrame[i] = CreateFrame(""frame"", """", parent)
 		RaidBuffFrame[i]:SetSize(size, size)
-		RaidBuffFrame[i]:SetPoint(""TOPLEFT"", size*(10 + i), -size *19 )   --  row 12-15,  column 20
+		RaidBuffFrame[i]:SetPoint(""TOPLEFT"", size*(10 + i), -size *22 )   --  row 12-15,  column 20
 		RaidBuffFrame[i].t = RaidBuffFrame[i]:CreateTexture()        
 		RaidBuffFrame[i].t:SetColorTexture(1, 1, 1, alphaColor)
 		RaidBuffFrame[i].t:SetAllPoints(RaidBuffFrame[i])
@@ -2705,7 +3391,7 @@ local function InitializeThree()
 	for i = 1, 5 do
 		PlayerStatFrame[i] = CreateFrame(""frame"", """", parent)
 		PlayerStatFrame[i]:SetSize(size, size)
-		PlayerStatFrame[i]:SetPoint(""TOPLEFT"", size*(i-1), -size *20 )   --  row 1-4,  column 21
+		PlayerStatFrame[i]:SetPoint(""TOPLEFT"", size*(i-1), -size *23 )   --  row 1-4,  column 21
 		PlayerStatFrame[i].t =PlayerStatFrame[i]:CreateTexture()        
 		PlayerStatFrame[i].t:SetColorTexture(1, 1, 1, alphaColor)
 		PlayerStatFrame[i].t:SetAllPoints(PlayerStatFrame[i])
@@ -2713,7 +3399,7 @@ local function InitializeThree()
 	end
 		timerDBMFrames = CreateFrame(""frame"", """", parent)
 		timerDBMFrames:SetSize(size, size);
-		timerDBMFrames:SetPoint(""TOPLEFT"", size * 5, -(size * 20))           -- column 6 row 21
+		timerDBMFrames:SetPoint(""TOPLEFT"", size * 5, -(size * 23))           -- column 6 row 21
 		timerDBMFrames.t = timerDBMFrames:CreateTexture()        
 		timerDBMFrames.t:SetColorTexture(0, 0, 0, alphaColor)
 		timerDBMFrames.t:SetAllPoints(timerDBMFrames)
@@ -2722,7 +3408,7 @@ local function InitializeThree()
 
 		totemsFrame = CreateFrame(""frame"", """", parent)
 		totemsFrame:SetSize(size, size);
-		totemsFrame:SetPoint(""TOPLEFT"", size * 6, -(size * 20))           -- column 7 row 21
+		totemsFrame:SetPoint(""TOPLEFT"", size * 6, -(size * 23))           -- column 7 row 21
 		totemsFrame.t = totemsFrame:CreateTexture()        
 		totemsFrame.t:SetColorTexture(0, 0, 0, alphaColor)
 		totemsFrame.t:SetAllPoints(totemsFrame)
@@ -2730,7 +3416,7 @@ local function InitializeThree()
 
 		targetInfoFrame = CreateFrame(""frame"", """", parent)
 		targetInfoFrame:SetSize(size, size);
-		targetInfoFrame:SetPoint(""TOPLEFT"", size * 7, -(size * 20))           -- column 8 row 21
+		targetInfoFrame:SetPoint(""TOPLEFT"", size * 7, -(size * 23))           -- column 8 row 21
 		targetInfoFrame.t = targetInfoFrame:CreateTexture()        
 		targetInfoFrame.t:SetColorTexture(0, 0, 0, alphaColor)
 		targetInfoFrame.t:SetAllPoints(targetInfoFrame)
@@ -2738,13 +3424,13 @@ local function InitializeThree()
 
 		setBonusFrame = CreateFrame(""frame"", """", parent)
 		setBonusFrame:SetSize(size, size);
-		setBonusFrame:SetPoint(""TOPLEFT"", size * 8, -(size * 20))           -- column 9 row 21
+		setBonusFrame:SetPoint(""TOPLEFT"", size * 8, -(size * 23))           -- column 9 row 21
 		setBonusFrame.t = setBonusFrame:CreateTexture()        
 		setBonusFrame.t:SetColorTexture(0, 0, 0, alphaColor)
 		setBonusFrame.t:SetAllPoints(setBonusFrame)
 		setBonusFrame:Show()
 end
-
+is_casting = false
 local function HealinEventHandler(self,event, ...)
     if event == ""NAME_PLATE_UNIT_ADDED"" then
 		    AddNameplate(select(1,...))
@@ -2757,6 +3443,28 @@ local function HealinEventHandler(self,event, ...)
 		end
 	end
 
+	if event == ""UNIT_SPELLCAST_SUCCEEDED"" then
+		if not is_casting then
+			for _, spellId in pairs(cooldowns) do
+				if spellId == select(5,...) then
+                    timeDiff = GetTime() - sendTime
+                    timeDiff = timeDiff > select(4, GetNetStats())/ 1000  and timeDiff or select(4, GetNetStats())/ 1000
+				end
+            end
+        end
+    is_casting = false
+	end
+	if event == ""UNIT_SPELLCAST_FAILED"" then
+        is_casting = false
+	end
+    if event == ""UNIT_SPELLCAST_START"" then
+            is_casting = true
+			timeDiff = GetTime() - sendTime
+            timeDiff = timeDiff > select(4, GetNetStats())/ 500  and timeDiff or select(4, GetNetStats())/ 500
+    end
+	if event == ""CURRENT_SPELL_CAST_CHANGED"" then
+        sendTime = GetTime()
+	end
 	if event == ""RAID_ROSTER_UPDATE"" or event == ""GROUP_ROSTER_UPDATE"" then
 	   UdateRaidSizeFrame()
     end
@@ -2770,12 +3478,17 @@ local function HealinEventHandler(self,event, ...)
 		updateUnitPower()
 	end
 	if event == ""PLAYER_ENTERING_WORLD""then
-		CharRaceUpdate()
+        HasteInfoUpdate()		
+    CharRaceUpdate()
 		Talents()
 		TurnOnPlates()
+        HasteInfoUpdate()
 		updateSetBonus()
 	end
 	if event == ""PLAYER_REGEN_DISABLED""then 
+	    UpdateMana()
+		updatePower()
+		updateUnitPower()
 		ClearNamePlates()
 		CharRaceUpdate()
 		Talents()
@@ -2784,6 +3497,7 @@ local function HealinEventHandler(self,event, ...)
 		updateSetBonus()
 	end
 	if event == ""PLAYER_REGEN_ENABLED""then 
+
 		ClearNamePlates()
 		activeEnemies()
 		updateCombat()
@@ -2813,6 +3527,9 @@ local function HealinEventHandler(self,event, ...)
 		hasTarget()
 		updatetargetInfoFrame()
 	end
+    if event == ""ACTIONBAR_UPDATE_STATE"" then
+        updateSpellCharges()
+    end
 	if event == ""PLAYER_ENTER_COMBAT"" or event == ""PLAYER_LEAVE_COMBAT"" then
 		updateIsFriendly()
 		AutoAtacking()
@@ -2829,13 +3546,7 @@ end
 
 local GlobalTimer = 0
 local function onUpDateFunction(self,elapsed)
-		if GlobalTimer <= 0 then
-			GlobalTimer = .10
-		else
-			GlobalTimer = GlobalTimer - elapsed
-		end
-		
-		if GlobalTimer <= .01 then
+	
 			updateRaidBuff()
 			
 			updateDBMFrames(elapsed)
@@ -2857,7 +3568,7 @@ local function onUpDateFunction(self,elapsed)
 			updateSpellCooldowns()
 			updateSpellInRangeFrames()
 			updateTargetDebuffs()
-			updateSpellCharges()
+			
 			updateTargetBuffs()
 			PlayerNotMove()
 			updateTargetCurrentSpell()
@@ -2868,9 +3579,6 @@ local function onUpDateFunction(self,elapsed)
 			updateItemCooldowns()
 			updatePlayerDebuffs()
 			updateIsSpellOverlayedFrames()
-
-			 GlobalTimer= .10
-		end
 end	
 frame:SetScript(""OnEvent"",HealinEventHandler)
 frame:SetScript(""OnUpdate"",onUpDateFunction)";
@@ -3113,7 +3821,7 @@ end";
         private const string LibXmlContent = @"<Ui>
 	<Script file=""LibSpellRange-1.0.lua""/>
 </Ui>";
-        private const string LibStubLua= "LibStub.lua";
+        private const string LibStubLua = "LibStub.lua";
         private const string LibStubLuaContent = @"-- $Id: LibStub.lua 103 2014-10-16 03:02:50Z mikk $
 -- LibStub is a simple versioning stub meant for use in Libraries.  http://www.wowace.com/addons/libstub/ for more info
 -- LibStub is hereby placed in the Public Domain
@@ -3185,11 +3893,6 @@ LibStub.lua";
 
 
 }
-
-
-
-
-
 
 /*
 [AddonDetails.db]
@@ -3284,4 +3987,5 @@ Aura,2645,Ghost Wolf
 Aura,234143,Temptation
 Item,142117,Prolonged Power
 Item,142173,Collapsing Futures
+[Dispell.db]
 */
