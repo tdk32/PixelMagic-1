@@ -185,7 +185,7 @@ namespace PixelMagic.Rotation
                     SpellCast(VOID_BOLT);
             }
 
-            if (!WoW.IsMoving && DotsUp() && !WoW.PlayerHasBuff(T19_VOID) && WoW.IsSpellOnCooldown(VOID_BOLT))
+            if (!WoW.IsMoving && DotsUp() && !WoW.PlayerHasBuff(T19_VOID) && WoW.LastSpell != VOID_ERUPTION)
                 SpellCast(MIND_BLAST);
 
             if(WoW.PlayerSpellCharges(SHADOW_WORD_DEATH) == 2 && WoW.Insanity <= 80 && WoW.TargetHealthPercent <= 20 && DotsUp())
