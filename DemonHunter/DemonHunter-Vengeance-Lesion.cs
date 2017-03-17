@@ -835,6 +835,18 @@ namespace PixelMagic.Rotation
                     {
                         WoW.CastSpell("Metamorphasis");
                     }
+					
+				if (WoW.PlayerHasBuff("Metamorphasis") && WoW.CanCast("Shear") && !WoW.CanCast("Soul Carver") && !WoW.CanCast("Immolation Aura") && WoW.PlayerBuffStacks("Soul Fragments") < 5)
+					{
+						WoW.CastSpell("Shear");
+						return;
+					}
+				if (WoW.PlayerHasBuff("Metamorphasis") && WoW.CanCast("Soul Cleave") && WoW.Pain > 50 && WoW.PlayerBuffStacks("Soul Fragments") > 4  )
+					{
+						WoW.CastSpell("Soul Cleave");
+						return;
+					}
+				
 				
 				
 				
@@ -1031,7 +1043,7 @@ namespace PixelMagic.Rotation
                     {
                         if (!WoW.IsSpellOnCooldown("Sigal of Silence") && WoW.WasLastCasted("Arcane Torrent"))
                         {
-                            Log.Write("Interrupting spell");
+                            
                             WoW.CastSpell("Sigal of Silence");
                             interruptwatch.Reset();
                             interruptwatch.Start();
@@ -1040,7 +1052,7 @@ namespace PixelMagic.Rotation
 
                         if (!WoW.IsSpellOnCooldown("Arcane Torrent") && WoW.WasLastCasted("Sigal of Silence"))
                         {
-                            Log.Write("Interrupting spell");
+                            
                             WoW.CastSpell("Arcane Torrent");
                             interruptwatch.Reset();
                             interruptwatch.Start();
