@@ -1,13 +1,15 @@
 //-TWonderchilds Shadow Priest
 //-ToDo:
 //          - AoE Rotation
+//          - Legendary Trinket
+//          - Legendary Boots
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Threading;
 using PixelMagic.GUI;
 using PixelMagic.Helpers;
-using System;
+
 
 namespace PixelMagic.Rotation
 {
@@ -35,6 +37,7 @@ namespace PixelMagic.Rotation
         private const string SHADOWFORM_AURA = "Shadowform";
         private const string POWER_INFUSION_AURA = "Power Infusion";
         private const string VOIDFORM_AURA = "Voidform";
+        private const string T19_VOID = "Void";
         //--------------------------//
         //-Form-Stuff---------------//
         // Cooldowns
@@ -125,14 +128,17 @@ namespace PixelMagic.Rotation
         //--------------------------//
         public override void Stop()
         {
-            if (DetectKeyPress.GetKeyState(0x76) < 0)
-                UseCooldowns = !UseCooldowns;
         }
         //-Pulse--------------------//
         public override void Pulse()
         {
             if (DetectKeyPress.GetKeyState(0x76) < 0)
+            {
                 UseCooldowns = !UseCooldowns;
+                Thread.Sleep(150);
+            }
+                
+
             if (WoW.IsInCombat)
                 interruptwatch.Start();
             else
@@ -171,14 +177,15 @@ namespace PixelMagic.Rotation
             if (!WoW.PlayerHasBuff(VOIDFORM_AURA) && WoW.Insanity >= 65 && !WoW.IsMoving && DotsUp())
                 SpellCast(VOID_ERUPTION);
 
-            if(WoW.PlayerHasBuff(VOIDFORM_AURA) && DotsUp())
+            if(WoW.PlayerHasBuff(VOIDFORM_AURA))
             {
-                if(!WoW.IsMoving && VoidTorrentRadio2.Checked)
+                if(!WoW.IsMoving && VoidTorrentRadio2.Checked && DotsUp() && !WoW.PlayerHasBuff(T19_VOID) && WoW.IsSpellOnCooldown(MIND_BLAST) && WoW.IsSpellOnCooldown(VOID_BOLT))
                     SpellCast(VOID_TORRENT);
-                SpellCast(VOID_BOLT);
+                if(WoW.PlayerHasBuff(T19_VOID) || DotsUp())
+                    SpellCast(VOID_BOLT);
             }
 
-            if (!WoW.IsMoving && DotsUp())
+            if (!WoW.IsMoving && DotsUp() && !WoW.PlayerHasBuff(T19_VOID) && WoW.IsSpellOnCooldown(VOID_BOLT))
                 SpellCast(MIND_BLAST);
 
             if(WoW.PlayerSpellCharges(SHADOW_WORD_DEATH) == 2 && WoW.Insanity <= 80 && WoW.TargetHealthPercent <= 20 && DotsUp())
@@ -186,13 +193,13 @@ namespace PixelMagic.Rotation
             if (WoW.PlayerSpellCharges(SHADOW_WORD_DEATH) == 1 && WoW.Insanity <= int.Parse(SWDText.Text) && WoW.TargetHealthPercent <= 20 && DotsUp())
                 SpellCast(SHADOW_WORD_DEATH);
 
-            if ((!WoW.TargetHasDebuff(VAMPIRIC_TOUCH) || WoW.TargetDebuffTimeRemaining(VAMPIRIC_TOUCH) <= 4) && !WoW.IsMoving && WoW.LastSpell!= VAMPIRIC_TOUCH) //Messy workaround to fix the double VT-Cast, since addon/BLizz API is returning weird values
+            if ((!WoW.TargetHasDebuff(VAMPIRIC_TOUCH) || WoW.TargetDebuffTimeRemaining(VAMPIRIC_TOUCH) <= 4) && !WoW.IsMoving && WoW.LastSpell!= VAMPIRIC_TOUCH && !WoW.PlayerHasBuff(T19_VOID)) //Messy workaround to fix the double VT-Cast, since addon/BLizz API is returning weird values
                 SpellCast(VAMPIRIC_TOUCH);
                 
-            if ((!WoW.TargetHasDebuff(SHADOW_WORD_PAIN) || WoW.TargetDebuffTimeRemaining(SHADOW_WORD_PAIN) <= 3))
+            if ((!WoW.TargetHasDebuff(SHADOW_WORD_PAIN) || WoW.TargetDebuffTimeRemaining(SHADOW_WORD_PAIN) <= 3) && !WoW.PlayerHasBuff(T19_VOID))
                 SpellCast(SHADOW_WORD_PAIN);
             
-            if(WoW.TargetHasDebuff(SHADOW_WORD_PAIN) && WoW.TargetHasDebuff(VAMPIRIC_TOUCH) && !WoW.IsMoving && WoW.IsSpellOnCooldown(MIND_BLAST))
+            if(WoW.TargetHasDebuff(SHADOW_WORD_PAIN) && WoW.TargetHasDebuff(VAMPIRIC_TOUCH) && !WoW.IsMoving && WoW.IsSpellOnCooldown(MIND_BLAST) && !WoW.PlayerHasBuff(T19_VOID) && WoW.LastSpell != VOID_ERUPTION)
                 SpellCast(MIND_FLAY);
         }
 
@@ -224,7 +231,7 @@ namespace PixelMagic.Rotation
                 SpellCast(SHADOW_FIEND);
             if (SFWaitBox.Checked && WoW.IsSpellOnCooldown(POWER_INFUSION) && WoW.SpellCooldownTimeRemaining(POWER_INFUSION) > int.Parse(SFWaitText.Text))
                 SpellCast(SHADOW_FIEND);
-            if (!WoW.IsMoving && VoidTorrentRadio1.Checked && DotsUp() && VoidTorrentBox.Checked)
+            if (!WoW.IsMoving && VoidTorrentRadio1.Checked && DotsUp() && VoidTorrentBox.Checked && WoW.IsSpellOnCooldown(MIND_BLAST) && WoW.IsSpellOnCooldown(VOID_BOLT))
                 SpellCast(VOID_TORRENT);
             if (WoW.HealthPercent < int.Parse(VEText.Text) && !WoW.IsSpellOnCooldown(VAMPIRIC_EMBRACE))
             {
@@ -284,6 +291,7 @@ Spell,15487,Silence,E
 Spell,47585,Dispersion,NumPad5
 Aura,232698,Shadowform
 Aura,194249,Voidform
+Aura,211657,Void
 Aura,34914,Vampiric Touch
 Aura,589,Shadow Word: Pain
 Aura,17,Power Word: Shield
