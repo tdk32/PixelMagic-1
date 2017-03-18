@@ -1107,6 +1107,10 @@ namespace PixelMagic.Rotation
 
                 if (CharInfo.T7 == 3)
                 {
+                    //Log.Write("Frost Shock :  " + WoW.IsSpellOnCooldown("Frost Shock"));
+                    //var c = WoW.GetBlockColor(3, 4);
+                    //Log.Write("Red : " + c.R * 100 / 255 + " Green : " + c.G * 100 / 255 + " Blue : " + c.B * 100 / 255);
+
                     //actions.single_if=flame_shock,if=!ticking
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true) && !WoW.TargetHasDebuff("Flame Shock"))
                     {
@@ -1115,14 +1119,15 @@ namespace PixelMagic.Rotation
                     }
                     //actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up&maelstrom>=86
                     if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great")
-                    && WoW.Maelstrom >= 86)
+                    && WoW.Maelstrom >= 86 && TargetInfo.Range)
                     {
                         WoW.CastSpell("Earthquake");
                         return;
                     }
                     //actions.single_if+=/frost_shock,if=buff.Icefury.up&maelstrom>=86
-                    if (WoW.CanCast("Frost Shock", true, true, true, false, true) && PlayerHasBuff("Icefury") && WoW.Maelstrom >= 86)
+                    if (WoW.CanCast("Frost Shock") && PlayerHasBuff("Icefury") && WoW.Maelstrom >= 86)
                     {
+                        Log.Write("Frost shock 1");
                         WoW.CastSpell("Frost Shock");
                         return;
                     }
@@ -1133,7 +1138,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     //actions.single_if +=/ stormkeeper,if= raid_event.adds.count < 3 | raid_event.adds.in> 50
-                    if (WoW.CanCast("Stormkeeper", true, true, false, false, true) && !PlayerHasBuff("Icefury") && !IsMoving)
+                    if (WoW.CanCast("Stormkeeper", true, true, false, false, true) && !IsMoving)
 
                     {
                         WoW.CastSpell("Stormkeeper");
@@ -1147,7 +1152,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     //actions.single_if+=/Icefury,if=raid_event.movement.in<5|maelstrom<=76
-                    if (WoW.CanCast("Icefury", true, true, true, false, true) && CharInfo.T7 == 3 && WoW.Maelstrom <= 76 && !IsMoving && !PlayerHasBuff("Stormkeeper"))
+                    if (WoW.CanCast("Icefury", true, true, true, false, true) && CharInfo.T7 == 3 && WoW.Maelstrom <= 76 && !IsMoving)
                     {
                         WoW.CastSpell("Icefury");
                         return;
@@ -1160,7 +1165,7 @@ namespace PixelMagic.Rotation
                     }
                     //actions.single_if+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&buff.stormkeeper.up&spell_targets.chain_lightning<3
                     if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && (PlayerHasBuff("Power of the Maelstrom")
-                    || PlayerHasBuff("Stormkeeper")) && combatRoutine.Type != RotationType.AOE && !IsMoving)
+                    && PlayerHasBuff("Stormkeeper")) && combatRoutine.Type != RotationType.AOE)
                     {
                         WoW.CastSpell("Lightning Bolt");
                         return;
@@ -1174,9 +1179,11 @@ namespace PixelMagic.Rotation
                     //actions.single_if+=/frost_shock,
                     //if=buff.Icefury.up&( (maelstrom>=20&raid_event.movement.in>buff.Icefury.remains)
                     //|buff.Icefury.remains<(1.5*spell_haste*buff.Icefury.stack+1))
+                    //FIX
                     if (WoW.CanCast("Frost Shock", true, true, true, false, true)
-                    && (PlayerHasBuff("Icefury") && WoW.Maelstrom >= 20 && IsMoving) || PlayerHasBuff("Icefury") && PlayerBuffTimeRemaining("Icefury") < GCD * WoW.PlayerSpellCharges("Icefury") + 1)
+                    && ((PlayerHasBuff("Icefury") && WoW.Maelstrom >= 20 && IsMoving) || PlayerHasBuff("Icefury") && PlayerBuffTimeRemaining("Icefury") < GCD * (WoW.PlayerSpellCharges("Icefury") + 2)))
                     {
+                        Log.Write("Frost shock 2");
                         WoW.CastSpell("Frost Shock");
                         return;
                     }
@@ -1190,6 +1197,7 @@ namespace PixelMagic.Rotation
                     if (WoW.CanCast("Frost Shock", true, true, true, false, true)
                     && (PlayerHasBuff("Icefury") && PlayerHasBuff("Icefury") && IsMoving))
                     {
+                        Log.Write("Frost shock 3");
                         WoW.CastSpell("Frost Shock");
                         return;
                     }
@@ -1208,7 +1216,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     //actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up
-                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great"))
+                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great")&& TargetInfo.Range)
                     {
                         WoW.CastSpell("Earthquake");
                         return;
@@ -1692,12 +1700,11 @@ namespace PixelMagic.Rotation
                       }*/
                     // Log.Write("Buff Time :" +  PlayerBuffTimeRemaining("Flametongue") + " GCD: " + GCD + "Has buff :" + PlayerHasBuff("Flametongue"));
                     // actions +=/ boulderfist,if= buff.boulderfist.remains < gcd | (maelstrom <= 50 & active_enemies >= 3)
-                    if (CharInfo.T1 == 3 && WoW.CanCast("Boulderfist", true, true, true, false, true) && WoW.Maelstrom <= 50
+                    if (CharInfo.T1 == 3 && WoW.CanCast("Boulderfist", true, true, true, false, true)
                       && (PlayerBuffTimeRemaining("Boulderfist") <= GCD || !PlayerHasBuff("Boulderfist"))
                    || (WoW.Maelstrom <= 50 && combatRoutine.Type == RotationType.AOE))
                     {
                         Log.Write("Buff Time :" + PlayerBuffTimeRemaining("Boulderfist") + " GCD: " + GCD+"Has buff :"+ PlayerHasBuff("Boulderfist"));
-                        Log.Write("Boulder fist cast 1");
                         WoW.CastSpell("Boulderfist"); //boulderfist it to not waste a charge
                         return;
                     }
@@ -1877,7 +1884,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // actions +=/ flametongue,if= buff.flametongue.remains < 4.8
-                    if ((!PlayerHasBuff("Flametongue") || PlayerBuffTimeRemaining("Flametongue") <= 300)
+                    if ((!PlayerHasBuff("Flametongue") || PlayerBuffTimeRemaining("Flametongue") <= 480)
                          && WoW.CanCast("Flametongue", true, true, true, false, true))
                     {
                         WoW.CastSpell("Flametongue");
@@ -2080,16 +2087,17 @@ namespace PixelMagic.Rotation
                     addonlua = addonlua.Replace("local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId", "local name, _, _, count, debuffType, duration, expirationTime, _, _, _, spellId");
                     addonlua = addonlua.Replace("local name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3", "local name, _, _, count, _, duration, expires, _, _, _, spellID, _, _, _, _, _, _, _, _");
                     addonlua = addonlua.Replace("local name, _, _, count, debuffType, duration, expirationTime, _, _, _, spellId, canApplyAura, isBossDebuff, value1, value2, value3", "local name, _, _, count, _, duration, expirationTime, _, _, _, spellId, _, _, _, _, _");
-                    addonlua = addonlua.Replace("if name == \"Wild Imps\"", "if (name == \"Wild Imps\" or name == \"Spirit Wolf\" or name == \"Totem Mastery\")");
-                    addonlua = addonlua.Replace("and(startTime + duration - GetTime() > 1.6) ", "and(startTime + duration - GetTime() > (1.5 / (1 + (GetHaste() / 100) ))) ");
+                    //addonlua = addonlua.Replace("if name == \"Wild Imps\"", "if (name == \"Wild Imps\" or name == \"Spirit Wolf\" or name == \"Totem Mastery\")");
+                    //addonlua = addonlua.Replace("and(startTime + duration - GetTime() > 1.6) ", "and(startTime + duration - GetTime() > (1.5 / (1 + (GetHaste() / 100) ))) ");*/
                     addonlua = addonlua.Replace("end" + Environment.NewLine + Environment.NewLine + "local function InitializeTwo()", Environment.NewLine);
                     addonlua = addonlua.Replace("	--print (\"Initialising Spell Charges Frames\")", "end" + Environment.NewLine + "local function InitializeTwo()" + Environment.NewLine + "	--print (\"Initialising Spell Charges Frames\")" + Environment.NewLine);
-                    addonlua = addonlua.Replace("IsSpellInRange(name, \"target\")", "LibStub(\"SpellRange-1.0\").IsSpellInRange(name, \"target\")");
+                    
                     // addonlua = addonlua.Replace("if (guid ~= lastTargetGUID) then", "");
                     //ddonlua = addonlua.Replace("lastTargetGUID = guid" + Environment.NewLine + "	end", "print(\"target selected\")");
                     addonlua = addonlua.Replace("local function InitializeOne()", Environment.NewLine + CustomLua + Environment.NewLine + "local function InitializeOne()");
                     addonlua = addonlua.Replace("InitializeOne()" + Environment.NewLine + "            InitializeTwo()", "InitializeOne()" + Environment.NewLine + "            InitializeTwo()" + Environment.NewLine + "            InitializeFour()");
-                    addonlua = addonlua.Replace("healthFrame:SetScript(\"OnUpdate\", updateHealth)", "");
+                   addonlua = addonlua.Replace("healthFrame:SetScript(\"OnUpdate\", updateHealth)", "");
+                    addonlua = addonlua.Replace("IsSpellInRange(name, \"target\")", "LibStub(\"SpellRange-1.0\").IsSpellInRange(name, \"target\")");
                     addonlua = addonlua.Replace("powerFrame:SetScript(\"OnUpdate\", updatePower)", "");
                     addonlua = addonlua.Replace("targetHealthFrame:SetScript(\"OnUpdate\", updateTargetHealth)", "");
                     addonlua = addonlua.Replace("unitCombatFrame:SetScript(\"OnUpdate\", updateCombat)", "");
@@ -2169,7 +2177,7 @@ namespace PixelMagic.Rotation
             AsyncPulse();
             if (AddonEmbeded && RangeLib && AddonEdited)
             {
-                /* DBMPrePull();*/
+                //DBMPrePull();
                 TimerReset();
                 if (WoW.IsInCombat && WoW.HasTarget && !IsMounted)
                 {
@@ -2342,15 +2350,19 @@ public static bool IsMoving
             return false;
             
         }
+        public static bool TargetHasDeBuff(int auraNoInArrayOfAuras)
+        {
+            var c = WoW.GetBlockColor(auraNoInArrayOfAuras, 4);
+            return (c.R != 255);
+        }
         public static int TargetDebuffTimeRemaining(int auraNoInArrayOfAuras)
         {
             var c = WoW.GetBlockColor(auraNoInArrayOfAuras, 4);
-
+            if (!TargetHasDeBuff(auraNoInArrayOfAuras))
+                return 0;
             try
             {
-                Log.WriteDirectlyToLogFile($"Green = {c.G}");
-                if (c.G == 255)
-                    return 0;
+                Log.WriteDirectlyToLogFile($"Target debuff Green = {c.G}, Blue = {c.B}");
                 return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
             }
             catch (Exception ex)
@@ -2358,7 +2370,9 @@ public static bool IsMoving
                 Log.Write("Failed to find debuff target stacks for color G = " + c.B, Color.Red);
                 Log.Write("Error: " + ex.Message, Color.Red);
             }
+            Log.Write("SADFasdf");
             return 0;
+            
         }
 
         public static int TargetDebuffTimeRemaining(string debuffName)
@@ -2366,7 +2380,7 @@ public static bool IsMoving
             foreach (var aura in SpellBook.Auras)
             {
                 if (aura.AuraName == debuffName)
-                    return TargetDebuffStacks(aura.InternalAuraNo);
+                    return TargetDebuffTimeRemaining(aura.InternalAuraNo);
             }
             Log.Write($"[TargetDebuffTimeRemaining] Unable to find buff with name '{debuffName}' in Spell Book");
             return -1;
@@ -2466,8 +2480,7 @@ end
 ";
         private const string partybuffdebuff = @"local function updatePartyBuffs()
 	for _, auraId in pairs(buffs) do
-        local buff = ""Unitbuff"";
-        local auraName = GetSpellInfo(auraId)
+           local auraName = GetSpellInfo(auraId)
     for i = 1, 4 do
         if auraName == nil then
             if ( PartyBuffs[z].BuffLast[auraId] ~= ""BuffOff"") then
@@ -2529,7 +2542,6 @@ local function updatePartyDebuffs(self, event)
     
 	for _, debuffId in pairs(debuffs) do
     for i =1, 4 do
-        local buff = ""UnitDebuff"";
         local auraName = GetSpellInfo(auraId)
    
         if auraName == nil then
@@ -2596,7 +2608,7 @@ end
 
 			 PartyBuffs[z].Buffs[buffId] = CreateFrame(""frame"","""", parent)
 			 PartyBuffs[z].Buffs[buffId]:SetSize(size, size)
-	         PartyBuffs[z].Buffs[buffId]:SetPoint(""TOPLEFT"", i * size, -size * 11+z)                            -- column 13 [Target Buffs]
+	         PartyBuffs[z].Buffs[buffId]:SetPoint(""TOPLEFT"", i * size, -size * (11+z))                            -- column 13 [Target Buffs]
 			 PartyBuffs[z].Buffs[buffId].t = PartyBuffs[z].Buffs[buffId]:CreateTexture()
 	         PartyBuffs[z].Buffs[buffId].t:SetColorTexture(1, 1, 1, alphaColor)
 		     PartyBuffs[z].Buffs[buffId].t:SetAllPoints(  PartyBuffs[z].Buffs[buffId])
@@ -2610,7 +2622,7 @@ end
 		for z=1, 4 do 
 			PartyBuffs[z].debuffs[debuffId] = CreateFrame(""frame"","""", parent)
 			PartyBuffs[z].debuffs[debuffId]:SetSize(size, size)
-			PartyBuffs[z].debuffs[debuffId]:SetPoint(""TOPLEFT"", i * size, -size * 15+z)         -- row 4, column 1+ [Spell In Range]
+			PartyBuffs[z].debuffs[debuffId]:SetPoint(""TOPLEFT"", i * size, -size * (15+z))         -- row 4, column 1+ [Spell In Range]
 			PartyBuffs[z].debuffs[debuffId].t = PartyBuffs[z].debuffs[debuffId]:CreateTexture()        
 			PartyBuffs[z].debuffs[debuffId].t:SetColorTexture(1, 1, 1, alphaColor)
 			PartyBuffs[z].debuffs[debuffId].t:SetAllPoints(PartyBuffs[z].debuffs[debuffId])
@@ -2637,7 +2649,7 @@ end
 local Race = {
 	[""Human""] = 0.01,
 	[""Dwarf""]= 0.02,
-	[""nightelf""]= 0.03,
+	[""Night Elf""]= 0.03,
 	[""Gnome""]= 0.04,
 	[""Draenei""]= 0.05,
 	[""Pandaren""]= 0.06,
@@ -2817,7 +2829,6 @@ frame:RegisterUnitEvent(""UNIT_SPELLCAST_SUCCEEDED"",""player"")
 local function updateTargetDebuffs(self, event)
     
 	for _, auraId in pairs(debuffs) do
-        local buff = ""UnitDebuff"";
         local auraName = GetSpellInfo(auraId)
 
         if auraName == nil then
@@ -2836,10 +2847,9 @@ local function updateTargetDebuffs(self, event)
         local name, _, _, count, _, duration, expirationTime, _, _, _, spellId, _, _, _, _, _ = UnitDebuff(""target"", auraName, nil, ""PLAYER|HARMFUL"")
 
 		if (name == auraName) then -- We have Aura up and Aura ID is matching our list
-                local getTime = GetTime()
                 local remainingTime = 0
                 if(expirationTime ~=0) then
-                     remainingTime = expirationTime - getTime + (timeDiff)
+                     remainingTime = expirationTime - GetTime() - (timeDiff)
                 end
                 remainingTime = string.format(""%00.2f"", tostring(remainingTime))
 
@@ -2866,16 +2876,14 @@ local function updateTargetDebuffs(self, event)
     end
 end
 local function updateMyBuffs(self, event)
-    
 	for _, auraId in pairs(buffs) do
 		local auraName = GetSpellInfo(auraId)
 		
 		if auraName == nil then
-			if (lastBuffState[auraId] ~= ""BuffOff"") then
+	        if (lastBuffState[auraId] ~= ""BuffOff"") then
                 buffFrames[auraId].t:SetColorTexture(1, 1, 1, alphaColor)
                 buffFrames[auraId].t:SetAllPoints(false)
-                lastBuffState[auraId] = ""BuffOff""
-                --print(""["" .. buff.. ""] "" .. auraName.. "" Off"")
+                 lastBuffState[auraId] = ""BuffOff"" 
             end
 			return
 		end
@@ -2883,11 +2891,11 @@ local function updateMyBuffs(self, event)
         local name, _, _, count, debuffType, duration, expirationTime, _, _, _, spellId = UnitBuff(""player"", auraName)
 
 		if (name == auraName) then -- We have Aura up and Aura ID is matching our list
-                local getTime = GetTime()
                 local remainingTime = 0
-                if(expirationTime ~=0) then
-                     remainingTime = expirationTime - getTime + 0.5
+                if(expirationTime~=0) then
+                    remainingTime = math.floor(expirationTime -GetTime() - timeDiff)
                 end
+                if (lastBuffState[auraId] ~= ""BuffOn"" .. count .. remainingTime) then
                 remainingTime = string.format(""%00.2f"", tostring(remainingTime))
                 local red = count/100;
 			    local green = tonumber(strsub(tostring(remainingTime), 1, 2)) / 100
@@ -2897,21 +2905,15 @@ local function updateMyBuffs(self, event)
               --  if spellId == 194084 then
                 --    print(""Remaining CD: "",remainingTime,"" Count : "",red, "" Seconds :"",green,"" tenths : "",blue)
                 --end
-			if (lastBuffState[auraId] ~= ""BuffOn"" .. count..remainingTime) then
-                
-                --print(""expirationTime:""..expirationTime.."" remainingTime:"" .. remainingTime.. "" blue:"" .. blue.. "" strbluecount:"" ..  strbluecount)
-                buffFrames[auraId].t:SetColorTexture(red, green, blue, alphaColor)
-
-                buffFrames[auraId].t:SetAllPoints(false)
-                --print(""["" .. buff.. ""] "" .. auraName.. "" "" .. count.. "" Green: "" .. green)
-                lastBuffState[auraId] = ""BuffOn"" .. count
-            end
+		     buffFrames[auraId].t:SetColorTexture(red, green, blue, alphaColor)
+             buffFrames[auraId].t:SetAllPoints(false)
+            lastBuffState[auraId] = ""BuffOn"" .. count 
+        end
         else
             if (lastBuffState[auraId] ~= ""BuffOff"") then
-                buffFrames[auraId].t:SetColorTexture(1, 1, 1, alphaColor)
-                buffFrames[auraId].t:SetAllPoints(false)
-                lastBuffState[auraId] = ""BuffOff""
-                --print(""["" .. buff.. ""] "" .. auraName.. "" Off"")
+             buffFrames[auraId].t:SetColorTexture(1, 1, 1, alphaColor)
+             buffFrames[auraId].t:SetAllPoints(false)
+             lastBuffState[auraId] = ""BuffOff""
             end
         end
     end
@@ -2940,7 +2942,7 @@ local function updateSpellCooldowns(self, event)
 		if remainingTime ~= 0 then -- the spell is not ready to be cast
             	--print(""Spell with Id = "" .. spellId .. "" is on CD"")
                 --print("" "" ..spellId.. "" remaining time: "" ..math.floor(remainingTime)..  "" "")
-				remainingTime = string.format(""%00.3f"",tostring(remainingTime) )
+				remainingTime = string.format(""%00.2f"",tostring(remainingTime) )
 				local green = tonumber(strsub(tostring(remainingTime), 1, 2))/100
 				local blue = tonumber(strsub( tostring(remainingTime), -3,-2))/100
 				cooldownframes[spellId].t:SetColorTexture(1, green, blue, alphaColor)				
@@ -3430,6 +3432,7 @@ local function InitializeFour()
 		setBonusFrame.t:SetAllPoints(setBonusFrame)
 		setBonusFrame:Show()
 end
+
 is_casting = false
 local function HealinEventHandler(self,event, ...)
     if event == ""NAME_PLATE_UNIT_ADDED"" then
