@@ -38,6 +38,7 @@ namespace PixelMagic.Rotation
         private const string POWER_INFUSION_AURA = "Power Infusion";
         private const string VOIDFORM_AURA = "Voidform";
         private const string T19_VOID = "Void";
+        private const string LEG_BOOTS = "Norgannon's Foresight";
         //--------------------------//
         //-Form-Stuff---------------//
         // Cooldowns
@@ -60,17 +61,10 @@ namespace PixelMagic.Rotation
         //--------------------------//
 
         private readonly Stopwatch interruptwatch = new Stopwatch();
+        public override string Name { get { return "TWonderchild's Shadow Priest"; } }
+        public override string Class { get { return "Priest"; } }
 
-        public override string Name => "TWonderchild's Shadow Priest";
-
-        public override string Class => "Priest";
-
-
-        public override Form SettingsForm
-        {
-            get;
-            set;
-        }
+        public override Form SettingsForm{ get; set; }
         //--------------------------//
         //-Init---------------------//
         public override void Initialize()
@@ -188,7 +182,7 @@ namespace PixelMagic.Rotation
             if (!WoW.IsMoving && DotsUp() && !WoW.PlayerHasBuff(T19_VOID) && WoW.LastSpell != VOID_ERUPTION)
                 SpellCast(MIND_BLAST);
 
-            if(WoW.PlayerSpellCharges(SHADOW_WORD_DEATH) == 2 && WoW.Insanity <= 80 && WoW.TargetHealthPercent <= 20 && DotsUp())
+            if(WoW.PlayerSpellCharges(SHADOW_WORD_DEATH) == 2 && (WoW.Insanity <= 80 || (WoW.IsSpellOnCooldown(MIND_BLAST) && WoW.IsSpellOnCooldown(VOID_BOLT))) && WoW.TargetHealthPercent <= 20 && DotsUp())
                 SpellCast(SHADOW_WORD_DEATH);
             if (WoW.PlayerSpellCharges(SHADOW_WORD_DEATH) == 1 && WoW.Insanity <= int.Parse(SWDText.Text) && WoW.TargetHealthPercent <= 20 && DotsUp())
                 SpellCast(SHADOW_WORD_DEATH);
@@ -265,6 +259,11 @@ namespace PixelMagic.Rotation
             else
                 return false;
         }
+
+        private bool MoveCheck()
+        {
+            return false;
+        }
     }
 }
 /*
@@ -303,4 +302,5 @@ Aura,80353,Time Warp
 Aura,90355,Ancient Hysteria
 Aura,160452,Netherwinds
 Aura,178207,Drums of Fury
+Aura,236430,Norgannon's Foresight
 */
