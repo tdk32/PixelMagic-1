@@ -441,11 +441,11 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Turtle");
                         return;
                     }
-					if (WoW.CanCast("Ancient Healing Potion") && WoW.HealthPercent < 20 && !WoW.IsSpellOnCooldown("Ancient Healing Potion") && WoW.HealthPercent != 0)
+					/*if (WoW.CanCast("Ancient Healing Potion") && WoW.HealthPercent < 20 && !WoW.IsSpellOnCooldown("Ancient Healing Potion") && WoW.HealthPercent != 0)
 						{
 							WoW.CastSpell("Ancient Healing Potion");
 							return;
-						}
+						}*/
 					/*if (WoW.CanCast("Silkweave Bandage") && WoW.HealthPercent < 40 && WoW.PlayerHasBuff("Turtle") && !WoW.IsMoving && !WoW.PlayerHasDebuff("Bandaged"))
 						{
 							WoW.CastSpell("Silkweave Bandage");
@@ -581,11 +581,11 @@ namespace PixelMagic.Rotation
                     WoW.CastSpell("Turtle");
                     return;
                 }
-                if (WoW.CanCast("Ancient Healing Potion") && WoW.HealthPercent < 20 && !WoW.IsSpellOnCooldown("Ancient Healing Potion") && WoW.HealthPercent != 0)
+                /*if (WoW.CanCast("Ancient Healing Potion") && WoW.HealthPercent < 20 && !WoW.IsSpellOnCooldown("Ancient Healing Potion") && WoW.HealthPercent != 0)
                 {
                     WoW.CastSpell("Ancient Healing Potion");
                     return;
-                }
+                }*/
                 /*if (WoW.CanCast("Silkweave Bandage") && WoW.HealthPercent < 40 && WoW.PlayerHasBuff("Turtle") && !WoW.IsMoving && !WoW.PlayerHasDebuff("Bandaged"))
 						{
 							WoW.CastSpell("Silkweave Bandage");
