@@ -96,24 +96,16 @@ namespace PixelMagic.Rotation
                     return;
                 }
 
-                //Call pet
+                ////Revive Pet Call pet
                 if (!WoW.HasPet
-                    && !IsMounted
-                    && !PlayerHasBuff("Feign Death")
-                    && WoW.HealthPercent != 0)
-                {
-                    WoW.CastSpell("Call Pet");
-                    return;
-                }
-
-                //Revive Pet
-                if ((!WoW.HasPet || WoW.PetHealthPercent < 1)
                     && !IsMounted
                     && !PlayerHasBuff("Feign Death")
                     && WoW.HealthPercent != 0)
                 {
                     WoW.CastSpell("Heart of the Phoenix");
                     WoW.CastSpell("Revive Pet");
+                    Thread.Sleep(500);
+                    WoW.CastSpell("Call Pet");
                     return;
                 }
 
@@ -894,12 +886,12 @@ namespace PixelMagic.Rotation
             return 0;
         }
 
-        public static int TargetDebuffTimeRemaining(string debuffName)
+       public static int TargetDebuffTimeRemaining(string debuffName)
         {
             foreach (var aura in SpellBook.Auras)
             {
                 if (aura.AuraName == debuffName)
-                    return TargetDebuffStacks(aura.InternalAuraNo);
+                    return TargetDebuffTimeRemaining(aura.InternalAuraNo);
             }
             Log.Write($"[TargetDebuffTimeRemaining] Unable to find buff with name '{debuffName}' in Spell Book");
             return -1;
@@ -1009,7 +1001,7 @@ end
 
 			 PartyBuffs[z].Buffs[buffId] = CreateFrame(""frame"","""", parent)
 			 PartyBuffs[z].Buffs[buffId]:SetSize(size, size)
-	         PartyBuffs[z].Buffs[buffId]:SetPoint(""TOPLEFT"", i * size, -size * 11+z)                            -- column 13 [Target Buffs]
+	         PartyBuffs[z].Buffs[buffId]:SetPoint(""TOPLEFT"", i * size, -size * (11+z))                            -- column 13 [Target Buffs]
 			 PartyBuffs[z].Buffs[buffId].t = PartyBuffs[z].Buffs[buffId]:CreateTexture()
 	         PartyBuffs[z].Buffs[buffId].t:SetColorTexture(1, 1, 1, alphaColor)
 		     PartyBuffs[z].Buffs[buffId].t:SetAllPoints(  PartyBuffs[z].Buffs[buffId])
@@ -1023,7 +1015,7 @@ end
 		for z=1, 4 do 
 			PartyBuffs[z].debuffs[debuffId] = CreateFrame(""frame"","""", parent)
 			PartyBuffs[z].debuffs[debuffId]:SetSize(size, size)
-			PartyBuffs[z].debuffs[debuffId]:SetPoint(""TOPLEFT"", i * size, -size * 15+z)         -- row 4, column 1+ [Spell In Range]
+            PartyBuffs[z].debuffs[debuffId]:SetPoint(""TOPLEFT"", i * size, -size * (15+z))         -- row 4, column 1+ [Spell In Range]
 			PartyBuffs[z].debuffs[debuffId].t = PartyBuffs[z].debuffs[debuffId]:CreateTexture()        
 			PartyBuffs[z].debuffs[debuffId].t:SetColorTexture(1, 1, 1, alphaColor)
 			PartyBuffs[z].debuffs[debuffId].t:SetAllPoints(PartyBuffs[z].debuffs[debuffId])
