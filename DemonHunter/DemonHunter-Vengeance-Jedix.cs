@@ -5,7 +5,6 @@
 
 using System;
 using System.Drawing;
-using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
 using PixelMagic.Helpers;
@@ -14,17 +13,17 @@ namespace PixelMagic.Rotation
 {
     public class DemonHunterVengJE : CombatRoutine
     {
-		private NumericUpDown nudMetaPercentValue;
+	private NumericUpDown nudMetaPercentValue;
 		
-		private CheckBox BloodelfBox;
+	private CheckBox BloodelfBox;
 		
-        public override string Name => "PixelMagic Vengeance by Jedix";
+        public override string Name { get { return "PixelMagic Vengeance by Jedix"; } }
 
-        public override string Class => "Demon Hunter";
+        public override string Class { get { return "Demon Hunter"; } }
 
         public override Form SettingsForm { get; set; }
 		
-		public static bool Bloodelf
+	public static bool Bloodelf
         {
             get
             {
@@ -78,12 +77,12 @@ namespace PixelMagic.Rotation
 			BloodelfText.BringToFront();
         }
 		
-		private void CmdSave_Click(object sender, EventArgs e)
+	private void CmdSave_Click(object sender, EventArgs e)
         {
             ConfigFile.WriteValue("Demonhunter", "Metamorphosis Usage Percent", nudMetaPercentValue.Value.ToString());
         }
 		
-		private void Bloodelf_Click(object sender, EventArgs e)
+	private void Bloodelf_Click(object sender, EventArgs e)
         {
             Bloodelf = BloodelfBox.Checked;
         }
