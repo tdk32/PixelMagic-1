@@ -11,7 +11,6 @@ using System.Text;
 using System.Threading;
 using PixelMagic.Helpers;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -1118,7 +1117,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     //actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up&maelstrom>=86
-                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great")
+                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.PlayerHasBuff("Echoes of the Great")
                     && WoW.Maelstrom >= 86 && TargetInfo.Range)
                     {
                         WoW.CastSpell("Earthquake");
@@ -1216,7 +1215,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     //actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up
-                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great")&& TargetInfo.Range)
+                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.PlayerHasBuff("Echoes of the Great")&& TargetInfo.Range)
                     {
                         WoW.CastSpell("Earthquake");
                         return;
@@ -1257,13 +1256,13 @@ namespace PixelMagic.Rotation
                 {
                     //actions.single_lr+=/flame_shock,if=maelstrom>=20
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true)
-                    && (WoW.Maelstrom >= 20 && !WoW.TargetHasDebuff("Flame Shock")))
+                    && !WoW.TargetHasDebuff("Flame Shock"))
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
                     }
                     //actions.single_lr+=/earthquake,if=buff.echoes_of_the_great_sundering.up&maelstrom>86
-                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great") && WoW.Maelstrom >= 86)
+                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great") && WoW.Maelstrom >= 86 && TargetInfo.Range)
                     {
                         WoW.CastSpell("Earthquake");
                         return;
@@ -1293,7 +1292,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     //actions.single_lr+=/lava_burst,if=dot.flame_shock.remains>cast_time&cooldown_react
-                    if (WoW.CanCast("Lava Burst", true, true, true, false, true)
+                    if (WoW.CanCast("Lava Burst", true, true, true, false, true) && !IsMoving
                     && (TargetDebuffTimeRemaining("Flame Shock") > 200f / (1 + (hastePct / 100f))))
                     {
                         WoW.CastSpell("Lava Burst");
@@ -1301,7 +1300,7 @@ namespace PixelMagic.Rotation
                     }
                     //actions.single_Lr+=/flame_shock,if=maelstrom>=20&buff.elemental_focus.up,target_if=refreshable
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true) && WoW.Maelstrom >= 20
-                    && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")) && PlayerHasBuff("Elemental Focus"))
+                    && (TargetDebuffTimeRemaining("Flame Shock") < GCD || !WoW.TargetHasDebuff("Flame Shock")) && PlayerHasBuff("Elemental Focus"))
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
@@ -1315,7 +1314,7 @@ namespace PixelMagic.Rotation
 
                     //actions.single_asc+=/lightning_bolt,if=buff.power_of_the_maelstrom.up&buff.stormkeeper.up&spell_targets.chain_lightning<3
                     if (WoW.CanCast("Lightning Bolt", true, true, true, false, true) && PlayerHasBuff("Power of the Maelstrom")
-                    && PlayerHasBuff("Stormkeeper") && !IsMoving)
+                    && PlayerHasBuff("Stormkeeper"))
                     {
                         WoW.CastSpell("Lightning Bolt");
                         return;
@@ -1342,7 +1341,7 @@ namespace PixelMagic.Rotation
 
 
                     //actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up
-                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great"))
+                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great")&& TargetInfo.Range)
                     {
                         WoW.CastSpell("Earthquake");
                         return;
@@ -1397,7 +1396,7 @@ namespace PixelMagic.Rotation
 
                     //actions.single_lr+=/flame_shock,moving=1,target_if=refreshable
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true)
-                    && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")) && IsMoving)
+                    && (TargetDebuffTimeRemaining("Flame Shock") < GCD || !WoW.TargetHasDebuff("Flame Shock")) && IsMoving)
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
@@ -1421,7 +1420,7 @@ namespace PixelMagic.Rotation
                     //actions.single_asc=ascendance,if=dot.flame_shock.remains>buff.ascendance.duration
                     //&(time >= 60 | buff.bloodlust.up) 
                     // & cooldown.lava_burst.remains > 0 & !buff.stormkeeper.up
-                    if (WoW.CanCast("AscendanceEle", true, true, false, false, true)
+                    if (WoW.CanCast("AscendanceEle", true, true, true, false, true)
                      && (TargetDebuffTimeRemaining("Flame Shock") > 1500)
                      && (WoW.IsSpellOnCooldown("Lava Burst") && !PlayerHasBuff("Stormkeeper")) && UseCooldowns)
                     {
@@ -1432,14 +1431,14 @@ namespace PixelMagic.Rotation
                     //actions.single_asc+=/flame_shock,if=maelstrom>=20
 
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true)
-                    && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")) && WoW.Maelstrom >= 20)
+                    && (TargetDebuffTimeRemaining("Flame Shock") < GCD || !WoW.TargetHasDebuff("Flame Shock")) && WoW.Maelstrom >= 20)
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
                     }
                     //&remains<=buff.ascendance.duration&cooldown.ascendance.remains+buff.ascendance.duration<=duration
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true) && WoW.Maelstrom >= 20
-                        && (TargetDebuffTimeRemaining("Flame Shock") <= PlayerBuffTimeRemaining("AscendanceEle") && PlayerHasBuff("AscendanceEle")
+                        && (TargetDebuffTimeRemaining("Flame Shock") < PlayerBuffTimeRemaining("AscendanceEle") && PlayerHasBuff("AscendanceEle")
                         || PlayerBuffTimeRemaining("AscendanceEle") + GetCooldownTimeRemaining("AscendanceEle") <= TargetDebuffTimeRemaining("Flame Shock")))
                     {
                         WoW.CastSpell("Flame Shock");
@@ -1452,7 +1451,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     //actions.single_if +=/ stormkeeper,if= raid_event.adds.count < 3 | raid_event.adds.in> 50
-                    if (WoW.CanCast("Stormkeeper", true, true, false, false, true) && !PlayerHasBuff("AscendanceEle"))
+                    if (WoW.CanCast("Stormkeeper", true, true, false, false, true) && !PlayerHasBuff("AscendanceEle")&& !IsMoving)
                     {
                         WoW.CastSpell("Stormkeeper");
                         return;
@@ -1484,7 +1483,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     //actions.single_if+=/flame_shock,if=maelstrom>=20&buff.elemental_focus.up,target_if=refreshable
-                    if (WoW.CanCast("Flame Shock", true, true, true, false, true) && WoW.Maelstrom >= 20 && PlayerHasBuff("Elemental Focus") && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")))
+                    if (WoW.CanCast("Flame Shock", true, true, true, false, true) && WoW.Maelstrom >= 20 && PlayerHasBuff("Elemental Focus") && (TargetDebuffTimeRemaining("Flame Shock") < GCD || !WoW.TargetHasDebuff("Flame Shock")))
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
@@ -1504,7 +1503,7 @@ namespace PixelMagic.Rotation
 
 
                     //actions.single_if+=/earthquake,if=buff.echoes_of_the_great_sundering.up
-                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great"))
+                    if (WoW.CanCast("Earthquake", true, true, false, false, true) && WoW.TargetHasDebuff("Echoes of the Great")&& TargetInfo.Range)
                     {
                         WoW.CastSpell("Earthquake");
                         return;
@@ -1539,7 +1538,7 @@ namespace PixelMagic.Rotation
                     }
                     //actions.single_if+=/flame_shock,moving=1,target_if=refreshable
                     if (WoW.CanCast("Flame Shock", true, true, true, false, true)
-                    && (TargetDebuffTimeRemaining("Flame Shock") < 450 || !WoW.TargetHasDebuff("Flame Shock")))
+                    && (TargetDebuffTimeRemaining("Flame Shock") < GCD || !WoW.TargetHasDebuff("Flame Shock")))
                     {
                         WoW.CastSpell("Flame Shock");
                         return;
@@ -1594,7 +1593,7 @@ namespace PixelMagic.Rotation
                     // actions.aoe +=/ lava_burst,if= dot.flame_shock.remains > cast_time 
                     //& buff.lava_surge.up & !talent.lightning_rod.enabled & spell_targets.chain_lightning < 4
                     if (WoW.CanCast("Lava Burst", true, true, true, false, true)
-                    && (TargetDebuffTimeRemaining("Flame Shock") > GCD || !WoW.TargetHasDebuff("Flame Shock"))
+                    && (TargetDebuffTimeRemaining("Flame Shock") > 200f / (1 + (hastePct / 100f)) || !WoW.TargetHasDebuff("Flame Shock"))
                     && PlayerHasBuff("Lava Surge") && CharInfo.T7 != 2 && combatRoutine.Type == RotationType.AOE)
 
                     {
@@ -1603,7 +1602,7 @@ namespace PixelMagic.Rotation
                     }
                     //actions.aoe +=/ elemental_blast,if= !talent.lightning_rod.enabled & spell_targets.chain_lightning < 5
                     if (WoW.CanCast("Elemental Blast", true, true, true, false, true)
-                    && CharInfo.T7 != 7 && CharInfo.T5 == 3 && combatRoutine.Type == RotationType.AOE && npcCount < 5)
+                    && CharInfo.T7 != 7 && CharInfo.T5 == 3 && combatRoutine.Type == RotationType.AOE && npcCount < 5 && !IsMoving)
                     {
                         WoW.CastSpell("Elemental Blast");
                         return;
@@ -1616,13 +1615,13 @@ namespace PixelMagic.Rotation
                     }
                     //actions.aoe +=/ chain_lightning,target_if = debuff.lightning_rod.down
                     //actions.aoe +=/ chain_lightning
-                    if (WoW.CanCast("Chain Lightning", true, true, true, false, true)
+                    if (WoW.CanCast("Chain Lightning", true, true, true, false, true) && !IsMoving
                     && (CharInfo.T7 == 2 && WoW.TargetHasDebuff("Lightning Rod")))
                     {
                         WoW.CastSpell("Chain Lightning");
                         return;
                     }
-                    if (WoW.CanCast("Chain Lightning", true, true, true, false, true)
+                    if (WoW.CanCast("Chain Lightning", true, true, true, false, true) && !IsMoving
                    && CharInfo.T7 != 2)
                     {
                         WoW.CastSpell("Chain Lightning");
@@ -1969,43 +1968,43 @@ namespace PixelMagic.Rotation
 
                     // To copy a folder's contents to a new location:
                     // Create a new target folder, if necessary.
-                    if (!Directory.Exists(targetPath))
+                    if (!WoW.IO.Directory.Exists(targetPath))
                     {
-                        Directory.CreateDirectory(targetPath);
+                        WoW.IO.Directory.CreateDirectory(targetPath);
                         Log.Write("Base target:" + targetPath);
                     }
-                    if (!Directory.Exists(targetPathSub))
+                    if (!WoW.IO.Directory.Exists(targetPathSub))
                     {
                         Log.Write("Sub target:" + targetPathSub);
-                        Directory.CreateDirectory(targetPathSub);
+                        WoW.IO.Directory.CreateDirectory(targetPathSub);
                     }
 
-                    if (Directory.Exists(targetPath))
+                    if (WoW.IO.Directory.Exists(targetPath))
                     {
-                        if (!File.Exists(Path.Combine(targetPath, LibSpellToc)))
+                        if (!WoW.IO.File.Exists(targetPath + LibSpellToc))
                         {
 
-                            File.WriteAllText(Path.Combine(targetPath, LibSpellToc), LibSpellTocContent);
+                            WoW.IO.File.WriteAllText(targetPath + LibSpellToc, LibSpellTocContent);
                         }
-                        if (!File.Exists(Path.Combine(targetPath, LibSpellLua)))
+                        if (!WoW.IO.File.Exists(targetPath +  LibSpellLua))
                         {
-                            File.WriteAllText(Path.Combine(targetPath, LibSpellLua), LibSpellLuaContent);
+                            WoW.IO.File.WriteAllText(targetPath + LibSpellLua, LibSpellLuaContent);
                         }
-                        if (!File.Exists(Path.Combine(targetPath, LibXml)))
+                        if (!WoW.IO.File.Exists(targetPath+ LibXml))
                         {
-                            File.WriteAllText(Path.Combine(targetPath, LibXml), LibXmlContent);
+                            WoW.IO.File.WriteAllText(targetPath + LibXml, LibXmlContent);
                         }
                     }
 
-                    if (Directory.Exists(targetPathSub))
+                    if (WoW.IO.Directory.Exists(targetPathSub))
                     {
-                        if (!File.Exists(Path.Combine(targetPathSub, LibStubLua)))
+                        if (!WoW.IO.File.Exists(targetPathSub + LibStubLua))
                         {
-                            File.WriteAllText(Path.Combine(targetPathSub, LibStubLua), LibStubLuaContent);
+                            WoW.IO.File.WriteAllText(targetPathSub + LibStubLua, LibStubLuaContent);
                         }
-                        if (!File.Exists(Path.Combine(targetPathSub, LibStubToc)))
+                        if (!WoW.IO.File.Exists(targetPathSub + LibStubToc))
                         {
-                            File.WriteAllText(Path.Combine(targetPathSub, LibStubToc), LibStubTocContent);
+                            WoW.IO.File.WriteAllText(targetPathSub + LibStubToc, LibStubTocContent);
                         }
 
                     }
@@ -2026,12 +2025,12 @@ namespace PixelMagic.Rotation
                 {
 
                     Log.Write("Addon emedding Editing in progress");
-                    if (!File.Exists(Path.Combine("" + WoW.AddonPath + "\\" + AddonName + "\\", AddonEmbedName)))
+                    if (!WoW.IO.File.Exists("" + WoW.AddonPath + "\\" + AddonName + "\\"+ AddonEmbedName))
                     {
                         string addonlua = " < Ui xmlns = \"http://www.blizzard.com/wow/ui/\" xmlns: xsi = \"http://www.w3.org/2001/XMLSchema-instance \" xsi: schemaLocation = \"http://www.blizzard.com/wow/ui/ ..\\FrameXML\\UI.xsd\" >" + Environment.NewLine
-                    + "< Script file = \"lib\\LibSpellRange-1.0\\LibSpellRange-1.0.lua\" />" + Environment.NewLine
+                    + "< Script WoW.IO.File = \"lib\\LibSpellRange-1.0\\LibSpellRange-1.0.lua\" />" + Environment.NewLine
                     + "</ Ui >" + Environment.NewLine;
-                        File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonEmbedName, addonlua);
+                        WoW.IO.File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonEmbedName, addonlua);
                         Log.Write("Addon Embedding complete");
 
                     }
@@ -2049,7 +2048,7 @@ namespace PixelMagic.Rotation
             {
                 try
                 {
-                    string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
+                    string addonlua = WoW.IO.File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
                     int start = addonlua.IndexOf("local function updateSpellCooldowns(self, event)");
                     int end = addonlua.IndexOf("local lastItemCooldownState = {");
                     addonlua = addonlua.Remove(start, end - start);
@@ -2064,7 +2063,7 @@ namespace PixelMagic.Rotation
                     addonlua = addonlua.Insert(start, partybuffdebuff);
                     start = addonlua.IndexOf("local Party1Buffs = { }");
                     end = addonlua.IndexOf("local function updateRaidHealth(self, event)");
-                    addonlua = addonlua.Remove(start, end - start);
+                     addonlua = addonlua.Remove(start, end - start);
                     addonlua = addonlua.Insert(start, partyvarable);
                     start = addonlua.IndexOf("local function updateParty1Buffs()");
                     end = addonlua.IndexOf("local function updateRaidSize(self, event)");
@@ -2129,7 +2128,7 @@ namespace PixelMagic.Rotation
                     addonlua = addonlua.Replace("itemframes[itemId]:SetScript(\"OnUpdate\", updateItemCooldowns)", "");
                     addonlua = addonlua.Replace("spellOverlayedFrames[spellId]:SetScript(\"OnUpdate\", updateIsSpellOverlayedFrames)", "");
                     addonlua = addonlua.Replace("playerDebuffFrames[debuffId]:SetScript(\"OnUpdate\", updatePlayerDebuffs)", "");
-                    File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
+                    WoW.IO.File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
                     AddonEdited = true;
                 }
                 catch (Exception ex)
@@ -2250,7 +2249,8 @@ public static bool IsMoving
 
             try
             {
-                Log.WriteDirectlyToLogFile($"Green = {c.G} Blue = {c.B}");
+                
+                
                 if (c.G == 255)
                     return 0;
                 return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
@@ -2258,7 +2258,6 @@ public static bool IsMoving
             }
             catch (Exception ex)
             {
-                Log.Write($"Red = {c.R} Green = {c.G}");
                 Log.Write(ex.Message, Color.Red);
             }
 
@@ -2271,7 +2270,7 @@ public static bool IsMoving
                 if (spell.SpellName == spellBookSpellName)
                     return GetCooldownTimeRemaining(spell.InternalSpellNo);
             }
-            Log.Write($"[IsSpellOnCooldown] Unable to find spell with name '{spellBookSpellName}' in Spell Book");
+            Log.Write("[IsSpellOnCooldown] Unable to find spell with name " +spellBookSpellName +" in Spell Book");
             return 0;
         }
         private static int PlayerBuffStacks(int auraNoInArrayOfAuras)
@@ -2281,7 +2280,7 @@ public static bool IsMoving
             try
             {
                 // ReSharper disable once PossibleNullReferenceException
-                var stacks = dtColorHelper.Select($"[Rounded] = '{c.R}'").ToString();
+                var stacks = dtColorHelper.Select("[Rounded] = "+ c.R).ToString();
 
                 return int.Parse(stacks);
             }
@@ -2300,7 +2299,7 @@ public static bool IsMoving
                 if (aura.AuraName == auraName)
                     return PlayerBuffStacks(aura.InternalAuraNo);
             }
-            Log.Write($"[PlayerBuffTimeRemaining] Unable to find buff with name '{auraName}' in Spell Book");
+            Log.Write("[PlayerBuffTimeRemaining] Unable to find buff with name " +auraName +" in Spell Book");
             return -1;
         }
         public static int PlayerBuffTimeRemaining(int auraNoInArrayOfAuras)
@@ -2311,7 +2310,8 @@ public static bool IsMoving
             try
             {
                 // ReSharper disable once PossibleNullReferenceException
-               Log.WriteDirectlyToLogFile($"Green = {c.G} Blue = {c.B}");
+               Log.WriteDirectlyToLogFile("Green = "+ c.G +" Blue = "+ c.B);
+
                return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
             }
             catch (Exception ex)
@@ -2329,7 +2329,7 @@ public static bool IsMoving
                 if (aura.AuraName == buffName)
                     return PlayerBuffTimeRemaining(aura.InternalAuraNo);
             }
-            Log.Write($"[PlayerBuffTimeRemaining] Unable to find buff with name '{buffName}' in Spell Book");
+            Log.Write("[PlayerBuffTimeRemaining] Unable to find buff with name "+buffName+ " in Spell Book");
             return -1;
 
         }
@@ -2346,7 +2346,7 @@ public static bool IsMoving
                 if (aura.AuraName == buffName)
                     return PlayerHasBuff(aura.InternalAuraNo);
             }
-            Log.Write($"[PlayerHasBuff] Unable to find buff with name '{buffName}' in Spell Book");
+            Log.Write("[PlayerHasBuff] Unable to find buff with name " +buffName +" in Spell Book");
             return false;
             
         }
@@ -2362,7 +2362,7 @@ public static bool IsMoving
                 return 0;
             try
             {
-                Log.WriteDirectlyToLogFile($"Target debuff Green = {c.G}, Blue = {c.B}");
+                Log.WriteDirectlyToLogFile("Target debuff Green = "+c.G +" Blue = "+c.B);
                 return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
             }
             catch (Exception ex)
@@ -2382,7 +2382,7 @@ public static bool IsMoving
                 if (aura.AuraName == debuffName)
                     return TargetDebuffTimeRemaining(aura.InternalAuraNo);
             }
-            Log.Write($"[TargetDebuffTimeRemaining] Unable to find buff with name '{debuffName}' in Spell Book");
+            Log.Write("[TargetDebuffTimeRemaining] Unable to find buff with name" +debuffName +"in Spell Book");
             return -1;
         }
         public static int TargetDebuffStacks(int auraNoInArrayOfAuras)
@@ -2391,7 +2391,7 @@ public static bool IsMoving
 
             try
             {
-                Log.WriteDirectlyToLogFile($"Green = {c.G}");
+                Log.WriteDirectlyToLogFile("Green = "+c.G);
                 if (c.R == 255)
                     return 0;
 
@@ -2414,7 +2414,7 @@ public static bool IsMoving
                 if (aura.AuraName == debuffName)
                     return TargetDebuffStacks(aura.InternalAuraNo);
             }
-            Log.Write($"[TargetDebuffTimeRemaining] Unable to find buff with name '{debuffName}' in Spell Book");
+            Log.Write("[TargetDebuffTimeRemaining] Unable to find buff with name "+debuffName +" in Spell Book");
             return -1;
         }
 
@@ -3445,28 +3445,33 @@ local function HealinEventHandler(self,event, ...)
 			UpdateRaidIndicators(select(1,...))
 		end
 	end
-
-	if event == ""UNIT_SPELLCAST_SUCCEEDED"" then
+    if event == ""UNIT_SPELLCAST_SUCCEEDED"" then
 		if not is_casting then
 			for _, spellId in pairs(cooldowns) do
 				if spellId == select(5,...) then
                     timeDiff = GetTime() - sendTime
-                    timeDiff = timeDiff > select(4, GetNetStats())/ 1000  and timeDiff or select(4, GetNetStats())/ 1000
+                    timeDiff = timeDiff > select(4, GetNetStats())/ 500  and timeDiff or select(4, GetNetStats())/ 500
 				end
             end
         end
     is_casting = false
 	end
-	if event == ""UNIT_SPELLCAST_FAILED"" then
-        is_casting = false
+	if event == ""UNIT_SPELLCAST_START"" then
+		if not is_casting then
+			for _, spellId in pairs(cooldowns) do
+				if spellId == select(5,...) then
+                    timeDiff = GetTime() - sendTime
+                    timeDiff = timeDiff > select(4, GetNetStats())/ 500  and timeDiff or select(4, GetNetStats())/ 500
+				end
+            end
+        end
+    is_casting = false
 	end
-    if event == ""UNIT_SPELLCAST_START"" then
-            is_casting = true
-			timeDiff = GetTime() - sendTime
-            timeDiff = timeDiff > select(4, GetNetStats())/ 500  and timeDiff or select(4, GetNetStats())/ 500
-    end
 	if event == ""CURRENT_SPELL_CAST_CHANGED"" then
         sendTime = GetTime()
+	end
+    if event == ""UNIT_SPELLCAST_FAILED"" then
+        is_casting = false
 	end
 	if event == ""RAID_ROSTER_UPDATE"" or event == ""GROUP_ROSTER_UPDATE"" then
 	   UdateRaidSizeFrame()
@@ -3482,7 +3487,7 @@ local function HealinEventHandler(self,event, ...)
 	end
 	if event == ""PLAYER_ENTERING_WORLD""then
         HasteInfoUpdate()		
-    CharRaceUpdate()
+         CharRaceUpdate()
 		Talents()
 		TurnOnPlates()
         HasteInfoUpdate()
@@ -3609,7 +3614,7 @@ lib.xml";
 -- * Allows ranged checking based on both spell name and spellID.
 -- * Works correctly with replacement spells that will not work using Blizzard's IsSpellInRange method alone.
 --
--- @class file
+-- @class WoW.IO.File
 -- @name LibSpellRange-1.0.lua
 
 local major = ""SpellRange-1.0""
@@ -3822,7 +3827,7 @@ function Lib.SpellHasRange(spellInput)
 end";
         private const string LibXml = "lib.xml";
         private const string LibXmlContent = @"<Ui>
-	<Script file=""LibSpellRange-1.0.lua""/>
+	<Script WoW.IO.File=""LibSpellRange-1.0.lua""/>
 </Ui>";
         private const string LibStubLua = "LibStub.lua";
         private const string LibStubLuaContent = @"-- $Id: LibStub.lua 103 2014-10-16 03:02:50Z mikk $
