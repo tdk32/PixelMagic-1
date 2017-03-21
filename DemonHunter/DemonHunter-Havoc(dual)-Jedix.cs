@@ -5,7 +5,6 @@
 
 using System;
 using System.Drawing;
-using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
 using PixelMagic.Helpers;
@@ -16,11 +15,11 @@ namespace PixelMagic.Rotation
     {
         private NumericUpDown nudBlurPercentValue;
 		
-		private static readonly Stopwatch coolDownStopWatch = new Stopwatch();
+	private static readonly Stopwatch coolDownStopWatch = new Stopwatch();
 
-        public override string Name => "Havoc dual by Jedix";
+        public override string Name { get { return "Havoc dual by Jedix"; } }
 
-        public override string Class => "Demon Hunter";
+        public override string Class { get { return "Demon Hunter"; } }
 
         public override Form SettingsForm { get; set; }
 
