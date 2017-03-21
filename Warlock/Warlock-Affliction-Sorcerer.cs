@@ -286,10 +286,10 @@ namespace PixelMagic.Rotation
             if ((Convert.ToDouble(pixelColor.G) == 255))
                 hastePct = 0f;
             else
-                if (postive == 1)
-                    hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f);
-                else
-                    hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f) * (-1);
+                            if (postive == 1)
+                hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f);
+            else
+                hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f) * (-1);
             if (race > 13)
                 race = 0;
             if (spec > 34)
@@ -314,25 +314,24 @@ namespace PixelMagic.Rotation
         }
 
         private void SelectRotation()
-        {
+        {  
             if (Nameplates)
-            {
-                if (Control.IsKeyLocked(Keys.Scroll))
+            { 
+                if(Control.IsKeyLocked(Keys.Scroll))
                 {
                     if (npcCount >= 4 && !WoW.TargetIsPlayer)
                         combatRoutine.ChangeType(RotationType.AOE);
-                    /*if ((npcCount == 2 || npcCount == 3) && !WoW.TargetIsPlayer)
-                        combatRoutine.ChangeType(RotationType.SingleTargetCleave);*/
+                    
                     if ((npcCount <= 1))
-                        combatRoutine.ChangeType(RotationType.SingleTarget);
+                        combatRoutine.ChangeType(RotationType.SingleTarget);            
                 }
             }
         }
 
-
+        
         private static string AddonName = ConfigFile.ReadValue("PixelMagic", "AddonName");
         private static string AddonEmbedName = "BossLib.xml";// Initialization variables		
-        private bool AddonEdited = false;
+        private bool AddonEdited = false;        
         public void RangeLibCopy()
         {
             try
@@ -439,7 +438,7 @@ namespace PixelMagic.Rotation
                 RangeLibCopy();
                 Thread.Sleep(350);
                 WoW.Reload();
-            }
+            }            
         }
         private void AddonEdit()
         {
@@ -532,6 +531,15 @@ namespace PixelMagic.Rotation
             Log.Write("Editing Addon Complete");
         }
 
+
+        public static bool IsMoving
+        {
+            get
+            {
+                var c = WoW.GetBlockColor(1, 7);
+                return (c.R == Color.Red.R) && (c.B == Color.Blue.B);
+            }
+        }
         public static bool IsMounted
         {
             get
@@ -540,6 +548,177 @@ namespace PixelMagic.Rotation
                 return (c.G == Color.Green.G && (c.B == Color.Blue.B));
             }
         }
+        public static int SpellCooldownTimeRemaining(int spellNoInArrayOfSpells)
+        {
+            var c = WoW.GetBlockColor(spellNoInArrayOfSpells, 2);
+
+            try
+            {
+                Log.WriteDirectlyToLogFile($"Green = {c.G} Blue = {c.B}");
+                if (c.G == 255)
+                    return 0;
+                return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
+
+            }
+            catch (Exception ex)
+            {
+                Log.Write($"Red = {c.R} Green = {c.G}");
+                Log.Write(ex.Message, Color.Red);
+            }
+
+            return 0;
+        }
+        public static int SpellCooldownTimeRemaining(string spellBookSpellName)
+        {
+            foreach (var spell in SpellBook.Spells)
+            {
+                if (spell.SpellName == spellBookSpellName)
+                    return SpellCooldownTimeRemaining(spell.InternalSpellNo);
+            }
+            Log.Write($"[IsSpellOnCooldown] Unable to find spell with name '{spellBookSpellName}' in Spell Book");
+            return 0;
+        }
+        private static int PlayerBuffStacks(int auraNoInArrayOfAuras)
+        {
+            var c = WoW.GetBlockColor(auraNoInArrayOfAuras, 8);
+
+            try
+            {
+                Log.WriteDirectlyToLogFile($"Green = {c.G}");
+                if (c.R == 255)
+                    return 0;
+
+                // ReSharper disable once PossibleNullReferenceException
+                return Convert.ToInt32(Math.Round(Convert.ToSingle(c.R) * 100 / 255));
+            }
+            catch (Exception ex)
+            {
+                Log.Write("Failed to find buff stacks for color G = " + c.R, Color.Red);
+                Log.Write("Error: " + ex.Message, Color.Red);
+            }
+
+            return 0;
+        }
+        private static int PlayerBuffStacks(string auraName)
+        {
+            foreach (var aura in SpellBook.Auras)
+            {
+                if (aura.AuraName == auraName)
+                    return PlayerBuffStacks(aura.InternalAuraNo);
+            }
+            Log.Write($"[PlayerBuffTimeRemaining] Unable to find buff with name '{auraName}' in Spell Book");
+            return -1;
+        }
+        public static int PlayerBuffTimeRemaining(int auraNoInArrayOfAuras)
+        {
+            var c = WoW.GetBlockColor(auraNoInArrayOfAuras, 8);
+            if (PlayerHasBuff(auraNoInArrayOfAuras) == false)
+                return 0;
+            try
+            {
+                // ReSharper disable once PossibleNullReferenceException
+               Log.WriteDirectlyToLogFile($"Green = {c.G} Blue = {c.B}");
+               return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
+            }
+            catch (Exception ex)
+            {
+                Log.Write("Failed to find buff stacks for color G = " + c.B, Color.Red);
+                Log.Write("Error: " + ex.Message, Color.Red);
+            }
+
+            return 0;
+        }
+        public static int PlayerBuffTimeRemaining(string buffName)
+        {
+            foreach (var aura in SpellBook.Auras)
+            {
+                if (aura.AuraName == buffName)
+                    return PlayerBuffTimeRemaining(aura.InternalAuraNo);
+            }
+            Log.Write($"[PlayerBuffTimeRemaining] Unable to find buff with name '{buffName}' in Spell Book");
+            return -1;
+
+        }
+        public static bool PlayerHasBuff(int auraNoInArrayOfAuras)
+        {
+            var c = WoW.GetBlockColor(auraNoInArrayOfAuras, 8);
+            return (c.R != 255);
+        }
+
+        public static bool PlayerHasBuff(string buffName)
+        {
+            foreach (var aura in SpellBook.Auras)
+            {
+                if (aura.AuraName == buffName)
+                    return PlayerHasBuff(aura.InternalAuraNo);
+            }
+            Log.Write($"[PlayerHasBuff] Unable to find buff with name '{buffName}' in Spell Book");
+            return false;
+            
+        }
+        public static int TargetDebuffTimeRemaining(int auraNoInArrayOfAuras)
+        {
+            var c = WoW.GetBlockColor(auraNoInArrayOfAuras, 4);
+
+            try
+            {
+                Log.WriteDirectlyToLogFile($"Green = {c.G}");
+                if (c.G == 255)
+                    return 0;
+                return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
+            }
+            catch (Exception ex)
+            {
+                Log.Write("Failed to find debuff target stacks for color G = " + c.B, Color.Red);
+                Log.Write("Error: " + ex.Message, Color.Red);
+            }
+            return 0;
+        }
+
+       public static int TargetDebuffTimeRemaining(string debuffName)
+        {
+            foreach (var aura in SpellBook.Auras)
+            {
+                if (aura.AuraName == debuffName)
+                    return TargetDebuffTimeRemaining(aura.InternalAuraNo);
+            }
+            Log.Write($"[TargetDebuffTimeRemaining] Unable to find buff with name '{debuffName}' in Spell Book");
+            return -1;
+        }
+        public static int TargetDebuffStacks(int auraNoInArrayOfAuras)
+        {
+            var c = WoW.GetBlockColor(auraNoInArrayOfAuras, 4);
+
+            try
+            {
+                Log.WriteDirectlyToLogFile($"Green = {c.G}");
+                if (c.R == 255)
+                    return 0;
+
+                // ReSharper disable once PossibleNullReferenceException
+                return Convert.ToInt32(Math.Round(Convert.ToSingle(c.R) * 100 / 255));
+            }
+            catch (Exception ex)
+            {
+                Log.Write("Failed to find debuff stacks for color G = " + c.G, Color.Red);
+                Log.Write("Error: " + ex.Message, Color.Red);
+            }
+
+            return 0;
+        }
+
+        public static int TargetDebuffStacks(string debuffName)
+        {
+            foreach (var aura in SpellBook.Auras)
+            {
+                if (aura.AuraName == debuffName)
+                    return TargetDebuffStacks(aura.InternalAuraNo);
+            }
+            Log.Write($"[TargetDebuffTimeRemaining] Unable to find buff with name '{debuffName}' in Spell Book");
+            return -1;
+        }
+
+
         public override Form SettingsForm { get; set; }
 
         /// <summary>
@@ -611,7 +790,7 @@ end
 
 			 PartyBuffs[z].Buffs[buffId] = CreateFrame(""frame"","""", parent)
 			 PartyBuffs[z].Buffs[buffId]:SetSize(size, size)
-	         PartyBuffs[z].Buffs[buffId]:SetPoint(""TOPLEFT"", i * size, -size * 11+z)                            -- column 13 [Target Buffs]
+	         PartyBuffs[z].Buffs[buffId]:SetPoint(""TOPLEFT"", i * size, -size * (11+z))                            -- column 13 [Target Buffs]
 			 PartyBuffs[z].Buffs[buffId].t = PartyBuffs[z].Buffs[buffId]:CreateTexture()
 	         PartyBuffs[z].Buffs[buffId].t:SetColorTexture(1, 1, 1, alphaColor)
 		     PartyBuffs[z].Buffs[buffId].t:SetAllPoints(  PartyBuffs[z].Buffs[buffId])
@@ -625,7 +804,7 @@ end
 		for z=1, 4 do 
 			PartyBuffs[z].debuffs[debuffId] = CreateFrame(""frame"","""", parent)
 			PartyBuffs[z].debuffs[debuffId]:SetSize(size, size)
-			PartyBuffs[z].debuffs[debuffId]:SetPoint(""TOPLEFT"", i * size, -size * 15+z)         -- row 4, column 1+ [Spell In Range]
+            PartyBuffs[z].debuffs[debuffId]:SetPoint(""TOPLEFT"", i * size, -size * (15+z))         -- row 4, column 1+ [Spell In Range]
 			PartyBuffs[z].debuffs[debuffId].t = PartyBuffs[z].debuffs[debuffId]:CreateTexture()        
 			PartyBuffs[z].debuffs[debuffId].t:SetColorTexture(1, 1, 1, alphaColor)
 			PartyBuffs[z].debuffs[debuffId].t:SetAllPoints(PartyBuffs[z].debuffs[debuffId])
