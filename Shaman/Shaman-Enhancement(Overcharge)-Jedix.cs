@@ -12,10 +12,10 @@ namespace PixelMagic.Rotation
     public class Enhancement : CombatRoutine
     {
 		private static readonly Stopwatch coolDownStopWatch = new Stopwatch();
-		
-        public override string Name => "Enhancement(Overcharge) by Jedix";
+	
+	public override string Name { get { return "Enhancement(Overcharge) by Jedix"; } }
 
-        public override string Class => "Shaman";
+        public override string Class { get { return "Shaman"; } }
 
         public override Form SettingsForm { get; set; }
 
