@@ -3,7 +3,6 @@
 // ReSharper disable ConvertPropertyToExpressionBody
 
 using System;
-using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Diagnostics;
@@ -20,11 +19,17 @@ namespace PixelMagic.Rotation
 		private CheckBox TrueFrothingZerkerFalseMassacre;
 		
 		
-		 public override string Name => "Fury Warrior";
+		 	
+		public override string Name
+        {
+            get { return "Fury Warrior"; }
+        }
 
-        public override string Class => "Warrior";
-		
-		
+        
+		 public override string Class
+        {
+            get { return "Warrior"; }
+        }
 		        
 		private static bool TFZFMint
         {
