@@ -46,10 +46,18 @@ namespace PixelMagic.Rotation
         //
 
 
-        public override string Name => "Protection Warrior";
+      	public override string Name
+        {
+            get { return "Protection Warrior"; }
+        }
 
-        public override string Class => "Warrior";
+        
+		 public override string Class
+        {
+            get { return "Warrior"; }
+        }
 
+        
         private static bool generalInterrupts
         {
             get
