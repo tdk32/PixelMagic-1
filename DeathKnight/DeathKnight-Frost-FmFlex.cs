@@ -1,8 +1,7 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using PixelMagic.Helpers;
@@ -13,16 +12,20 @@ namespace PixelMagic.Rotation
     public class DKFrostMGFmflex : CombatRoutine
     {
 
-        private string gcdTime = "1.3";
+        private string gcdTime = "0.7";
         private bool AddonEdited = false;
+
+        private bool haveCoF = true;
+        private bool haveHRW = true;
 
         private static readonly Stopwatch coolDownStopWatch = new Stopwatch();
         private int currentRunes;
         private bool hasBreath;
+        private bool useNextHRWCharge = false;
 
         private bool isMelee;
         private int runicPower;
-        public bool useChainofIce = false;
+        private bool useChainofIce = false;
 
         public override string Name
         {
@@ -259,7 +262,6 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            Log.Write("Welcome to F m Flex Frost");
             Log.Write("Welcome to the Frost DK by Fmflex", Color.Green);
             SettingsFormDFF = new SettingsFormDFF();
             SettingsForm = SettingsFormDFF;
@@ -279,19 +281,14 @@ namespace PixelMagic.Rotation
             SettingsFormDFF.checkHotkeysFrostAMSPercent.Text = FrostAMSHPPercent.ToString();
             try
             {
-                if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\KickSettings.ini"))
-                    throw new FileNotFoundException();
-                using (var file = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + @"\KickSettings.ini"))
+                if (!WoW.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\KickSettings.ini"))
+                    Log.Write("KickSettings.ini doesn't exist yet");
+                string text = WoW.IO.File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"\KickSettings.ini");
+                foreach (string line in text.Split('\n'))
                 {
-                    while (file.Peek() >= 0)
-                    {
-                        SettingsFormDFF.spellList.Items.Add(file.ReadLine());
-                    }
+                    SettingsFormDFF.spellList.Items.Add(line);
                 }
-            }
-            catch (FileNotFoundException)
-            {
-                Log.Write("KickSettings.ini doesn't exist yet");
+                
             }
             catch (Exception ex)
             {
@@ -319,25 +316,23 @@ namespace PixelMagic.Rotation
         {
             if (!SettingsFormDFF.spellText.Text.Equals("") && Regex.IsMatch(SettingsFormDFF.spellText.Text, @"^\d+$"))
                 SettingsFormDFF.spellList.Items.Add(SettingsFormDFF.spellText.Text);
-            using (var file = new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + @"\KickSettings.ini", false))
+            string text = "";
+            foreach (string line in SettingsFormDFF.spellList.Items)
             {
-                foreach (string line in SettingsFormDFF.spellList.Items)
-                {
-                    file.WriteLine(line);
-                }
+                    text+=line+"/n";
             }
+            WoW.IO.File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + @"\KickSettings.ini", text);
         }
 
         private void btnremovespell_Click(object sender, EventArgs e)
         {
             SettingsFormDFF.spellList.Items.Remove(SettingsFormDFF.spellList.SelectedItem);
-            using (var file = new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + @"\KickSettings.ini", false))
+            string text = "";
+            foreach (string line in SettingsFormDFF.spellList.Items)
             {
-                foreach (string line in SettingsFormDFF.spellList.Items)
-                {
-                    file.WriteLine(line);
-                }
+                text += line + "/n";
             }
+            WoW.IO.File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + @"\KickSettings.ini", text);
         }
 
         private void KeyDown(object sender, KeyEventArgs e)
@@ -493,7 +488,6 @@ namespace PixelMagic.Rotation
                 if (coolDownStopWatch.ElapsedMilliseconds > 1000)
                 {
                     combatRoutine.UseCooldowns = !combatRoutine.UseCooldowns;
-                    Log.Write("Cooldowns " + (combatRoutine.UseCooldowns ? "On" : "Off"));
                     coolDownStopWatch.Restart();
                 }
             }
@@ -536,13 +530,19 @@ namespace PixelMagic.Rotation
             {
                 WoW.CastSpell("PillarofFrost");
             }
-            if (runicPower <= 30 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.IsSpellOnCooldown("HEmpower Rune") && hasBreath)
+            if ((haveCoF || useNextHRWCharge) && haveHRW && runicPower <= 30 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.PlayerHasBuff("HEmpower Rune") && !WoW.IsSpellOnCooldown("HEmpower Rune") && hasBreath)
             {
+                useNextHRWCharge = false;
                 WoW.CastSpell("HEmpower Rune");
+            }
+            if ((haveCoF || useNextHRWCharge) && !haveHRW && runicPower <= 50 && currentRunes <=1 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.IsSpellOnCooldown("HEmpower Rune") && hasBreath)
+            {
+                WoW.CastSpell("Empower Rune");
             }
             if (combatRoutine.UseCooldowns && isMelee && currentRunes >= 2 && runicPower >= 70 && CanCastNoRange("Breath"))
             {
                 WoW.CastSpell("Breath");
+                useNextHRWCharge = true;
                 return;
             }
             if (combatRoutine.UseCooldowns && isMelee && runicPower >= 70 && CanCastNoRange("Breath"))
@@ -1209,4 +1209,5 @@ Aura,45524,ChainofIce
 Aura,207256,Obliteration
 Aura,152279,Breath
 Aura,207127,HEmpower Rune
+Aura,211805,Gathering Storm
 */
