@@ -366,7 +366,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Bestial Wrath");
                         return;
                     }
-					if (WoW.CanCast("Bestial Wrath") && WoW.Focus >= 108 && WoW.IsSpellInRange("Cobra Shot") && !WoW.PlayerHasBuff("Turtle") && !WoW.IsSpellOnCooldown("Bestial Wrath") && WoW.SpellCooldownTimeRemaining("Kill Command") <= 3)
+					if (WoW.CanCast("Bestial Wrath") && WoW.Focus >= 100 && WoW.IsSpellInRange("Cobra Shot") && !WoW.PlayerHasBuff("Turtle") && !WoW.IsSpellOnCooldown("Bestial Wrath") && WoW.SpellCooldownTimeRemaining("Kill Command") <= 3)
                     {
                         WoW.CastSpell("Bestial Wrath");
                         return;
