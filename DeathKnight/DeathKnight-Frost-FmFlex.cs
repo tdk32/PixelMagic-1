@@ -443,13 +443,13 @@ namespace PixelMagic.Rotation
             string AddonName = ConfigFile.ReadValue("PixelMagic", "AddonName");
             try
             {
-                string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
+                string addonlua = WoW.IO.File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
                 string modif = "if remainingTime > " + gcdTime + " then";
 
                 addonlua = addonlua.Replace("if remainingTime ~= 0 then", modif);
 
 
-                File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
+                WoW.IO.File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
                 Log.Write("Addon Editing in progress");
                 WoW.Reload();
 
