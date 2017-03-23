@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -415,10 +414,10 @@ namespace PixelMagic.Rotation
             if ((Convert.ToDouble(pixelColor.G) == 255))
                 hastePct = 0f;
             else
-                            if (postive == 1)
-                hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f);
-            else
-                hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f) * (-1);
+                if (postive == 1)
+                    hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f);
+                else
+                    hastePct = (Convert.ToSingle(pixelColor.G) * 100f / 255f) * (-1);
             if (race > 13)
                 race = 0;
             if (spec > 34)
@@ -443,24 +442,23 @@ namespace PixelMagic.Rotation
         }
 
         private void SelectRotation()
-        {  
+        {
             if (Nameplates)
-            { 
-                if(Control.IsKeyLocked(Keys.Scroll))
+            {
+                if (Control.IsKeyLocked(Keys.Scroll))
                 {
                     if (npcCount >= 3 && !WoW.TargetIsPlayer)
-                        combatRoutine.ChangeType(RotationType.AOE);
-                    
+                        combatRoutine.ChangeType(RotationType.AOE);                    
                     if ((npcCount <= 2))
-                        combatRoutine.ChangeType(RotationType.SingleTarget);            
+                        combatRoutine.ChangeType(RotationType.SingleTarget);
                 }
             }
         }
 
-        
+
         private static string AddonName = ConfigFile.ReadValue("PixelMagic", "AddonName");
         private static string AddonEmbedName = "BossLib.xml";// Initialization variables		
-        private bool AddonEdited = false;        
+        private bool AddonEdited = false;
         public void RangeLibCopy()
         {
             try
@@ -470,43 +468,42 @@ namespace PixelMagic.Rotation
 
                 // To copy a folder's contents to a new location:
                 // Create a new target folder, if necessary.
-                if (!Directory.Exists(targetPath))
+                if (!WoW.IO.Directory.Exists(targetPath))
                 {
-                    Directory.CreateDirectory(targetPath);
+                    WoW.IO.Directory.CreateDirectory(targetPath);
                     Log.Write("Base target:" + targetPath);
                 }
-                if (!Directory.Exists(targetPathSub))
+                if (!WoW.IO.Directory.Exists(targetPathSub))
                 {
                     Log.Write("Sub target:" + targetPathSub);
-                    Directory.CreateDirectory(targetPathSub);
+                    WoW.IO.Directory.CreateDirectory(targetPathSub);
                 }
 
-                if (Directory.Exists(targetPath))
+                if (WoW.IO.Directory.Exists(targetPath))
                 {
-                    if (!File.Exists(Path.Combine(targetPath, LibSpellToc)))
+                    if (!WoW.IO.File.Exists(targetPath + LibSpellToc))
                     {
-
-                        File.WriteAllText(Path.Combine(targetPath, LibSpellToc), LibSpellTocContent);
+                        WoW.IO.File.WriteAllText((targetPath + LibSpellToc), LibSpellTocContent);
                     }
-                    if (!File.Exists(Path.Combine(targetPath, LibSpellLua)))
+                    if (!WoW.IO.File.Exists(targetPath + LibSpellLua))
                     {
-                        File.WriteAllText(Path.Combine(targetPath, LibSpellLua), LibSpellLuaContent);
+                        WoW.IO.File.WriteAllText((targetPath + LibSpellLua), LibSpellLuaContent);
                     }
-                    if (!File.Exists(Path.Combine(targetPath, LibXml)))
+                    if (!WoW.IO.File.Exists((targetPath + LibXml)))
                     {
-                        File.WriteAllText(Path.Combine(targetPath, LibXml), LibXmlContent);
+                        WoW.IO.File.WriteAllText((targetPath + LibXml), LibXmlContent);
                     }
                 }
 
-                if (Directory.Exists(targetPathSub))
+                if (WoW.IO.Directory.Exists(targetPathSub))
                 {
-                    if (!File.Exists(Path.Combine(targetPathSub, LibStubLua)))
+                    if (!WoW.IO.File.Exists(targetPathSub + LibStubLua))
                     {
-                        File.WriteAllText(Path.Combine(targetPathSub, LibStubLua), LibStubLuaContent);
+                        WoW.IO.File.WriteAllText((targetPathSub + LibStubLua), LibStubLuaContent);
                     }
-                    if (!File.Exists(Path.Combine(targetPathSub, LibStubToc)))
+                    if (!WoW.IO.File.Exists(targetPathSub + LibStubToc))
                     {
-                        File.WriteAllText(Path.Combine(targetPathSub, LibStubToc), LibStubTocContent);
+                        WoW.IO.File.WriteAllText((targetPathSub + LibStubToc), LibStubTocContent);
                     }
 
                 }
@@ -526,12 +523,12 @@ namespace PixelMagic.Rotation
             {
 
                 Log.Write("Addon emedding Editing in progress");
-                if (!File.Exists(Path.Combine("" + WoW.AddonPath + "\\" + AddonName + "\\", AddonEmbedName)))
+                if (!WoW.IO.File.Exists("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonEmbedName))
                 {
                     string addonlua = " < Ui xmlns = \"http://www.blizzard.com/wow/ui/\" xmlns: xsi = \"http://www.w3.org/2001/XMLSchema-instance \" xsi: schemaLocation = \"http://www.blizzard.com/wow/ui/ ..\\FrameXML\\UI.xsd\" >" + Environment.NewLine
                 + "< Script file = \"lib\\LibSpellRange-1.0\\LibSpellRange-1.0.lua\" />" + Environment.NewLine
                 + "</ Ui >" + Environment.NewLine;
-                    File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonEmbedName, addonlua);
+                    WoW.IO.File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonEmbedName, addonlua);
                     Log.Write("Addon Embedding complete");
 
                 }
@@ -567,13 +564,13 @@ namespace PixelMagic.Rotation
                 RangeLibCopy();
                 Thread.Sleep(350);
                 WoW.Reload();
-            }            
+            }
         }
         private void AddonEdit()
         {
             try
             {
-                string addonlua = File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
+                string addonlua = WoW.IO.File.ReadAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua");
                 int start = addonlua.IndexOf("local function updateSpellCooldowns(self, event)");
                 int end = addonlua.IndexOf("local lastItemCooldownState = {");
                 addonlua = addonlua.Remove(start, end - start);
@@ -650,7 +647,7 @@ namespace PixelMagic.Rotation
                 addonlua = addonlua.Replace("itemframes[itemId]:SetScript(\"OnUpdate\", updateItemCooldowns)", "");
                 addonlua = addonlua.Replace("spellOverlayedFrames[spellId]:SetScript(\"OnUpdate\", updateIsSpellOverlayedFrames)", "");
                 addonlua = addonlua.Replace("playerDebuffFrames[debuffId]:SetScript(\"OnUpdate\", updatePlayerDebuffs)", "");
-                File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
+                WoW.IO.File.WriteAllText("" + WoW.AddonPath + "\\" + AddonName + "\\" + AddonName + ".lua", addonlua);
                 AddonEdited = true;
             }
             catch (Exception ex)
@@ -683,7 +680,7 @@ namespace PixelMagic.Rotation
 
             try
             {
-                Log.WriteDirectlyToLogFile($"Green = {c.G} Blue = {c.B}");
+                Log.WriteDirectlyToLogFile("Green = " + c.G + "Blue =" + c.B);
                 if (c.G == 255)
                     return 0;
                 return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
@@ -691,7 +688,7 @@ namespace PixelMagic.Rotation
             }
             catch (Exception ex)
             {
-                Log.Write($"Red = {c.R} Green = {c.G}");
+                Log.Write("Red =" + c.R + "Green =" + c.G);
                 Log.Write(ex.Message, Color.Red);
             }
 
@@ -704,7 +701,7 @@ namespace PixelMagic.Rotation
                 if (spell.SpellName == spellBookSpellName)
                     return SpellCooldownTimeRemaining(spell.InternalSpellNo);
             }
-            Log.Write($"[IsSpellOnCooldown] Unable to find spell with name '{spellBookSpellName}' in Spell Book");
+            Log.Write("[IsSpellOnCooldown] Unable to find spell with name" + spellBookSpellName + "in Spell Book");
             return 0;
         }
         private static int PlayerBuffStacks(int auraNoInArrayOfAuras)
@@ -713,7 +710,7 @@ namespace PixelMagic.Rotation
 
             try
             {
-                Log.WriteDirectlyToLogFile($"Green = {c.G}");
+                Log.WriteDirectlyToLogFile("Green =" + c.G);
                 if (c.R == 255)
                     return 0;
 
@@ -735,7 +732,7 @@ namespace PixelMagic.Rotation
                 if (aura.AuraName == auraName)
                     return PlayerBuffStacks(aura.InternalAuraNo);
             }
-            Log.Write($"[PlayerBuffTimeRemaining] Unable to find buff with name '{auraName}' in Spell Book");
+            Log.Write("[PlayerBuffTimeRemaining] Unable to find buff with name" + auraName + "in Spell Book");
             return -1;
         }
         public static int PlayerBuffTimeRemaining(int auraNoInArrayOfAuras)
@@ -746,8 +743,8 @@ namespace PixelMagic.Rotation
             try
             {
                 // ReSharper disable once PossibleNullReferenceException
-               Log.WriteDirectlyToLogFile($"Green = {c.G} Blue = {c.B}");
-               return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
+                Log.WriteDirectlyToLogFile("Green =" + c.G + "Blue =" + c.B);
+                return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
             }
             catch (Exception ex)
             {
@@ -764,7 +761,7 @@ namespace PixelMagic.Rotation
                 if (aura.AuraName == buffName)
                     return PlayerBuffTimeRemaining(aura.InternalAuraNo);
             }
-            Log.Write($"[PlayerBuffTimeRemaining] Unable to find buff with name '{buffName}' in Spell Book");
+            Log.Write("[PlayerBuffTimeRemaining] Unable to find buff with name" + buffName + "in Spell Book");
             return -1;
 
         }
@@ -781,9 +778,9 @@ namespace PixelMagic.Rotation
                 if (aura.AuraName == buffName)
                     return PlayerHasBuff(aura.InternalAuraNo);
             }
-            Log.Write($"[PlayerHasBuff] Unable to find buff with name '{buffName}' in Spell Book");
+            Log.Write("[PlayerHasBuff] Unable to find buff with name" + buffName + "in Spell Book");
             return false;
-            
+
         }
         public static int TargetDebuffTimeRemaining(int auraNoInArrayOfAuras)
         {
@@ -791,7 +788,7 @@ namespace PixelMagic.Rotation
 
             try
             {
-                Log.WriteDirectlyToLogFile($"Green = {c.G}");
+                Log.WriteDirectlyToLogFile("Green =" + c.G);
                 if (c.G == 255)
                     return 0;
                 return Convert.ToInt32(Math.Round(Convert.ToSingle(c.G) * 10000 / 255)) + Convert.ToInt32(Math.Round(Convert.ToSingle(c.B) * 100 / 255));
@@ -804,14 +801,14 @@ namespace PixelMagic.Rotation
             return 0;
         }
 
-       public static int TargetDebuffTimeRemaining(string debuffName)
+        public static int TargetDebuffTimeRemaining(string debuffName)
         {
             foreach (var aura in SpellBook.Auras)
             {
                 if (aura.AuraName == debuffName)
                     return TargetDebuffTimeRemaining(aura.InternalAuraNo);
             }
-            Log.Write($"[TargetDebuffTimeRemaining] Unable to find buff with name '{debuffName}' in Spell Book");
+            Log.Write("[TargetDebuffTimeRemaining] Unable to find buff with name" + debuffName + "in Spell Book");
             return -1;
         }
         public static int TargetDebuffStacks(int auraNoInArrayOfAuras)
@@ -820,7 +817,7 @@ namespace PixelMagic.Rotation
 
             try
             {
-                Log.WriteDirectlyToLogFile($"Green = {c.G}");
+                Log.WriteDirectlyToLogFile("Green =" + c.G);
                 if (c.R == 255)
                     return 0;
 
@@ -843,7 +840,7 @@ namespace PixelMagic.Rotation
                 if (aura.AuraName == debuffName)
                     return TargetDebuffStacks(aura.InternalAuraNo);
             }
-            Log.Write($"[TargetDebuffTimeRemaining] Unable to find buff with name '{debuffName}' in Spell Book");
+            Log.Write("[TargetDebuffTimeRemaining] Unable to find buff with name" + debuffName + "in Spell Book");
             return -1;
         }
 
