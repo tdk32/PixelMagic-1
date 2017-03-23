@@ -7,6 +7,8 @@
 // - Sometimes overcapping Astral Power due PixelMagic not detecting Astral Power fast enough.
 // - Oneth's Intuition not yet coded to normal rotation, will do it next.
 // Changelog :
+// Version r29
+// - Fixed Sunfire and Moonfire
 // Version r28
 // - Fixed even more things
 // Version r27
@@ -697,7 +699,8 @@ namespace PixelMagic.Rotation
                     }
 					// New Moon
                     if (WoW.IsSpellInRange("Moon") 
-                        && WoW.CanCast("Moon"))
+                        && WoW.CanCast("Moon")
+                        && WoW.PlayerSpellCharges("Moon") == 3)
                     {
                         WoW.CastSpell("Moon");
                         return;
@@ -1024,6 +1027,22 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("KBW");
                         return;
                     }
+                    // Moonfire if none on target
+                    if (WoW.IsSpellInRange("LStrike")
+                        && WoW.CanCast("Moonfire")
+                        && !WoW.TargetHasDebuff("Moonfire"))
+                    {
+                        WoW.CastSpell("Moonfire");
+                        return;
+                    }
+                    //Sunfire if none on target
+                    if (WoW.IsSpellInRange("LStrike")
+                        && WoW.CanCast("Sunfire")
+                        && !WoW.TargetHasDebuff("Sunfire"))
+                    {
+                        WoW.CastSpell("Sunfire");
+                        return;
+                    }
                     // Starsurge
                     if (WoW.IsSpellInRange("Starsurge") && WoW.CanCast("Starsurge") && WoW.CurrentAstralPower >= 40)
                     {
@@ -1133,6 +1152,22 @@ namespace PixelMagic.Rotation
                     if (KBW && !WoW.ItemOnCooldown("KBW") && WoW.IsSpellInRange("LStrike"))
                     {
                         WoW.CastSpell("KBW");
+                        return;
+                    }
+                    // Moonfire if none on target
+                    if (WoW.IsSpellInRange("LStrike")
+                        && WoW.CanCast("Moonfire")
+                        && !WoW.TargetHasDebuff("Moonfire"))
+                    {
+                        WoW.CastSpell("Moonfire");
+                        return;
+                    }
+                    //Sunfire if none on target
+                    if (WoW.IsSpellInRange("LStrike")
+                        && WoW.CanCast("Sunfire")
+                        && !WoW.TargetHasDebuff("Sunfire"))
+                    {
+                        WoW.CastSpell("Sunfire");
                         return;
                     }
                     // Starsurge
@@ -1268,6 +1303,22 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // Priority execute order
+                    // Moonfire if none on target
+                    if (WoW.IsSpellInRange("LStrike")
+                        && WoW.CanCast("Moonfire")
+                        && !WoW.TargetHasDebuff("Moonfire"))
+                    {
+                        WoW.CastSpell("Moonfire");
+                        return;
+                    }
+                    //Sunfire if none on target
+                    if (WoW.IsSpellInRange("LStrike")
+                        && WoW.CanCast("Sunfire")
+                        && !WoW.TargetHasDebuff("Sunfire"))
+                    {
+                        WoW.CastSpell("Sunfire");
+                        return;
+                    }
                     // New Moon
                     if (WoW.IsSpellInRange("Moon") 
                         && WoW.CanCast("Moon")
@@ -1502,7 +1553,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("SolarW");
                         return;
                     }
-
+                    return;
                 }
                 // While moving
                 if (WoW.IsInCombat && WoW.HasTarget&& WoW.TargetIsEnemy&&WoW.PlayerHasBuff("Moonkin")&&WoW.IsMoving)
@@ -1653,6 +1704,7 @@ namespace PixelMagic.Rotation
                         
                         return;
                     }
+                    return;
                 }
                 // Stellar Drift
                 if (StellarDrift && WoW.IsMoving && WoW.PlayerHasBuff("StarfallP") && WoW.IsSpellInRange("LStrike"))
