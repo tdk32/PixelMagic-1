@@ -254,8 +254,7 @@ namespace PixelMagic.Rotation
                 {
                     return Convert.ToBoolean(VoidTorrent1);
                 }
-
-                return true;
+                return false;
             }
             set { ConfigFile.WriteValue("TWShadow", "VoidTorrent1", value.ToString()); }
         }
@@ -467,12 +466,12 @@ namespace PixelMagic.Rotation
         private void radVoidTorrent1_Click(object sender, EventArgs e)
         {
             radVoidTorrent1 = VoidTorrentRadio1.Checked;
-            radVoidTorrent2 = !VoidTorrentRadio1.Checked;
+            radVoidTorrent2 = VoidTorrentRadio2.Checked;
         }
         private void radVoidTorrent2_Click(object sender, EventArgs e)
         {
             radVoidTorrent2 = VoidTorrentRadio2.Checked;
-            radVoidTorrent1 = !VoidTorrentRadio2.Checked;
+            radVoidTorrent1 = VoidTorrentRadio1.Checked;
         }
         private void chkLegTrinket_Click(object sender, EventArgs e)
         {
