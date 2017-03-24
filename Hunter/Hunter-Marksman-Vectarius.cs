@@ -285,9 +285,14 @@ namespace PixelMagic.Rotation
         public override void Pulse() // Updated for Legion (tested and working for single target)
         {
 			 if (combatRoutine.Type == RotationType.SingleTarget)  // Do Single Target Stuff here
-            {
+            {				
 				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
                 {	
+					if (WoW.CanCast("Salve") && !WoW.PlayerHasBuff("Salve")) //!WoW.HasBuff("Hunters Mark"))
+                    {
+                        WoW.CastSpell("Salve");
+                        return;
+                    }				
 					/*if (WoW.CanCast("Arcane Torrent") && WoW.Focus <= 100) //!WoW.HasBuff("Hunters Mark"))
                     {
                         WoW.CastSpell("Arcane Torrent");
@@ -350,7 +355,12 @@ namespace PixelMagic.Rotation
             if (combatRoutine.Type == RotationType.AOE)
             {
 				 if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
-                {					
+                {		
+					if (WoW.CanCast("Salve") && !WoW.PlayerHasBuff("Salve")) //!WoW.HasBuff("Hunters Mark"))
+                    {
+                        WoW.CastSpell("Salve");
+                        return;
+                    }			
 					if (WoW.CanCast("Trueshot")) //!WoW.HasBuff("Hunters Mark"))
                     {
                         WoW.CastSpell("Trueshot");
@@ -411,12 +421,23 @@ namespace PixelMagic.Rotation
             if (combatRoutine.Type == RotationType.SingleTargetCleave)
             {
 				 if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
-                {					
+                {	
+					if (WoW.CanCast("Salve") && !WoW.PlayerHasBuff("Salve")) //!WoW.HasBuff("Hunters Mark"))
+                    {
+                        WoW.CastSpell("Salve");
+                        return;
+                    }			
+					/*if (WoW.CanCast("Arcane Torrent") && WoW.Focus <= 100) //!WoW.HasBuff("Hunters Mark"))
+                    {
+                        WoW.CastSpell("Arcane Torrent");
+                        return;
+                    }
+*/					
 					if (WoW.CanCast("Trueshot")) //!WoW.HasBuff("Hunters Mark"))
                     {
                         WoW.CastSpell("Trueshot");
                         return;
-                    }					
+                    }	
 					if (WoW.CanCast("Piercing Shot") && WoW.TargetHasDebuff("Vulnerable") && WoW.Focus >= 100 && WoW.IsSpellInRange("Windburst")) //!WoW.HasBuff("Hunters Mark"))
                     {
                         WoW.CastSpell("Piercing Shot");
@@ -432,7 +453,7 @@ namespace PixelMagic.Rotation
 					    WoW.CastSpell("Marked Shot");
                         return;
 					}	
-					if (WoW.CanCast("Windburst") && WoW.Focus >= 20 && WoW.IsSpellOnCooldown("Piercing Shot") && WoW.IsSpellOnCooldown("Piercing Shot") && WoW.IsSpellInRange("Windburst")) //!WoW.HasBuff("Hunters Mark"))
+					if (WoW.CanCast("Windburst") && WoW.Focus >= 20 && WoW.IsSpellOnCooldown("Piercing Shot") && WoW.IsSpellInRange("Windburst")) //!WoW.HasBuff("Hunters Mark"))
                     {
                         WoW.CastSpell("Windburst");
                         return;
@@ -565,6 +586,7 @@ AddonAuthor=Vectarius
 AddonName=myspellpriority
 WoWVersion=Legion - 70100
 [SpellBook.db]
+Spell,194386,Salve,D3
 Spell,204147,Windburst,D2
 Spell,120360,Barrage,D3
 Spell,131894,Murder of Crows,D9
@@ -579,6 +601,7 @@ Spell,109304,Exhil,V
 Spell,193526,Trueshot,C
 Spell,186265,Turtle,G
 Spell,5384,Death,F
+Aura,194386,Salve
 Aura,223138,Marking Targets
 Aura,185987,Hunters Mark
 Aura,194594,Lock and Load
