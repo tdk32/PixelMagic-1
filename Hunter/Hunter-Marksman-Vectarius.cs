@@ -284,6 +284,10 @@ namespace PixelMagic.Rotation
 
         public override void Pulse() // Updated for Legion (tested and working for single target)
         {
+			 if (combatRoutine.Type == RotationType.SingleTarget)  // Do Single Target Stuff here
+            {
+				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
+                {	
 					/*if (WoW.CanCast("Arcane Torrent") && WoW.Focus <= 100) //!WoW.HasBuff("Hunters Mark"))
                     {
                         WoW.CastSpell("Arcane Torrent");
@@ -341,8 +345,12 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Arcane Shot");
                         return;
                     }	
+			} 
+			}
             if (combatRoutine.Type == RotationType.AOE)
             {
+				 if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
+                {					
 					if (WoW.CanCast("Trueshot")) //!WoW.HasBuff("Hunters Mark"))
                     {
                         WoW.CastSpell("Trueshot");
@@ -399,8 +407,11 @@ namespace PixelMagic.Rotation
                         return;
                     }				
 			}
+			}
             if (combatRoutine.Type == RotationType.SingleTargetCleave)
             {
+				 if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
+                {					
 					if (WoW.CanCast("Trueshot")) //!WoW.HasBuff("Hunters Mark"))
                     {
                         WoW.CastSpell("Trueshot");
@@ -452,6 +463,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Arcane Shot");
                         return;
                     }	
+				}
 			}
                 
 				}
