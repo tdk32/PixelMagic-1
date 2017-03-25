@@ -11,6 +11,7 @@ to-do:
 - add all spec variations
 
 rev2 - nice looking code
+	 - Piercing Shot Checkbox
 	 - Salve CheckBox
 	 - Cooldowns Overlay Button implemented
 	 - Counter Shot implemented
@@ -392,7 +393,8 @@ namespace PixelMagic.Rotation
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.Focus >= 100 
 						&& !WoW.PlayerIsChanneling
-						&& !WoW.PlayerIsCasting						
+						&& !WoW.PlayerIsCasting			
+						&& PiercingShot
 						&& WoW.IsSpellInRange("Windburst"))
                     {
                         WoW.CastSpell("Piercing Shot");
@@ -535,7 +537,8 @@ namespace PixelMagic.Rotation
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.Focus >= 100 
 						&& !WoW.PlayerIsChanneling
-						&& !WoW.PlayerIsCasting						
+						&& !WoW.PlayerIsCasting			
+						&& PiercingShot
 						&& WoW.IsSpellInRange("Windburst")) 
                     {
                         WoW.CastSpell("Piercing Shot");
@@ -680,7 +683,8 @@ namespace PixelMagic.Rotation
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.Focus >= 100 
 						&& !WoW.PlayerIsChanneling
-						&& !WoW.PlayerIsCasting						
+						&& !WoW.PlayerIsCasting					
+						&& PiercingShot
 						&& WoW.IsSpellInRange("Windburst"))
                     {
                         WoW.CastSpell("Piercing Shot");
@@ -803,7 +807,7 @@ namespace PixelMagic.Rotation
             get { return "Hunter"; }
         }
 
-		private static Image LowGow
+		private static Image Logo
         {
             get
             {
