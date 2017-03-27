@@ -5,6 +5,8 @@
 // Balance Druid rotation by Scotishdwarf and Daniel
 // NOTE : THIS BUILD IS WITHOUT STARFALL, USER NEED TO USE IT MANUALLY
 // Changelog :
+// Version r30
+// - Additional checks to Emerald Dreamcatcher rotation
 // Version r29
 // - Fixed Sunfire and Moonfire
 // Version r28
@@ -72,7 +74,7 @@ using System.Windows.Forms;
 
 namespace PixelMagic.Rotation
 {
-    public class BalanceDruid : CombatRoutine
+    public class BalanceDruidNoStarfall : CombatRoutine
     {
         private readonly Stopwatch pullwatch = new Stopwatch();
         private CheckBox NaturesBalanceBox;
@@ -109,127 +111,127 @@ namespace PixelMagic.Rotation
         {
             get
             {
-                var naturesBalance = ConfigFile.ReadValue("BalanceDruid", "NaturesBalance").Trim();
+                var naturesBalance = ConfigFile.ReadValue("BalanceDruidNoStarfall", "NaturesBalance").Trim();
 
                 return naturesBalance != "" && Convert.ToBoolean(naturesBalance);
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "NaturesBalance", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "NaturesBalance", value.ToString()); }
         }
 		private static bool Incarnation
         {
             get
             {
-                var incarnation = ConfigFile.ReadValue("BalanceDruid", "Incarnation").Trim();
+                var incarnation = ConfigFile.ReadValue("BalanceDruidNoStarfall", "Incarnation").Trim();
 
                 return incarnation != "" && Convert.ToBoolean(incarnation);
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "Incarnation", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "Incarnation", value.ToString()); }
         }
         private static bool SouloftheForest
         {
             get
             {
-                var souloftheForest = ConfigFile.ReadValue("BalanceDruid", "SouloftheForest").Trim();
+                var souloftheForest = ConfigFile.ReadValue("BalanceDruidNoStarfall", "SouloftheForest").Trim();
 
                 return souloftheForest != "" && Convert.ToBoolean(souloftheForest);
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "SouloftheForest", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "SouloftheForest", value.ToString()); }
         }
         private static bool AstralCommunion
         {
             get
             {
-                var astralCommunion = ConfigFile.ReadValue("BalanceDruid", "AstralCommunion").Trim();
+                var astralCommunion = ConfigFile.ReadValue("BalanceDruidNoStarfall", "AstralCommunion").Trim();
 
                 return astralCommunion != "" && Convert.ToBoolean(astralCommunion);
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "AstralCommunion", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "AstralCommunion", value.ToString()); }
         }
         private static bool StellarFlare
         {
             get
             {
-                var stellarFlare = ConfigFile.ReadValue("BalanceDruid", "StellarFlare").Trim();
+                var stellarFlare = ConfigFile.ReadValue("BalanceDruidNoStarfall", "StellarFlare").Trim();
 
                 return stellarFlare != "" && Convert.ToBoolean(stellarFlare);
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "StellarFlare", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "StellarFlare", value.ToString()); }
         }
         private static bool HealingLowHP
         {
             get
             {
-                var healingLowHP = ConfigFile.ReadValue("BalanceDruid", "HealingLowHP").Trim();
+                var healingLowHP = ConfigFile.ReadValue("BalanceDruidNoStarfall", "HealingLowHP").Trim();
 
                 return healingLowHP != "" && Convert.ToBoolean(healingLowHP);
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "HealingLowHP", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "HealingLowHP", value.ToString()); }
         }
         private static bool Renewal
         {
             get
             {
-                var renewal = ConfigFile.ReadValue("BalanceDruid", "Renewal").Trim();
+                var renewal = ConfigFile.ReadValue("BalanceDruidNoStarfall", "Renewal").Trim();
 
                 return renewal != "" && Convert.ToBoolean(renewal);
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "Renewal", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "Renewal", value.ToString()); }
         }
         private static bool BlessingOfAncients
         {
             get
             {
-                var blessingOfAncients = ConfigFile.ReadValue("BalanceDruid", "BlessingOfAncients").Trim();
+                var blessingOfAncients = ConfigFile.ReadValue("BalanceDruidNoStarfall", "BlessingOfAncients").Trim();
 
                 return blessingOfAncients != "" && Convert.ToBoolean(blessingOfAncients);
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "BlessingOfAncients", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "BlessingOfAncients", value.ToString()); }
         }
         private static bool StellarDrift
         {
             get
             {
-                var stellarDrift = ConfigFile.ReadValue("BalanceDruid", "StellarDrift").Trim();
+                var stellarDrift = ConfigFile.ReadValue("BalanceDruidNoStarfall", "StellarDrift").Trim();
 
                 return stellarDrift != "" && Convert.ToBoolean(stellarDrift);
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "StellarDrift", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "StellarDrift", value.ToString()); }
         }
         private static bool KBW
         {
             get
             {
-                var kBW = ConfigFile.ReadValue("BalanceDruid", "KBW").Trim();
+                var kBW = ConfigFile.ReadValue("BalanceDruidNoStarfall", "KBW").Trim();
 
                 return kBW != "" && Convert.ToBoolean(kBW);
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "KBW", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "KBW", value.ToString()); }
         }
         private static bool EmeraldDreamcatcher
         {
             get
             {
-                var emeraldDreamcatcher = ConfigFile.ReadValue("BalanceDruid", "EmeraldDreamcatcher").Trim();
+                var emeraldDreamcatcher = ConfigFile.ReadValue("BalanceDruidNoStarfall", "EmeraldDreamcatcher").Trim();
 
                 return emeraldDreamcatcher != "" && Convert.ToBoolean(emeraldDreamcatcher);
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "EmeraldDreamcatcher", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "EmeraldDreamcatcher", value.ToString()); }
         }
         private static bool StarfallMacro
         {
             get
             {
-                var starfallMacro = ConfigFile.ReadValue("BalanceDruid", "StarfallMacro").Trim();
+                var starfallMacro = ConfigFile.ReadValue("BalanceDruidNoStarfall", "StarfallMacro").Trim();
 
                 return starfallMacro != "" && Convert.ToBoolean(starfallMacro);
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "StarfallMacro", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "StarfallMacro", value.ToString()); }
         }
         private static int StarsurgeAsP
         {
             get
             {
-                var starsurgeAsP = ConfigFile.ReadValue("BalanceDruid", "StarsurgeAsP");
+                var starsurgeAsP = ConfigFile.ReadValue("BalanceDruidNoStarfall", "StarsurgeAsP");
                 try
                 {
                     return Convert.ToInt32(starsurgeAsP);
@@ -239,7 +241,7 @@ namespace PixelMagic.Rotation
                     return 60;
                 }
             }
-            set { ConfigFile.WriteValue("BalanceDruid", "StarsurgeAsP", value.ToString()); }
+            set { ConfigFile.WriteValue("BalanceDruidNoStarfall", "StarsurgeAsP", value.ToString()); }
         }
 
         public override void Initialize()
@@ -536,12 +538,12 @@ namespace PixelMagic.Rotation
                     return;
                 }
                 // Emerald Dreamcatcher Rotation
-                if (EmeraldDreamcatcher)
+                if (EmeraldDreamcatcher && WoW.IsInCombat && WoW.HasTarget && UseCooldowns && WoW.TargetIsEnemy && WoW.PlayerHasBuff("Moonkin"))
                 {
                     // actions.ed=astral_communion,if=astral_power.deficit>=75&buff.the_emerald_dreamcatcher.up
                     if (AstralCommunion && WoW.CurrentAstralPower <= 25 && WoW.PlayerHasBuff("EmeraldDreamcatcherBuff"));
                     {
-                        WoW.CastSpell("Astral Communion");
+                        WoW.CastSpell("AstralCommunion");
                         return;
                     }
                     // actions.ed+=/incarnation,if=astral_power>=85&!buff.the_emerald_dreamcatcher.up|buff.bloodlust.up
@@ -1008,10 +1010,10 @@ namespace PixelMagic.Rotation
                     }
                     // Astral Communion if Astral Power smaller than 25
                     // TODO : Confugrable usage
-                    if (AstralCommunion && WoW.CanCast("Astral Communion")
+                    if (AstralCommunion && WoW.CanCast("AstralCommunion")
                         && WoW.CurrentAstralPower <= 25)
                     {
-                        WoW.CastSpell("Astral Communion");
+                        WoW.CastSpell("AstralCommunion");
                         return;
                     }
                 }
@@ -1605,10 +1607,10 @@ namespace PixelMagic.Rotation
                     }
                     // Astral Communion if Astral Power smaller than 25
                     // TODO : Confugrable usage
-                    if (AstralCommunion && WoW.CanCast("Astral Communion")
+                    if (AstralCommunion && WoW.CanCast("AstralCommunion")
                         && WoW.CurrentAstralPower <= 25)
                     {
-                        WoW.CastSpell("Astral Communion");
+                        WoW.CastSpell("AstralCommunion");
                         return;
                     }
                     // Incarnation
@@ -2135,7 +2137,7 @@ namespace PixelMagic.Rotation
 
 /*
 [AddonDetails.db]
-AddonAuthor=Daniel and Scotishdwarf
+AddonAuthor=Scotishdwarf
 AddonName=HideOrderHallBar
 WoWVersion=Legion - 70100
 [SpellBook.db]
@@ -2149,7 +2151,7 @@ Spell,202771,FullMoon,G
 Spell,202768,HalfMoon,G
 Spell,202347,StellarFlare,F9
 Spell,194223,CelestialAlignment,Z
-Spell,202359,Astral Communion,F10
+Spell,202359,AstralCommunion,F10
 Spell,202430,NaturesBalance,E
 Spell,102560,Incarnation,Z
 Spell,18562,Swiftmend,D4
