@@ -7,6 +7,8 @@
 // - Sometimes overcapping Astral Power due PixelMagic not detecting Astral Power fast enough.
 // - Oneth's Intuition not yet coded to normal rotation, will do it next.
 // Changelog :
+// Version r30
+// - Additional checks to Emerald Dreamcatcher rotation
 // Version r29
 // - Fixed Sunfire and Moonfire
 // Version r28
@@ -538,12 +540,12 @@ namespace PixelMagic.Rotation
                     return;
                 }
                 // Emerald Dreamcatcher Rotation
-                if (EmeraldDreamcatcher)
+                if (EmeraldDreamcatcher && WoW.IsInCombat && WoW.HasTarget && UseCooldowns && WoW.TargetIsEnemy && WoW.PlayerHasBuff("Moonkin"))
                 {
                     // actions.ed=astral_communion,if=astral_power.deficit>=75&buff.the_emerald_dreamcatcher.up
                     if (AstralCommunion && WoW.CurrentAstralPower <= 25 && WoW.PlayerHasBuff("EmeraldDreamcatcherBuff"));
                     {
-                        WoW.CastSpell("Astral Communion");
+                        WoW.CastSpell("AstralCommunion");
                         return;
                     }
                     // actions.ed+=/incarnation,if=astral_power>=85&!buff.the_emerald_dreamcatcher.up|buff.bloodlust.up
@@ -1011,10 +1013,10 @@ namespace PixelMagic.Rotation
                     }
                     // Astral Communion if Astral Power smaller than 25
                     // TODO : Confugrable usage
-                    if (AstralCommunion && WoW.CanCast("Astral Communion")
+                    if (AstralCommunion && WoW.CanCast("AstralCommunion")
                         && WoW.CurrentAstralPower <= 25)
                     {
-                        WoW.CastSpell("Astral Communion");
+                        WoW.CastSpell("AstralCommunion");
                         return;
                     }
                 }
@@ -1608,10 +1610,10 @@ namespace PixelMagic.Rotation
                     }
                     // Astral Communion if Astral Power smaller than 25
                     // TODO : Confugrable usage
-                    if (AstralCommunion && WoW.CanCast("Astral Communion")
+                    if (AstralCommunion && WoW.CanCast("AstralCommunion")
                         && WoW.CurrentAstralPower <= 25)
                     {
-                        WoW.CastSpell("Astral Communion");
+                        WoW.CastSpell("AstralCommunion");
                         return;
                     }
                     // Incarnation
@@ -2151,7 +2153,7 @@ Spell,202771,FullMoon,G
 Spell,202768,HalfMoon,G
 Spell,202347,StellarFlare,F9
 Spell,194223,CelestialAlignment,Z
-Spell,202359,Astral Communion,F10
+Spell,202359,AstralCommunion,F10
 Spell,202430,NaturesBalance,E
 Spell,102560,Incarnation,Z
 Spell,18562,Swiftmend,D4
