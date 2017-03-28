@@ -1,20 +1,16 @@
-// winifix@gmail.com
-// ReSharper disable UnusedMember.Global
-// ReSharper disable ConvertPropertyToExpressionBody
-
-/*
-Marksman by Vectarius
-
+/*Marksman by Vectarius
 to-do: 
 - improve dps?
 - add opener
 - add all spec variations
-
+rev4 - improved AS usage
+	 - slightly higher dps
+	 - changed Salve to Volley
 rev3 - added Trickshot checkbox
      - improved ST and AoE dps
 rev2 - nice looking code
 	 - Piercing Shot Checkbox
-	 - Salve CheckBox
+	 - Volley CheckBox
 	 - Cooldowns Overlay Button implemented
 	 - Counter Shot implemented
 rev1 - 7.1.5 Rotation
@@ -38,7 +34,7 @@ namespace PixelMagic.Rotation
         private CheckBox DeathBox;
         private CheckBox ExhilBox;
 		private CheckBox CounterShotBox;
-        private CheckBox SalveBox;	
+        private CheckBox VolleyBox;	
         private CheckBox PiercingShotBox;			
         private CheckBox TrickshotBox;			
 
@@ -194,24 +190,24 @@ namespace PixelMagic.Rotation
             SettingsForm.Controls.Add(CounterShotBox);   //CounterShot box			
 
 			
-            var lblSalveText = new Label //salve label
+            var lblVolleyText = new Label //Volley label
             {
-                Text = "Salve",
+                Text = "Volley",
                 Size = new Size(81, 13),
                 Left = 12,
                 Top = 226
             };
-            SettingsForm.Controls.Add(lblSalveText); //salve text
+            SettingsForm.Controls.Add(lblVolleyText); //Volley text
 
-            SalveBox = new CheckBox
+            VolleyBox = new CheckBox
             {
-                Checked = Salve,
+                Checked = Volley,
                 TabIndex = 12,
                 Size = new Size(15, 14),
                 Left = 115,
                 Top = 226
             };
-            SettingsForm.Controls.Add(SalveBox);   //salve box			
+            SettingsForm.Controls.Add(VolleyBox);   //Volley box			
 			
             var lblPiercingShotText = new Label //Trueshot LABEL - 129
             {
@@ -271,7 +267,7 @@ namespace PixelMagic.Rotation
             TrueshotBox.Checked = Trueshot;
             TurtleBox.Checked = Turtle;
             CounterShotBox.Checked = CounterShot;	
-            SalveBox.Checked = Salve;	
+            VolleyBox.Checked = Volley;	
 			PiercingShotBox.Checked = PiercingShot;			
 			TrickshotBox.Checked = Trickshot;	
 
@@ -284,7 +280,7 @@ namespace PixelMagic.Rotation
             ExhilBox.CheckedChanged += Exhil_Click;
             TrueshotBox.CheckedChanged += Trueshot_Click;
             CounterShotBox.CheckedChanged += CounterShot_Click;		
-            SalveBox.CheckedChanged += Salve_Click;		
+            VolleyBox.CheckedChanged += Volley_Click;		
             PiercingShotBox.CheckedChanged += PiercingShot_Click;		
             TrickshotBox.CheckedChanged += Trickshot_Click;					
 			
@@ -297,7 +293,7 @@ namespace PixelMagic.Rotation
             lblDeathText.BringToFront();
             lblTurtleText.BringToFront();
             lblCounterShotText.BringToFront();	
-            lblSalveText.BringToFront();
+            lblVolleyText.BringToFront();
             lblPiercingShotText.BringToFront();
             lblTrickshotText.BringToFront();				
 
@@ -308,7 +304,7 @@ namespace PixelMagic.Rotation
             Log.Write("Turtle = " + Turtle);
             Log.Write("Trueshot = " + Trueshot);
             Log.Write("CounterShot = " + CounterShot);	
-            Log.Write("Salve = " + Salve);		
+            Log.Write("Volley = " + Volley);		
             Log.Write("PiercingShot = " + PiercingShot);		
             Log.Write("Trickshot = " + Trickshot);				
         }
@@ -322,7 +318,7 @@ namespace PixelMagic.Rotation
             Trueshot = TrueshotBox.Checked;
             Turtle = TurtleBox.Checked;
             CounterShot = CounterShotBox.Checked;	
-            Salve = SalveBox.Checked;
+            Volley = VolleyBox.Checked;
             PiercingShot = PiercingShotBox.Checked;	
 			Trickshot = TrickshotBox.Checked;
 
@@ -360,9 +356,9 @@ namespace PixelMagic.Rotation
         {
             CounterShot = CounterShotBox.Checked;
         }	
-        private void Salve_Click(object sender, EventArgs e)
+        private void Volley_Click(object sender, EventArgs e)
         {
-            Salve = SalveBox.Checked;
+            Volley = VolleyBox.Checked;
         }	
         private void PiercingShot_Click(object sender, EventArgs e)
         {
@@ -401,11 +397,11 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Counter Shot");
                         return;
                     }				
-					if (WoW.CanCast("Salve") 
-						&& !WoW.PlayerHasBuff("Salve")
-						&& Salve)
+					if (WoW.CanCast("Volley") 
+						&& !WoW.PlayerHasBuff("Volley")
+						&& Volley)
                     {
-                        WoW.CastSpell("Salve");
+                        WoW.CastSpell("Volley");
                         return;
                     }				
 					/*if (WoW.CanCast("Arcane Torrent") 
@@ -451,11 +447,25 @@ namespace PixelMagic.Rotation
 						&& WoW.TargetHasDebuff("Hunters Mark") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting						
-						&& WoW.IsSpellInRange("Windburst"))
+						&& WoW.IsSpellInRange("Windburst")
+						&& WoW.TargetHasDebuff("Vulnerable")						
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1))
 					{	
 					    WoW.CastSpell("Marked Shot");
                         return;
 					}	
+					if (WoW.CanCast("Marked Shot") 
+						&& (WoW.Focus >= 25) 
+						&& WoW.TargetHasDebuff("Hunters Mark") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting						
+						&& WoW.IsSpellInRange("Windburst")
+						&& !WoW.TargetHasDebuff("Vulnerable"))						
+
+					{	
+					    WoW.CastSpell("Marked Shot");
+                        return;
+					}						
 /* 					if (WoW.CanCast("Windburst") 
 						&& !WoW.IsMoving
 						&& WoW.Focus >= 20 
@@ -495,7 +505,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -504,8 +514,38 @@ namespace PixelMagic.Rotation
 						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))						
                     {
                         WoW.CastSpell("AS");
-                        return;
+						
+						                    if (!WoW.IsMoving  // with piercing shot
+						&& WoW.Focus >= 50 
+						&& WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& PiercingShot
+						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))						
+                    {
+                        WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving  // with piercing shot
+						&& WoW.Focus >= 50 
+						&& WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& PiercingShot
+						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))						
+                    {
+                        WoW.CastSpell("AS");
+						return;
                     }	
+					}
+					}
                     if (!WoW.IsMoving 
 						&& WoW.Focus >= 95 
 						&& !WoW.TargetHasDebuff("Vulnerable") 
@@ -517,13 +557,40 @@ namespace PixelMagic.Rotation
 						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))
                     {
                         WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving 
+						&& WoW.Focus >= 95 
+						&& !WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") && WoW.IsSpellInRange("Windburst") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& PiercingShot
+						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))
+                    {
+                        WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving 
+						&& WoW.Focus >= 95 
+						&& !WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") && WoW.IsSpellInRange("Windburst") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& PiercingShot
+						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))
+                    {
+                        WoW.CastSpell("AS");
+						
                         return;
                     }
+					}
+					}
                     if (!WoW.IsMoving  // without piercing shot
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& Trickshot
 						&& !WoW.PlayerIsChanneling					
@@ -531,8 +598,37 @@ namespace PixelMagic.Rotation
 					
                     {
                         WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving  // without piercing shot
+						&& WoW.Focus >= 50 
+						&& WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& Trickshot
+						&& !WoW.PlayerIsChanneling					
+						&& !WoW.PlayerIsCasting)
+					
+                    {
+                        WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving  // without piercing shot
+						&& WoW.Focus >= 50 
+						&& WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& Trickshot
+						&& !WoW.PlayerIsChanneling					
+						&& !WoW.PlayerIsCasting)
+					
+                    {
+                        WoW.CastSpell("AS");
+						
                         return;
                     }	
+					}
+					}
                     if (!WoW.IsMoving 
 						&& WoW.Focus >= 95 
 						&& !WoW.TargetHasDebuff("Vulnerable") 
@@ -543,12 +639,38 @@ namespace PixelMagic.Rotation
 
                     {
                         WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving 
+						&& WoW.Focus >= 95 
+						&& !WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") && WoW.IsSpellInRange("Windburst") 
+						&& Trickshot						
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)
+
+                    {
+                        WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving 
+						&& WoW.Focus >= 95 
+						&& !WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") && WoW.IsSpellInRange("Windburst") 
+						&& Trickshot						
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)
+
+                    {
+                        WoW.CastSpell("AS");
+						
                         return;
-                    }					
+                    }	
+					}
+					}					
                     if (WoW.PlayerHasBuff ("Lock and Load") 
 						&& WoW.CanCast("AS") 
 						&& !WoW.PlayerIsChanneling
-						&& !WoW.PlayerIsCasting					
+						&& !WoW.PlayerIsCasting		
+						&& WoW.TargetHasDebuff("Vulnerable")
 						&& WoW.IsSpellInRange("Windburst")) 
                     {
                         WoW.CastSpell("AS");
@@ -557,6 +679,8 @@ namespace PixelMagic.Rotation
 						if (WoW.CanCast("Arcane Shot") 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& WoW.Focus <=94
+						&& WoW.TargetHasDebuff("Vulnerable")
+						&& WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1.7						
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting)						
 						
@@ -564,6 +688,53 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Arcane Shot");
                         return;
                     }					
+						if (WoW.CanCast("Arcane Shot") 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& WoW.Focus <=94
+						&& !WoW.TargetHasDebuff("Vulnerable")
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)						
+						
+                    {
+                        WoW.CastSpell("Arcane Shot");
+                        return;
+                    }
+						if (WoW.CanCast("Arcane Shot") 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& WoW.Focus <=99
+						&& PiercingShot
+						&& !WoW.IsSpellOnCooldown("Piercing Shot")
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)						
+						
+                    {
+                        WoW.CastSpell("Arcane Shot");
+                        return;
+                    }	
+						if (WoW.CanCast("Arcane Shot") 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& WoW.Focus <=99
+						&& PiercingShot
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& WoW.SpellCooldownTimeRemaining ("Piercing Shot") <3						
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)						
+						
+                    {
+                        WoW.CastSpell("Arcane Shot");
+                        return;
+                    }						
+						if (WoW.CanCast("Arcane Shot") 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& WoW.TargetHasDebuff("Vulnerable")
+						&& WoW.Focus <=49
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)						
+						
+                    {
+                        WoW.CastSpell("Arcane Shot");
+                        return;
+                    }						
                    /* if (WoW.CanCast("Arcane Shot") 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& WoW.Focus <=94
@@ -606,11 +777,11 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Counter Shot");
                         return;
                     }				
-					if (WoW.CanCast("Salve") 
-						&& !WoW.PlayerHasBuff("Salve")
-						&& Salve)
+					if (WoW.CanCast("Volley") 
+						&& !WoW.PlayerHasBuff("Volley")
+						&& Volley)
                     {
-                        WoW.CastSpell("Salve");
+                        WoW.CastSpell("Volley");
                         return;
                     }				
 					/*if (WoW.CanCast("Arcane Torrent") 
@@ -656,11 +827,25 @@ namespace PixelMagic.Rotation
 						&& WoW.TargetHasDebuff("Hunters Mark") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting						
-						&& WoW.IsSpellInRange("Windburst"))
+						&& WoW.IsSpellInRange("Windburst")
+						&& WoW.TargetHasDebuff("Vulnerable")						
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1))
 					{	
 					    WoW.CastSpell("Marked Shot");
                         return;
 					}	
+					if (WoW.CanCast("Marked Shot") 
+						&& (WoW.Focus >= 25) 
+						&& WoW.TargetHasDebuff("Hunters Mark") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting						
+						&& WoW.IsSpellInRange("Windburst")
+						&& !WoW.TargetHasDebuff("Vulnerable"))						
+
+					{	
+					    WoW.CastSpell("Marked Shot");
+                        return;
+					}						
 /* 					if (WoW.CanCast("Windburst") 
 						&& !WoW.IsMoving
 						&& WoW.Focus >= 20 
@@ -700,7 +885,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -709,8 +894,38 @@ namespace PixelMagic.Rotation
 						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))						
                     {
                         WoW.CastSpell("AS");
-                        return;
+						
+						                    if (!WoW.IsMoving  // with piercing shot
+						&& WoW.Focus >= 50 
+						&& WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& PiercingShot
+						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))						
+                    {
+                        WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving  // with piercing shot
+						&& WoW.Focus >= 50 
+						&& WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& PiercingShot
+						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))						
+                    {
+                        WoW.CastSpell("AS");
+						return;
                     }	
+					}
+					}
                     if (!WoW.IsMoving 
 						&& WoW.Focus >= 95 
 						&& !WoW.TargetHasDebuff("Vulnerable") 
@@ -722,13 +937,40 @@ namespace PixelMagic.Rotation
 						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))
                     {
                         WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving 
+						&& WoW.Focus >= 95 
+						&& !WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") && WoW.IsSpellInRange("Windburst") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& PiercingShot
+						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))
+                    {
+                        WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving 
+						&& WoW.Focus >= 95 
+						&& !WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") && WoW.IsSpellInRange("Windburst") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& PiercingShot
+						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))
+                    {
+                        WoW.CastSpell("AS");
+						
                         return;
                     }
+					}
+					}
                     if (!WoW.IsMoving  // without piercing shot
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& Trickshot
 						&& !WoW.PlayerIsChanneling					
@@ -736,8 +978,37 @@ namespace PixelMagic.Rotation
 					
                     {
                         WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving  // without piercing shot
+						&& WoW.Focus >= 50 
+						&& WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& Trickshot
+						&& !WoW.PlayerIsChanneling					
+						&& !WoW.PlayerIsCasting)
+					
+                    {
+                        WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving  // without piercing shot
+						&& WoW.Focus >= 50 
+						&& WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& Trickshot
+						&& !WoW.PlayerIsChanneling					
+						&& !WoW.PlayerIsCasting)
+					
+                    {
+                        WoW.CastSpell("AS");
+						
                         return;
                     }	
+					}
+					}
                     if (!WoW.IsMoving 
 						&& WoW.Focus >= 95 
 						&& !WoW.TargetHasDebuff("Vulnerable") 
@@ -748,12 +1019,38 @@ namespace PixelMagic.Rotation
 
                     {
                         WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving 
+						&& WoW.Focus >= 95 
+						&& !WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") && WoW.IsSpellInRange("Windburst") 
+						&& Trickshot						
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)
+
+                    {
+                        WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving 
+						&& WoW.Focus >= 95 
+						&& !WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") && WoW.IsSpellInRange("Windburst") 
+						&& Trickshot						
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)
+
+                    {
+                        WoW.CastSpell("AS");
+						
                         return;
-                    }					
+                    }	
+					}
+					}					
                     if (WoW.PlayerHasBuff ("Lock and Load") 
 						&& WoW.CanCast("AS") 
 						&& !WoW.PlayerIsChanneling
-						&& !WoW.PlayerIsCasting					
+						&& !WoW.PlayerIsCasting		
+						&& WoW.TargetHasDebuff("Vulnerable")
 						&& WoW.IsSpellInRange("Windburst")) 
                     {
                         WoW.CastSpell("AS");
@@ -762,6 +1059,8 @@ namespace PixelMagic.Rotation
 						if (WoW.CanCast("Multi-Shot") 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& WoW.Focus <=94
+						&& WoW.TargetHasDebuff("Vulnerable")
+						&& WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1.7						
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting)						
 						
@@ -769,6 +1068,53 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Multi-Shot");
                         return;
                     }					
+						if (WoW.CanCast("Multi-Shot") 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& WoW.Focus <=94
+						&& !WoW.TargetHasDebuff("Vulnerable")
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)						
+						
+                    {
+                        WoW.CastSpell("Arcane Shot");
+                        return;
+                    }
+						if (WoW.CanCast("Multi-Shot") 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& WoW.Focus <=99
+						&& PiercingShot
+						&& !WoW.IsSpellOnCooldown("Piercing Shot")
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)						
+						
+                    {
+                        WoW.CastSpell("Multi-Shot");
+                        return;
+                    }	
+						if (WoW.CanCast("Multi-Shot") 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& WoW.Focus <=99
+						&& PiercingShot
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& WoW.SpellCooldownTimeRemaining ("Piercing Shot") <3						
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)						
+						
+                    {
+                        WoW.CastSpell("Multi-Shot");
+                        return;
+                    }						
+						if (WoW.CanCast("Multi-Shot") 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& WoW.TargetHasDebuff("Vulnerable")
+						&& WoW.Focus <=49
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)						
+						
+                    {
+                        WoW.CastSpell("Multi-Shot");
+                        return;
+                    }						
                    /* if (WoW.CanCast("Arcane Shot") 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& WoW.Focus <=94
@@ -811,11 +1157,11 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Counter Shot");
                         return;
                     }				
-					if (WoW.CanCast("Salve") 
-						&& !WoW.PlayerHasBuff("Salve")
-						&& Salve)
+					if (WoW.CanCast("Volley") 
+						&& !WoW.PlayerHasBuff("Volley")
+						&& Volley)
                     {
-                        WoW.CastSpell("Salve");
+                        WoW.CastSpell("Volley");
                         return;
                     }				
 					/*if (WoW.CanCast("Arcane Torrent") 
@@ -861,11 +1207,25 @@ namespace PixelMagic.Rotation
 						&& WoW.TargetHasDebuff("Hunters Mark") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting						
-						&& WoW.IsSpellInRange("Windburst"))
+						&& WoW.IsSpellInRange("Windburst")
+						&& WoW.TargetHasDebuff("Vulnerable")						
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1))
 					{	
 					    WoW.CastSpell("Marked Shot");
                         return;
 					}	
+					if (WoW.CanCast("Marked Shot") 
+						&& (WoW.Focus >= 25) 
+						&& WoW.TargetHasDebuff("Hunters Mark") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting						
+						&& WoW.IsSpellInRange("Windburst")
+						&& !WoW.TargetHasDebuff("Vulnerable"))						
+
+					{	
+					    WoW.CastSpell("Marked Shot");
+                        return;
+					}						
 /* 					if (WoW.CanCast("Windburst") 
 						&& !WoW.IsMoving
 						&& WoW.Focus >= 20 
@@ -905,7 +1265,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -914,8 +1274,38 @@ namespace PixelMagic.Rotation
 						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))						
                     {
                         WoW.CastSpell("AS");
-                        return;
+						
+						                    if (!WoW.IsMoving  // with piercing shot
+						&& WoW.Focus >= 50 
+						&& WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& PiercingShot
+						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))						
+                    {
+                        WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving  // with piercing shot
+						&& WoW.Focus >= 50 
+						&& WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& PiercingShot
+						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))						
+                    {
+                        WoW.CastSpell("AS");
+						return;
                     }	
+					}
+					}
                     if (!WoW.IsMoving 
 						&& WoW.Focus >= 95 
 						&& !WoW.TargetHasDebuff("Vulnerable") 
@@ -927,13 +1317,40 @@ namespace PixelMagic.Rotation
 						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))
                     {
                         WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving 
+						&& WoW.Focus >= 95 
+						&& !WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") && WoW.IsSpellInRange("Windburst") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& PiercingShot
+						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))
+                    {
+                        WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving 
+						&& WoW.Focus >= 95 
+						&& !WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") && WoW.IsSpellInRange("Windburst") 
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& PiercingShot
+						&& (WoW.SpellCooldownTimeRemaining ("Piercing Shot") >3 || WoW.Focus >100))
+                    {
+                        WoW.CastSpell("AS");
+						
                         return;
                     }
+					}
+					}
                     if (!WoW.IsMoving  // without piercing shot
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& Trickshot
 						&& !WoW.PlayerIsChanneling					
@@ -941,8 +1358,37 @@ namespace PixelMagic.Rotation
 					
                     {
                         WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving  // without piercing shot
+						&& WoW.Focus >= 50 
+						&& WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& Trickshot
+						&& !WoW.PlayerIsChanneling					
+						&& !WoW.PlayerIsCasting)
+					
+                    {
+                        WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving  // without piercing shot
+						&& WoW.Focus >= 50 
+						&& WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& Trickshot
+						&& !WoW.PlayerIsChanneling					
+						&& !WoW.PlayerIsCasting)
+					
+                    {
+                        WoW.CastSpell("AS");
+						
                         return;
                     }	
+					}
+					}
                     if (!WoW.IsMoving 
 						&& WoW.Focus >= 95 
 						&& !WoW.TargetHasDebuff("Vulnerable") 
@@ -953,12 +1399,38 @@ namespace PixelMagic.Rotation
 
                     {
                         WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving 
+						&& WoW.Focus >= 95 
+						&& !WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") && WoW.IsSpellInRange("Windburst") 
+						&& Trickshot						
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)
+
+                    {
+                        WoW.CastSpell("AS");
+						
+						                    if (!WoW.IsMoving 
+						&& WoW.Focus >= 95 
+						&& !WoW.TargetHasDebuff("Vulnerable") 
+						&& WoW.CanCast("AS") && WoW.IsSpellInRange("Windburst") 
+						&& Trickshot						
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)
+
+                    {
+                        WoW.CastSpell("AS");
+						
                         return;
-                    }					
+                    }	
+					}
+					}					
                     if (WoW.PlayerHasBuff ("Lock and Load") 
 						&& WoW.CanCast("AS") 
 						&& !WoW.PlayerIsChanneling
-						&& !WoW.PlayerIsCasting					
+						&& !WoW.PlayerIsCasting		
+						&& WoW.TargetHasDebuff("Vulnerable")
 						&& WoW.IsSpellInRange("Windburst")) 
                     {
                         WoW.CastSpell("AS");
@@ -967,6 +1439,8 @@ namespace PixelMagic.Rotation
 						if (WoW.CanCast("Arcane Shot") 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& WoW.Focus <=94
+						&& WoW.TargetHasDebuff("Vulnerable")
+						&& WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1.7						
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting)						
 						
@@ -974,6 +1448,53 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Arcane Shot");
                         return;
                     }					
+						if (WoW.CanCast("Arcane Shot") 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& WoW.Focus <=94
+						&& !WoW.TargetHasDebuff("Vulnerable")
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)						
+						
+                    {
+                        WoW.CastSpell("Arcane Shot");
+                        return;
+                    }
+						if (WoW.CanCast("Arcane Shot") 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& WoW.Focus <=99
+						&& PiercingShot
+						&& !WoW.IsSpellOnCooldown("Piercing Shot")
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)						
+						
+                    {
+                        WoW.CastSpell("Arcane Shot");
+                        return;
+                    }	
+						if (WoW.CanCast("Arcane Shot") 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& WoW.Focus <=99
+						&& PiercingShot
+						&& WoW.IsSpellOnCooldown("Piercing Shot")
+						&& WoW.SpellCooldownTimeRemaining ("Piercing Shot") <3						
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)						
+						
+                    {
+                        WoW.CastSpell("Arcane Shot");
+                        return;
+                    }						
+						if (WoW.CanCast("Arcane Shot") 
+						&& WoW.IsSpellInRange("Windburst") 
+						&& WoW.TargetHasDebuff("Vulnerable")
+						&& WoW.Focus <=49
+						&& !WoW.PlayerIsChanneling
+						&& !WoW.PlayerIsCasting)						
+						
+                    {
+                        WoW.CastSpell("Arcane Shot");
+                        return;
+                    }						
                    /* if (WoW.CanCast("Arcane Shot") 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& WoW.Focus <=94
@@ -1107,15 +1628,15 @@ namespace PixelMagic.Rotation
             }
             set { ConfigFile.WriteValue("HunterMarksman", "CounterShot", value.ToString()); }
         }		
-        private static bool Salve
+        private static bool Volley
         {
             get
             {
-                var Salve = ConfigFile.ReadValue("HunterMarksman", "Salve").Trim();
+                var Volley = ConfigFile.ReadValue("HunterMarksman", "Volley").Trim();
 
-                return Salve != "" && Convert.ToBoolean(Salve);
+                return Volley != "" && Convert.ToBoolean(Volley);
             }
-            set { ConfigFile.WriteValue("HunterMarksman", "Salve", value.ToString()); }
+            set { ConfigFile.WriteValue("HunterMarksman", "Volley", value.ToString()); }
         }		
         private static bool PiercingShot
         {
@@ -1148,7 +1669,7 @@ AddonAuthor=Vectarius
 AddonName=myspellpriority
 WoWVersion=Legion - 70100
 [SpellBook.db]
-Spell,194386,Salve,D3
+Spell,194386,Volley,D3
 Spell,204147,Windburst,D2
 Spell,120360,Barrage,D3
 Spell,131894,Murder of Crows,D9
@@ -1163,7 +1684,7 @@ Spell,109304,Exhil,V
 Spell,193526,Trueshot,C
 Spell,186265,Turtle,G
 Spell,5384,Death,F
-Aura,194386,Salve
+Aura,194386,Volley
 Aura,223138,Marking Targets
 Aura,185987,Hunters Mark
 Aura,194594,Lock and Load
