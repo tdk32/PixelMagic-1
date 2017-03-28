@@ -63,7 +63,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
 					*/		
-                    if (WoW.CanCast("Fury of Eagle") && WoW.PlayerHasBuff("Mongoose Fury") && WoW.PlayerBuffStacks("Mongoose Fury") >= 4 && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    if (WoW.CanCast("Fury of Eagle") && WoW.PlayerHasBuff("Mongoose Fury") && WoW.PlayerBuffStacks("Mongoose Fury") >= 6 && WoW.PlayerBuffTimeRemaining("Mongoose Fury") < 2 && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
                     {
                         WoW.CastSpell("Fury of Eagle");
                         return;
