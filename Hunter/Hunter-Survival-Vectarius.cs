@@ -67,17 +67,24 @@ namespace PixelMagic.Rotation
                     {
                         WoW.CastSpell("Fury of Eagle");
                         return;
-                    }					
-                    if (WoW.CanCast("Flanking Strike") && WoW.Focus >= 50 && WoW.PlayerSpellCharges("Mongoose Bite") >= 0 && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
-                    {
-                        WoW.CastSpell("Flanking Strike");
-                        return;
-                    }	
-                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerBuffStacks("Mongoose Fury") >= 6 && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    }
+					
+                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerHasBuff("Mongoose Fury") && WoW.PlayerBuffStacks("Mongoose Fury") >= 6 && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
                     {
                         WoW.CastSpell("Mongoose Bite");
                         return;
                     }	
+                    if (WoW.CanCast("Flanking Strike") && WoW.Focus >= 50 && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Flanking Strike");
+                        return;
+                    }
+                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerHasBuff("Mongoose Fury") && WoW.IsSpellInRange("Mongoose Bite") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Mongoose Bite");
+                        return;
+                    }				
+				
                     if (WoW.CanCast("Murder of Crows") && WoW.Focus >= 30 && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
                     {
                         WoW.CastSpell("Murder of Crows");
@@ -113,13 +120,8 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Lacerate");
                         return;
                     }
-                    if (WoW.CanCast("Mongoose Bite") && (!WoW.TargetHasDebuff("Mongoose Fury") || (WoW.PlayerBuffTimeRemaining("Mongoose Fury") >= 3)) && WoW.IsSpellInRange("Mongoose Bite") &&
-                        !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
-                    {
-                        WoW.CastSpell("Mongoose Bite");
-                        return;
-                    }
-                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerSpellCharges ("Mongoose Bite") >= 2 && WoW.IsSpellInRange("Mongoose Bite") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+
+                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerSpellCharges ("Mongoose Bite") >= 3 && WoW.TargetHasDebuff("Lacerate") && WoW.TargetDebuffTimeRemaining("Lacerate") > 8 && !WoW.PlayerHasBuff("Mongoose Fury") && WoW.IsSpellInRange("Mongoose Bite") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
                     {
                         WoW.CastSpell("Mongoose Bite");
                         return;
@@ -128,18 +130,44 @@ namespace PixelMagic.Rotation
             }
             if (combatRoutine.Type == RotationType.AOE)
             {
-                 if ((WoW.HasTarget) && WoW.TargetIsEnemy && WoW.IsInCombat)
+                if ((WoW.HasTarget) && WoW.TargetIsEnemy && WoW.IsInCombat)
                 {
-                    if (WoW.CanCast("Fury of Eagle") && WoW.PlayerHasBuff("Mongoose Fury") && WoW.PlayerBuffStacks("Mongoose Fury") >= 4 && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                   /* 
+				   if (WoW.CanCast("Raptor Strike") && !WoW.PlayerHasBuff("MOK"))
+                    {
+                        WoW.CastSpell("Raptor Strike");
+			Log.Write("KEIN MOK!", Color.Green);
+                        return;
+                    }
+                    if (WoW.CanCast("Raptor Strike") && WoW.PlayerHasBuff("MOK") && WoW.PlayerBuffStacks("MOK") <= 4 && WoW.PlayerBuffTimeRemaining("MOK") < 2)
+                    {
+                        WoW.CastSpell("Raptor Strike");
+            Log.Write("weniger als 4x MOK! keine zeit", Color.Green);						
+                        return;
+                    }
+					*/		
+					if (WoW.CanCast("Fury of Eagle") && WoW.PlayerHasBuff("Mongoose Fury") && WoW.PlayerBuffStacks("Mongoose Fury") >= 4 && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
                     {
                         WoW.CastSpell("Fury of Eagle");
                         return;
-                    }						
-                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerBuffStacks("Mongoose Fury") >= 6 && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
-                    { 
+                    }
+					
+                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerHasBuff("Mongoose Fury") && WoW.PlayerBuffStacks("Mongoose Fury") >= 6 && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
                         WoW.CastSpell("Mongoose Bite");
                         return;
                     }	
+                    if (WoW.CanCast("Flanking Strike") && WoW.Focus >= 50 && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Flanking Strike");
+                        return;
+                    }
+                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerHasBuff("Mongoose Fury") && WoW.IsSpellInRange("Mongoose Bite") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Mongoose Bite");
+                        return;
+                    }				
+				
                     if (WoW.CanCast("Murder of Crows") && WoW.Focus >= 30 && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
                     {
                         WoW.CastSpell("Murder of Crows");
@@ -159,7 +187,7 @@ namespace PixelMagic.Rotation
                     {
                         WoW.CastSpell("Butchery");
                         return;
-                    }					
+                    }						
                     if (WoW.CanCast("Lacerate") && WoW.Focus >= 35 && WoW.TargetHasDebuff("Lacerate") && WoW.TargetDebuffTimeRemaining("Lacerate") < 2 && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
                     {
                         WoW.CastSpell("Lacerate");
@@ -180,13 +208,8 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Lacerate");
                         return;
                     }
-                    if (WoW.CanCast("Mongoose Bite") && (!WoW.TargetHasDebuff("Mongoose Fury") || (WoW.PlayerBuffTimeRemaining("Mongoose Fury") >= 3)) && WoW.IsSpellInRange("Mongoose Bite") &&
-                        !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
-                    {
-                        WoW.CastSpell("Mongoose Bite");
-                        return;
-                    }
-                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerSpellCharges ("Mongoose Bite") >= 2 && WoW.IsSpellInRange("Mongoose Bite") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+
+                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerSpellCharges ("Mongoose Bite") >= 3 && WoW.TargetHasDebuff("Lacerate") && WoW.TargetDebuffTimeRemaining("Lacerate") > 8 && !WoW.PlayerHasBuff("Mongoose Fury") && WoW.IsSpellInRange("Mongoose Bite") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
                     {
                         WoW.CastSpell("Mongoose Bite");
                         return;
@@ -195,7 +218,86 @@ namespace PixelMagic.Rotation
             }
             if (combatRoutine.Type == RotationType.SingleTargetCleave)
             {
-                // Do Single Target Cleave stuff here if applicable else ignore this one
+                if ((WoW.HasTarget) && WoW.TargetIsEnemy && WoW.IsInCombat)
+                {
+                   /* 
+				   if (WoW.CanCast("Raptor Strike") && !WoW.PlayerHasBuff("MOK"))
+                    {
+                        WoW.CastSpell("Raptor Strike");
+			Log.Write("KEIN MOK!", Color.Green);
+                        return;
+                    }
+                    if (WoW.CanCast("Raptor Strike") && WoW.PlayerHasBuff("MOK") && WoW.PlayerBuffStacks("MOK") <= 4 && WoW.PlayerBuffTimeRemaining("MOK") < 2)
+                    {
+                        WoW.CastSpell("Raptor Strike");
+            Log.Write("weniger als 4x MOK! keine zeit", Color.Green);						
+                        return;
+                    }
+					*/		
+					if (WoW.CanCast("Fury of Eagle") && WoW.PlayerHasBuff("Mongoose Fury") && WoW.PlayerBuffStacks("Mongoose Fury") >= 4 && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Fury of Eagle");
+                        return;
+                    }
+					
+                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerHasBuff("Mongoose Fury") && WoW.PlayerBuffStacks("Mongoose Fury") >= 6 && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Mongoose Bite");
+                        return;
+                    }	
+                    if (WoW.CanCast("Flanking Strike") && WoW.Focus >= 50 && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Flanking Strike");
+                        return;
+                    }
+                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerHasBuff("Mongoose Fury") && WoW.IsSpellInRange("Mongoose Bite") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Mongoose Bite");
+                        return;
+                    }				
+				
+                    if (WoW.CanCast("Murder of Crows") && WoW.Focus >= 30 && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Murder of Crows");
+                        return;
+                    }		
+                    if (WoW.CanCast("Caltrops") && WoW.TargetHasDebuff("Caltrops") && WoW.TargetDebuffTimeRemaining("Caltrops") < 2 && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Caltrops");
+                        return;
+                    }	
+                    if (WoW.CanCast("Caltrops") && !WoW.TargetHasDebuff("Caltrops") && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Caltrops");
+                        return;
+                    }							
+                    if (WoW.CanCast("Lacerate") && WoW.Focus >= 35 && WoW.TargetHasDebuff("Lacerate") && WoW.TargetDebuffTimeRemaining("Lacerate") < 2 && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Lacerate");
+                        return;
+                    }	
+                    if (WoW.CanCast("Lacerate") && WoW.Focus >= 35 && !WoW.TargetHasDebuff("Lacerate") && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Lacerate");
+                        return;
+                    }						
+                    if (WoW.CanCast("Explosive Trap") && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Explosive Trap");
+                        return;
+                    }
+                    if (WoW.CanCast("Lacerate") && WoW.Focus >= 35 && !WoW.TargetHasDebuff("Lacerate") && (WoW.Focus >= 35) && WoW.IsSpellInRange("Lacerate") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Lacerate");
+                        return;
+                    }
+
+                    if (WoW.CanCast("Mongoose Bite") && WoW.PlayerSpellCharges ("Mongoose Bite") >= 3 && WoW.TargetHasDebuff("Lacerate") && WoW.TargetDebuffTimeRemaining("Lacerate") > 8 && !WoW.PlayerHasBuff("Mongoose Fury") && WoW.IsSpellInRange("Mongoose Bite") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling && WoW.IsSpellInRange("Raptor Strike") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    {
+                        WoW.CastSpell("Mongoose Bite");
+                        return;
+                    }
+				}	
             }
         }
     }
