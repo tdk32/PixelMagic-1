@@ -587,14 +587,14 @@ namespace PixelMagic.Rotation
 			var cmdReadme = new Button {Text = "Macros! Use Them", Width = 65, Height = 25, Left = 125, Top = 425, Size = new Size(120, 31)};
 			// Checkboxes
 			//dps cooldowns
-            			CounterShotBox = new CheckBox {Checked = Muzzle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 250};		
+            			CounterShotBox = new CheckBox {Checked = CounterShot, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 250};		
             SettingsForm.Controls.Add(CounterShotBox);
-			ExhilarationBox = new CheckBox {Checked = Muzzle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 275};			
+			ExhilarationBox = new CheckBox {Checked = Exhilaration, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 275};			
             SettingsForm.Controls.Add(ExhilarationBox);
-			FeignDeathBox = new CheckBox {Checked = Muzzle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 300};
+			FeignDeathBox = new CheckBox {Checked = FeignDeath, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 300};
             SettingsForm.Controls.Add(FeignDeathBox);
 			
-			AspectoftheTurtleBox = new CheckBox {Checked = Muzzle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 325};			
+			AspectoftheTurtleBox = new CheckBox {Checked = AspectoftheTurtle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 325};			
 			            SettingsForm.Controls.Add(AspectoftheTurtleBox);
             TrueshotBox = new CheckBox {Checked = Trueshot, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 225};
             SettingsForm.Controls.Add(TrueshotBox);			
