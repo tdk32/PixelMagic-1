@@ -1025,8 +1025,8 @@ namespace PixelMagic.Rotation
 			Preset5Box.Checked = false;
 			Preset6Box.Checked = false;
 			
-			LoneWolfBox.Checked = false;
-			SteadyFocusBox.Checked = true;
+			LoneWolfBox.Checked = true;
+			SteadyFocusBox.Checked = false;
 			CarefulAimBox.Checked = false;
 			
 			LockandLoadBox.Checked= true;
@@ -1038,16 +1038,16 @@ namespace PixelMagic.Rotation
 			TrailblazerBox.Checked = false;
 			
 			ExplosiveShotBox.Checked = false;
-			SentinelBox.Checked = true;
-			PatientSniperBox.Checked = false;
+			SentinelBox.Checked = false;
+			PatientSniperBox.Checked = true;
 			
 			BindingShotBox.Checked = true;
 			WyvernStingBox.Checked = false;
 			CamouflageBox.Checked = false;
 			
-			AMurderofCrowsBox.Checked = true;
+			AMurderofCrowsBox.Checked = false;
 			BarrageBox.Checked = false;
-			VolleyBox.Checked = false;
+			VolleyBox.Checked = true;
 			
 			SidewindersBox.Checked = false;
 			PiercingShotBox.Checked = true;
@@ -1062,49 +1062,13 @@ namespace PixelMagic.Rotation
 			Preset4Box.Checked = false;
 			Preset5Box.Checked = false;
 			Preset6Box.Checked = false;
-			LoneWolfBox.Checked = false;
+			
+			LoneWolfBox.Checked = true;
 			SteadyFocusBox.Checked = false;
-			CarefulAimBox.Checked = true;
+			CarefulAimBox.Checked = false;
 			
 			LockandLoadBox.Checked= true;
 			BlackArrowBox.Checked = false;
-			TrueAimBox.Checked = false;
-			
-			PosthasteBox.Checked = true;
-			FarstriderBox.Checked = false;
-			TrailblazerBox.Checked = false;
-			
-			ExplosiveShotBox.Checked = false;
-			SentinelBox.Checked = true;
-			PatientSniperBox.Checked = false;
-			
-			BindingShotBox.Checked = true;
-			WyvernStingBox.Checked = false;
-			CamouflageBox.Checked = false;
-			
-			AMurderofCrowsBox.Checked = false;
-			BarrageBox.Checked = false;
-			VolleyBox.Checked = true;
-			
-			SidewindersBox.Checked = true;
-			PiercingShotBox.Checked = false;
-			TrickShotBox.Checked = false;
-			
-        }
-		private void Preset3_Click(object sender, EventArgs e)  // 2nd raid
-        {
-            Preset3 = Preset3Box.Checked;
-			Preset2Box.Checked = false;
-			Preset1Box.Checked = false;
-			Preset4Box.Checked = false;
-			Preset5Box.Checked = false;
-			Preset6Box.Checked = false;
-			LoneWolfBox.Checked = false;
-			SteadyFocusBox.Checked = true;
-			CarefulAimBox.Checked = false;
-			
-			LockandLoadBox.Checked= false;
-			BlackArrowBox.Checked = true;
 			TrueAimBox.Checked = false;
 			
 			PosthasteBox.Checked = true;
@@ -1120,25 +1084,25 @@ namespace PixelMagic.Rotation
 			CamouflageBox.Checked = false;
 			
 			AMurderofCrowsBox.Checked = false;
-			BarrageBox.Checked = true;
-			VolleyBox.Checked = false;
+			BarrageBox.Checked = false;
+			VolleyBox.Checked = true;
 			
-			SidewindersBox.Checked = true;
-			PiercingShotBox.Checked = false;
+			SidewindersBox.Checked = false;
+			PiercingShotBox.Checked = true;
 			TrickShotBox.Checked = false;
+			
         }
-		private void Preset4_Click(object sender, EventArgs e)  // 2nd M+
+		private void Preset3_Click(object sender, EventArgs e)  // 2nd raid
         {
-            Preset4 = Preset4Box.Checked;
+            Preset3 = Preset3Box.Checked;
 			Preset2Box.Checked = false;
-			Preset3Box.Checked = false;
 			Preset1Box.Checked = false;
+			Preset4Box.Checked = false;
 			Preset5Box.Checked = false;
 			Preset6Box.Checked = false;
-
-			LoneWolfBox.Checked = false;
+			LoneWolfBox.Checked = true;
 			SteadyFocusBox.Checked = false;
-			CarefulAimBox.Checked = true;
+			CarefulAimBox.Checked = false;
 			
 			LockandLoadBox.Checked= true;
 			BlackArrowBox.Checked = false;
@@ -1149,7 +1113,44 @@ namespace PixelMagic.Rotation
 			TrailblazerBox.Checked = false;
 			
 			ExplosiveShotBox.Checked = false;
-			SentinelBox.Checked = true;
+			SentinelBox.Checked = false;
+			PatientSniperBox.Checked = true;
+			
+			BindingShotBox.Checked = true;
+			WyvernStingBox.Checked = false;
+			CamouflageBox.Checked = false;
+			
+			AMurderofCrowsBox.Checked = false;
+			BarrageBox.Checked = false;
+			VolleyBox.Checked = true;
+			
+			SidewindersBox.Checked = false;
+			PiercingShotBox.Checked = false;
+			TrickShotBox.Checked = true;
+        }
+		private void Preset4_Click(object sender, EventArgs e)  // 2nd M+
+        {
+            Preset4 = Preset4Box.Checked;
+			Preset2Box.Checked = false;
+			Preset3Box.Checked = false;
+			Preset1Box.Checked = false;
+			Preset5Box.Checked = false;
+			Preset6Box.Checked = false;
+
+			LoneWolfBox.Checked = true;
+			SteadyFocusBox.Checked = false;
+			CarefulAimBox.Checked = false;
+			
+			LockandLoadBox.Checked= true;
+			BlackArrowBox.Checked = false;
+			TrueAimBox.Checked = false;
+			
+			PosthasteBox.Checked = true;
+			FarstriderBox.Checked = false;
+			TrailblazerBox.Checked = false;
+			
+			ExplosiveShotBox.Checked = true;
+			SentinelBox.Checked = false;
 			PatientSniperBox.Checked = false;
 			
 			BindingShotBox.Checked = true;
@@ -1160,9 +1161,9 @@ namespace PixelMagic.Rotation
 			BarrageBox.Checked = false;
 			VolleyBox.Checked = true;
 			
-			SidewindersBox.Checked = true;
+			SidewindersBox.Checked = false;
 			PiercingShotBox.Checked = false;
-			TrickShotBox.Checked = false;
+			TrickShotBox.Checked = true;
         }
 		private void Preset5_Click(object sender, EventArgs e)  // pure ST Raid
         {
@@ -1172,12 +1173,12 @@ namespace PixelMagic.Rotation
 			Preset4Box.Checked = false;
 			Preset1Box.Checked = false;
 			Preset6Box.Checked = false;
-			LoneWolfBox.Checked = false;
-			SteadyFocusBox.Checked = true;
+			LoneWolfBox.Checked = true;
+			SteadyFocusBox.Checked = false;
 			CarefulAimBox.Checked = false;
 			
-			LockandLoadBox.Checked= false;
-			BlackArrowBox.Checked = true;
+			LockandLoadBox.Checked= true;
+			BlackArrowBox.Checked = false;
 			TrueAimBox.Checked = false;
 			
 			PosthasteBox.Checked = true;
@@ -1185,8 +1186,8 @@ namespace PixelMagic.Rotation
 			TrailblazerBox.Checked = false;
 			
 			ExplosiveShotBox.Checked = false;
-			SentinelBox.Checked = true;
-			PatientSniperBox.Checked = false;
+			SentinelBox.Checked = false;
+			PatientSniperBox.Checked = true;
 			
 			BindingShotBox.Checked = true;
 			WyvernStingBox.Checked = false;
@@ -1208,8 +1209,8 @@ namespace PixelMagic.Rotation
 			Preset4Box.Checked = false;
 			Preset5Box.Checked = false;
 			Preset1Box.Checked = false;
-			LoneWolfBox.Checked = false;
-			SteadyFocusBox.Checked = true;
+			LoneWolfBox.Checked = true;
+			SteadyFocusBox.Checked = false;
 			CarefulAimBox.Checked = false;
 			
 			LockandLoadBox.Checked= true;
@@ -1220,9 +1221,9 @@ namespace PixelMagic.Rotation
 			FarstriderBox.Checked = false;
 			TrailblazerBox.Checked = false;
 			
-			ExplosiveShotBox.Checked = false;
+			ExplosiveShotBox.Checked = true;
 			SentinelBox.Checked = false;
-			PatientSniperBox.Checked = true;
+			PatientSniperBox.Checked = false;
 			
 			BindingShotBox.Checked = true;
 			WyvernStingBox.Checked = false;
@@ -1232,9 +1233,9 @@ namespace PixelMagic.Rotation
 			BarrageBox.Checked = true;
 			VolleyBox.Checked = false;
 			
-			SidewindersBox.Checked = true;
+			SidewindersBox.Checked = false;
 			PiercingShotBox.Checked = false;
-			TrickShotBox.Checked = false;
+			TrickShotBox.Checked = true;
         }
 		
 		
