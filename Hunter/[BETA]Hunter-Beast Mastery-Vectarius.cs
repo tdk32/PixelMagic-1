@@ -1309,7 +1309,13 @@ namespace PixelMagic.Rotation
                             return;
                         }	
 					}	
-
+					if (WoW.CanCast("Volley") 
+						&& !WoW.PlayerHasBuff("Volley")
+						&& Volley)
+                    {
+                        WoW.CastSpell("Volley");
+                        return;
+                    }
 					if (WoW.CanCast("Bestial Wrath") 
 						&& WoW.Focus >= 115 
 						&& WoW.IsSpellInRange("Cobra Shot") 
@@ -1426,6 +1432,13 @@ namespace PixelMagic.Rotation
                             return;
                         }	
 					}
+					if (WoW.CanCast("Volley") 
+						&& !WoW.PlayerHasBuff("Volley")
+						&& Volley)
+                    {
+                        WoW.CastSpell("Volley");
+                        return;
+                    }					
 					if (WoW.CanCast("Multi-Shot") && (WoW.Focus >= 40) && !WoW.PetHasBuff("Beast Cleave") && WoW.IsSpellInRange("Multi-Shot"))
                     {
                         WoW.CastSpell("Multi-Shot");                        
@@ -1552,7 +1565,13 @@ namespace PixelMagic.Rotation
                             return;
                         }	
 					}	
-
+					if (WoW.CanCast("Volley") 
+						&& !WoW.PlayerHasBuff("Volley")
+						&& Volley)
+                    {
+                        WoW.CastSpell("Volley");
+                        return;
+                    }
 					if (WoW.CanCast("Bestial Wrath") 
 						&& WoW.Focus >= 115 
 						&& WoW.IsSpellInRange("Cobra Shot") 
@@ -1649,10 +1668,11 @@ Spell,127834,Ancient Healing Potion,F5
 Spell,133940,Silkweave Bandage,None
 Spell,55709,Phoenix,F6
 Spell,5512,Healthstone,F7
-Spell,982,Revive Pet,V
+Spell,982,Revive Pet,X
 Spell,142117,Potion Power,F10
-Spell,136,Heal Pet,V
+Spell,136,Heal Pet,X
 Spell,144259,Kil'jaeden's Burning Wish,Q
+Spell,194386,Volley,F
 Aura,186265,Turtle
 Aura,11196,Bandaged
 Aura,234143,Temptation
@@ -1666,5 +1686,6 @@ Aura,229206,Potion Power
 Aura,19574,Bestial Wrath
 Aura,118455,Beast Cleave
 Aura,193530,Aspect of the Wild
+Aura,194386,Volley
 Item,144259,Kil'jaeden's Burning Wish
 */
