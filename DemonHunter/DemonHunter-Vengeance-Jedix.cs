@@ -126,7 +126,7 @@ namespace PixelMagic.Rotation
                         
 					}
 
-                    if (WoW.CanCast("Fiery Brand") && WoW.IsSpellInRange("Consume Magic") && !WoW.TargetHasDebuff("Fiery Demise"))
+                    if (WoW.CanCast("Fiery Brand") && WoW.IsSpellInRange("Fiery Brand") && !WoW.TargetHasDebuff("Fiery Demise"))
                     {
                         WoW.CastSpell("Fiery Brand");
                     }
@@ -137,7 +137,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
 
-                    if (WoW.CanCast("Spirit Bomb") && WoW.IsSpellInRange("Consume Magic") && WoW.PlayerHasBuff("Soul Fragments") && !WoW.TargetHasDebuff("Frailty"))
+                    if (WoW.CanCast("Spirit Bomb") && WoW.IsSpellInRange("Spirit Bomb") && WoW.PlayerHasBuff("Soul Fragments") && !WoW.TargetHasDebuff("Frailty"))
                     {
                         WoW.CastSpell("Spirit Bomb");
                         return;
@@ -213,7 +213,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
 					
-					if (WoW.CanCast("Throw Glaive") && !WoW.IsSpellInRange("Soul Carver") && WoW.IsSpellInRange("Consume Magic")) //Need to implement range 30y for Throw Glaive spell 204157
+					if (WoW.CanCast("Throw Glaive") && !WoW.IsSpellInRange("Soul Carver") && WoW.IsSpellInRange("Throw Glaive")) //Need to implement range 30y for Throw Glaive spell 204157
                     {
                         WoW.CastSpell("Throw Glaive");
                         return;
@@ -253,7 +253,7 @@ namespace PixelMagic.Rotation
                         
 					}
 
-                    if (WoW.CanCast("Fiery Brand") && WoW.IsSpellInRange("Consume Magic") && !WoW.TargetHasDebuff("Fiery Demise"))
+                    if (WoW.CanCast("Fiery Brand") && WoW.IsSpellInRange("Fiery Brand") && !WoW.TargetHasDebuff("Fiery Demise"))
                     {
                         WoW.CastSpell("Fiery Brand");
                     }
@@ -264,7 +264,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
 
-                    if (WoW.CanCast("Spirit Bomb") && WoW.IsSpellInRange("Consume Magic") && WoW.PlayerHasBuff("Soul Fragments") && !WoW.TargetHasDebuff("Frailty"))
+                    if (WoW.CanCast("Spirit Bomb") && WoW.IsSpellInRange("Spirit Bomb") && WoW.PlayerHasBuff("Soul Fragments") && !WoW.TargetHasDebuff("Frailty"))
                     {
                         WoW.CastSpell("Spirit Bomb");
                         return;
@@ -333,7 +333,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
 					
-					if (WoW.CanCast("Throw Glaive") && !WoW.IsSpellInRange("Soul Carver") && WoW.IsSpellInRange("Consume Magic")) //Need to implement range 30y for Throw Glaive spell 204157
+					if (WoW.CanCast("Throw Glaive") && !WoW.IsSpellInRange("Soul Carver") && WoW.IsSpellInRange("Throw Glaive")) //Need to implement range 30y for Throw Glaive spell 204157
                     {
                         WoW.CastSpell("Throw Glaive");
                         return;
