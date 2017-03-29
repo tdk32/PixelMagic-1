@@ -588,14 +588,14 @@ namespace PixelMagic.Rotation
 			
 			var cmdReadme = new Button {Text = "Macros! Use Them", Width = 65, Height = 25, Left = 125, Top = 425, Size = new Size(120, 31)};
 			// Checkboxes
-            CounterShotBox = new CheckBox {Checked = Muzzle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 250};		
+            CounterShotBox = new CheckBox {Checked = CounterShot, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 250};		
             SettingsForm.Controls.Add(CounterShotBox);
-			ExhilarationBox = new CheckBox {Checked = Muzzle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 275};			
+			ExhilarationBox = new CheckBox {Checked = Exhilaration, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 275};			
             SettingsForm.Controls.Add(ExhilarationBox);
-			FeignDeathBox = new CheckBox {Checked = Muzzle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 300};
+			FeignDeathBox = new CheckBox {Checked = FeignDeath, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 300};
             SettingsForm.Controls.Add(FeignDeathBox);
 			
-			AspectoftheTurtleBox = new CheckBox {Checked = Muzzle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 325};			
+			AspectoftheTurtleBox = new CheckBox {Checked = AspectoftheTurtle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 325};			
 			            SettingsForm.Controls.Add(AspectoftheTurtleBox);		
 			//dps cooldowns
             AspectoftheWildBox = new CheckBox {Checked = AspectoftheWild, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 225};
@@ -1240,9 +1240,9 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Death");
                         return;
                     }
-                    if (WoW.CanCast("Exhil") && WoW.HealthPercent < 30 && Exhil && !WoW.IsSpellOnCooldown("Exhil") && WoW.HealthPercent != 0)
+                    if (WoW.CanCast("Exhilaration") && WoW.HealthPercent < 30 && Exhilaration && !WoW.IsSpellOnCooldown("Exhil") && WoW.HealthPercent != 0)
                     {
-                        WoW.CastSpell("Exhil");
+                        WoW.CastSpell("Exhilaration");
                         return;
                     }	
 					if (WoW.CanCast("Turtle") && WoW.HealthPercent < 20 && Turtle && !WoW.IsSpellOnCooldown("Turtle") && WoW.HealthPercent != 0)
@@ -1367,9 +1367,9 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Death");
                         return;
                     }
-                    if (WoW.CanCast("Exhil") && WoW.HealthPercent < 30 && Exhil && !WoW.IsSpellOnCooldown("Exhil") && WoW.HealthPercent != 0)
+                    if (WoW.CanCast("Exhilaration") && WoW.HealthPercent < 30 && Exhilaration && !WoW.IsSpellOnCooldown("Exhilaration") && WoW.HealthPercent != 0)
                     {
-                        WoW.CastSpell("Exhil");
+                        WoW.CastSpell("Exhilaration");
                         return;
                     }	
 					if (WoW.CanCast("Turtle") && WoW.HealthPercent < 20 && Turtle && !WoW.IsSpellOnCooldown("Turtle") && WoW.HealthPercent != 0)
@@ -1483,9 +1483,9 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Death");
                         return;
                     }
-                    if (WoW.CanCast("Exhil") && WoW.HealthPercent < 30 && Exhil && !WoW.IsSpellOnCooldown("Exhil") && WoW.HealthPercent != 0)
+                    if (WoW.CanCast("Exhilaration") && WoW.HealthPercent < 30 && Exhilaration && !WoW.IsSpellOnCooldown("Exhilaration") && WoW.HealthPercent != 0)
                     {
-                        WoW.CastSpell("Exhil");
+                        WoW.CastSpell("Exhilaration");
                         return;
                     }	
 					if (WoW.CanCast("Turtle") && WoW.HealthPercent < 20 && Turtle && !WoW.IsSpellOnCooldown("Turtle") && WoW.HealthPercent != 0)
@@ -1629,7 +1629,7 @@ Spell,193530,Aspect of the Wild,D9
 Spell,20572,Blood Fury,F9
 Spell,207068,Titan's Thunder,D7
 Spell,5116,Concussive,None
-Spell,109304,Exhil,None
+Spell,109304,Exhilaration,None
 Spell,186265,Turtle,None
 Spell,5384,Death,None
 Spell,127834,Ancient Healing Potion,F5
