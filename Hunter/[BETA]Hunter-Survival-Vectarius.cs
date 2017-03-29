@@ -1030,31 +1030,31 @@ namespace PixelMagic.Rotation
 			Preset6Box.Checked = false;
 			
 			AnimalInstinctsBox.Checked = false;
-			ThrowingAxesBox.Checked = true;
-			WayoftheMokNathalBox.Checked = false;
+			ThrowingAxesBox.Checked = false;
+			WayoftheMokNathalBox.Checked = true;
 			
 			AMurderofCrowsBox.Checked= true;
 			MortalWoundsBox.Checked = false;
 			SnakeHunterBox.Checked = false;
 			
-			PosthasteBox.Checked = true;
-			DisengageBox.Checked = false;
+			PosthasteBox.Checked = false;
+			DisengageBox.Checked = true;
 			TrailblazerBox.Checked = false;
 			
-			CaltropsBox.Checked = false;
-			GuerrillaTacticsBox.Checked = true;
+			CaltropsBox.Checked = true;
+			GuerrillaTacticsBox.Checked = false;
 			SteelTrapBox.Checked = false;
 			
-			StickyBombBox.Checked = true;
+			StickyBombBox.Checked = false;
 			RangersNetBox.Checked = false;
-			CamouflageBox.Checked = false;
+			CamouflageBox.Checked = true;
 			
 			ButcheryBox.Checked = true;
 			DragonsfireGrenadeBox.Checked = false;
 			SerpentStingBox.Checked = false;
 			
-			SpittingCobraBox.Checked = false;
-			ExpertTrapperBox.Checked = true;
+			SpittingCobraBox.Checked = true;
+			ExpertTrapperBox.Checked = false;
 			AspectoftheBeastBox.Checked = false;
 			
         }
@@ -1066,32 +1066,33 @@ namespace PixelMagic.Rotation
 			Preset4Box.Checked = false;
 			Preset5Box.Checked = false;
 			Preset6Box.Checked = false;
-			AnimalInstinctsBox.Checked = false;
+			
+			AnimalInstinctsBox.Checked = true;
 			ThrowingAxesBox.Checked = false;
-			WayoftheMokNathalBox.Checked = true;
+			WayoftheMokNathalBox.Checked = false;
 			
 			AMurderofCrowsBox.Checked= true;
 			MortalWoundsBox.Checked = false;
 			SnakeHunterBox.Checked = false;
 			
-			PosthasteBox.Checked = true;
-			DisengageBox.Checked = false;
+			PosthasteBox.Checked = false;
+			DisengageBox.Checked = true;
 			TrailblazerBox.Checked = false;
 			
-			CaltropsBox.Checked = false;
-			GuerrillaTacticsBox.Checked = true;
+			CaltropsBox.Checked = true;
+			GuerrillaTacticsBox.Checked = false;
 			SteelTrapBox.Checked = false;
 			
-			StickyBombBox.Checked = true;
+			StickyBombBox.Checked = false;
 			RangersNetBox.Checked = false;
-			CamouflageBox.Checked = false;
+			CamouflageBox.Checked = true;
 			
-			ButcheryBox.Checked = false;
+			ButcheryBox.Checked = true;
 			DragonsfireGrenadeBox.Checked = false;
-			SerpentStingBox.Checked = true;
+			SerpentStingBox.Checked = false;
 			
-			SpittingCobraBox.Checked = true;
-			ExpertTrapperBox.Checked = false;
+			SpittingCobraBox.Checked = false;
+			ExpertTrapperBox.Checked = true;
 			AspectoftheBeastBox.Checked = false;
 			
         }
@@ -1103,29 +1104,30 @@ namespace PixelMagic.Rotation
 			Preset4Box.Checked = false;
 			Preset5Box.Checked = false;
 			Preset6Box.Checked = false;
+			
 			AnimalInstinctsBox.Checked = false;
-			ThrowingAxesBox.Checked = true;
-			WayoftheMokNathalBox.Checked = false;
+			ThrowingAxesBox.Checked = false;
+			WayoftheMokNathalBox.Checked = true;
 			
 			AMurderofCrowsBox.Checked= false;
 			MortalWoundsBox.Checked = true;
 			SnakeHunterBox.Checked = false;
 			
-			PosthasteBox.Checked = true;
-			DisengageBox.Checked = false;
+			PosthasteBox.Checked = false;
+			DisengageBox.Checked = true;
 			TrailblazerBox.Checked = false;
 			
-			CaltropsBox.Checked = true;
+			CaltropsBox.Checked = false;
 			GuerrillaTacticsBox.Checked = false;
-			SteelTrapBox.Checked = false;
+			SteelTrapBox.Checked = true;
 			
-			StickyBombBox.Checked = true;
+			StickyBombBox.Checked = false;
 			RangersNetBox.Checked = false;
-			CamouflageBox.Checked = false;
+			CamouflageBox.Checked = true;
 			
 			ButcheryBox.Checked = false;
-			DragonsfireGrenadeBox.Checked = true;
-			SerpentStingBox.Checked = false;
+			DragonsfireGrenadeBox.Checked = false;
+			SerpentStingBox.Checked = true;
 			
 			SpittingCobraBox.Checked = true;
 			ExpertTrapperBox.Checked = false;
@@ -1177,31 +1179,31 @@ namespace PixelMagic.Rotation
 			Preset1Box.Checked = false;
 			Preset6Box.Checked = false;
 			AnimalInstinctsBox.Checked = false;
-			ThrowingAxesBox.Checked = true;
-			WayoftheMokNathalBox.Checked = false;
+			ThrowingAxesBox.Checked = false;
+			WayoftheMokNathalBox.Checked = true;
 			
 			AMurderofCrowsBox.Checked= false;
 			MortalWoundsBox.Checked = true;
 			SnakeHunterBox.Checked = false;
 			
-			PosthasteBox.Checked = true;
-			DisengageBox.Checked = false;
+			PosthasteBox.Checked = false;
+			DisengageBox.Checked = true;
 			TrailblazerBox.Checked = false;
 			
 			CaltropsBox.Checked = false;
-			GuerrillaTacticsBox.Checked = true;
-			SteelTrapBox.Checked = false;
+			GuerrillaTacticsBox.Checked = false;
+			SteelTrapBox.Checked = true;
 			
-			StickyBombBox.Checked = true;
+			StickyBombBox.Checked = false;
 			RangersNetBox.Checked = false;
-			CamouflageBox.Checked = false;
+			CamouflageBox.Checked = true;
 			
-			ButcheryBox.Checked = true;
+			ButcheryBox.Checked = false;
 			DragonsfireGrenadeBox.Checked = false;
-			SerpentStingBox.Checked = false;
+			SerpentStingBox.Checked = true;
 			
-			SpittingCobraBox.Checked = false;
-			ExpertTrapperBox.Checked = true;
+			SpittingCobraBox.Checked = true;
+			ExpertTrapperBox.Checked = false;
 			AspectoftheBeastBox.Checked = false;
         }
 		private void Preset6_Click(object sender, EventArgs e) // AoE Raid / M+
@@ -1212,32 +1214,33 @@ namespace PixelMagic.Rotation
 			Preset4Box.Checked = false;
 			Preset5Box.Checked = false;
 			Preset1Box.Checked = false;
-			AnimalInstinctsBox.Checked = false;
-			ThrowingAxesBox.Checked = true;
+			
+			AnimalInstinctsBox.Checked = true;
+			ThrowingAxesBox.Checked = false;
 			WayoftheMokNathalBox.Checked = false;
 			
-			AMurderofCrowsBox.Checked= true;
-			MortalWoundsBox.Checked = false;
+			AMurderofCrowsBox.Checked= false;
+			MortalWoundsBox.Checked = true;
 			SnakeHunterBox.Checked = false;
 			
-			PosthasteBox.Checked = true;
-			DisengageBox.Checked = false;
+			PosthasteBox.Checked = false;
+			DisengageBox.Checked = true;
 			TrailblazerBox.Checked = false;
 			
-			CaltropsBox.Checked = false;
+			CaltropsBox.Checked = true;
 			GuerrillaTacticsBox.Checked = false;
-			SteelTrapBox.Checked = true;
+			SteelTrapBox.Checked = false;
 			
-			StickyBombBox.Checked = true;
+			StickyBombBox.Checked = false;
 			RangersNetBox.Checked = false;
-			CamouflageBox.Checked = false;
+			CamouflageBox.Checked = true;
 			
-			ButcheryBox.Checked = false;
-			DragonsfireGrenadeBox.Checked = true;
+			ButcheryBox.Checked = true;
+			DragonsfireGrenadeBox.Checked = false;
 			SerpentStingBox.Checked = false;
 			
-			SpittingCobraBox.Checked = true;
-			ExpertTrapperBox.Checked = false;
+			SpittingCobraBox.Checked = false;
+			ExpertTrapperBox.Checked = true;
 			AspectoftheBeastBox.Checked = false;
         }
 		
