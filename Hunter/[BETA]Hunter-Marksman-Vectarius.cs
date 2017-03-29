@@ -510,6 +510,17 @@ namespace PixelMagic.Rotation
 			
 			lblPreset6Box.ForeColor = Color.Black;
             SettingsForm.Controls.Add(lblPreset6Box);
+
+						var lblTextBox3 = new Label
+            {
+                Text =
+                    "Cooldowns",
+                Size = new Size(200, 17),
+                Left = 70,
+                Top = 250
+            };
+			lblTextBox3.ForeColor = Color.Black;
+			 SettingsForm.Controls.Add(lblTextBox3);			
 			
 			var lblTrueshotBox = new Label
             {
@@ -517,7 +528,7 @@ namespace PixelMagic.Rotation
                     "Trueshot",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 225
+                Top = 275
             };
 			
 			lblTrueshotBox.ForeColor = Color.Black;
@@ -529,7 +540,7 @@ namespace PixelMagic.Rotation
                     "Counter Shot",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 250
+                Top = 300
             };
 			
 			lblCounterShotBox.ForeColor = Color.Black;
@@ -541,7 +552,7 @@ namespace PixelMagic.Rotation
                     "Exhilaration",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 275
+                Top = 325
             };
 			
 			lblExhilarationBox.ForeColor = Color.Black;
@@ -553,7 +564,7 @@ namespace PixelMagic.Rotation
                     "Aspect of the Turtle",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 325
+                Top = 375
             };
 			
 			lblAspectoftheTurtleBox.ForeColor = Color.Black;
@@ -565,7 +576,7 @@ namespace PixelMagic.Rotation
                     "Feign Death",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 300
+                Top = 350
             };
 			
 			lblFeignDeathBox.ForeColor = Color.Black;
@@ -587,16 +598,16 @@ namespace PixelMagic.Rotation
 			var cmdReadme = new Button {Text = "Macros! Use Them", Width = 65, Height = 25, Left = 125, Top = 425, Size = new Size(120, 31)};
 			// Checkboxes
 			//dps cooldowns
-            			CounterShotBox = new CheckBox {Checked = CounterShot, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 250};		
+            			CounterShotBox = new CheckBox {Checked = CounterShot, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 300};		
             SettingsForm.Controls.Add(CounterShotBox);
-			ExhilarationBox = new CheckBox {Checked = Exhilaration, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 275};			
+			ExhilarationBox = new CheckBox {Checked = Exhilaration, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 325};			
             SettingsForm.Controls.Add(ExhilarationBox);
-			FeignDeathBox = new CheckBox {Checked = FeignDeath, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 300};
+			FeignDeathBox = new CheckBox {Checked = FeignDeath, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 350};
             SettingsForm.Controls.Add(FeignDeathBox);
 			
-			AspectoftheTurtleBox = new CheckBox {Checked = AspectoftheTurtle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 325};			
+			AspectoftheTurtleBox = new CheckBox {Checked = AspectoftheTurtle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 375};			
 			            SettingsForm.Controls.Add(AspectoftheTurtleBox);
-            TrueshotBox = new CheckBox {Checked = Trueshot, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 225};
+            TrueshotBox = new CheckBox {Checked = Trueshot, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 275};
             SettingsForm.Controls.Add(TrueshotBox);			
 			//T1 Checkboxes
 			LoneWolfBox = new CheckBox {Checked = LoneWolf, TabIndex = 8, Size = new Size(13, 13), Left = 468, Top = 88};
@@ -749,6 +760,7 @@ namespace PixelMagic.Rotation
 			lblDiscordBox.BringToFront();
 			lblTextBox.BringToFront();
 			lblTextBox2.BringToFront();
+			lblTextBox3.BringToFront();				
 			lblTitle.BringToFront();
 			
             TrueshotBox.BringToFront();		
