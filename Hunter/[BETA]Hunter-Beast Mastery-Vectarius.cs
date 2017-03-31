@@ -1248,19 +1248,19 @@ namespace PixelMagic.Rotation
             if (combatRoutine.Type == RotationType.SingleTarget)  // Do Single Target Stuff here
             {
 	
-                   /* if (WoW.CanCast("Death") && WoW.HealthPercent < 40 && Death && !WoW.IsSpellOnCooldown("Death") && WoW.HealthPercent != 0)
+                   if (WoW.CanCast("FeignDeath") && WoW.HealthPercent < 30 && FeignDeath && !WoW.IsSpellOnCooldown("FeignDeath") && WoW.HealthPercent != 0)
                     {
-                        WoW.CastSpell("Death");
+                        WoW.CastSpell("FeignDeath");
                         return;
                     }
-                    if (WoW.CanCast("Exhilaration") && WoW.HealthPercent < 30 && Exhilaration && !WoW.IsSpellOnCooldown("Exhil") && WoW.HealthPercent != 0)
+                    if (WoW.CanCast("Exhilaration") && WoW.HealthPercent < 40 && Exhilaration && !WoW.IsSpellOnCooldown("Exhil") && WoW.HealthPercent != 0)
                     {
                         WoW.CastSpell("Exhilaration");
                         return;
                     }	
-					if (WoW.CanCast("Turtle") && WoW.HealthPercent < 20 && Turtle && !WoW.IsSpellOnCooldown("Turtle") && WoW.HealthPercent != 0)
+					if (WoW.CanCast("AspectoftheTurtle") && WoW.HealthPercent < 20 && AspectoftheTurtle && !WoW.IsSpellOnCooldown("AspectoftheTurtle") && WoW.HealthPercent != 0)
                     {
-                        WoW.CastSpell("Turtle");
+                        WoW.CastSpell("AspectoftheTurtle");
                         return;
                     }
 					/*if (WoW.CanCast("Ancient Healing Potion") && WoW.HealthPercent < 20 && !WoW.IsSpellOnCooldown("Ancient Healing Potion") && WoW.HealthPercent != 0)
@@ -1381,19 +1381,19 @@ namespace PixelMagic.Rotation
             if (combatRoutine.Type == RotationType.AOE)
             {
 				
-                   /* if (WoW.CanCast("Death") && WoW.HealthPercent < 40 && Death && !WoW.IsSpellOnCooldown("Death") && WoW.HealthPercent != 0)
+                   if (WoW.CanCast("FeignDeath") && WoW.HealthPercent < 30 && FeignDeath && !WoW.IsSpellOnCooldown("FeignDeath") && WoW.HealthPercent != 0)
                     {
-                        WoW.CastSpell("Death");
+                        WoW.CastSpell("FeignDeath");
                         return;
                     }
-                    if (WoW.CanCast("Exhilaration") && WoW.HealthPercent < 30 && Exhilaration && !WoW.IsSpellOnCooldown("Exhilaration") && WoW.HealthPercent != 0)
+                    if (WoW.CanCast("Exhilaration") && WoW.HealthPercent < 40 && Exhilaration && !WoW.IsSpellOnCooldown("Exhil") && WoW.HealthPercent != 0)
                     {
                         WoW.CastSpell("Exhilaration");
                         return;
                     }	
-					if (WoW.CanCast("Turtle") && WoW.HealthPercent < 20 && Turtle && !WoW.IsSpellOnCooldown("Turtle") && WoW.HealthPercent != 0)
+					if (WoW.CanCast("AspectoftheTurtle") && WoW.HealthPercent < 20 && AspectoftheTurtle && !WoW.IsSpellOnCooldown("AspectoftheTurtle") && WoW.HealthPercent != 0)
                     {
-                        WoW.CastSpell("Turtle");
+                        WoW.CastSpell("AspectoftheTurtle");
                         return;
                     }
 					/*if (WoW.CanCast("Ancient Healing Potion") && WoW.HealthPercent < 20 && !WoW.IsSpellOnCooldown("Ancient Healing Potion") && WoW.HealthPercent != 0)
@@ -1438,13 +1438,40 @@ namespace PixelMagic.Rotation
                     {
                         WoW.CastSpell("Volley");
                         return;
+                    }	
+					if (WoW.CanCast("Kill Command") 
+						&& WoW.Focus >= 55 
+						&& WoW.IsSpellInRange("Kill Command") 
+						&& WoW.PetHasBuff("Beast Cleave") 
+						&& WoW.PetBuffTimeRemaining("Beast Cleave") >= 1.3) 
+					{
+                        WoW.CastSpell("Kill Command");
+                        return;
+                    }
+                    if (WoW.CanCast("Cobra Shot") 
+						&& (WoW.Focus >= 65)
+						&& KillerCobra				
+						&& WoW.IsSpellInRange("Cobra Shot") 
+						&& WoW.PetHasBuff("Beast Cleave") 
+						&& WoW.PetBuffTimeRemaining("Beast Cleave") >= 1.3 
+						&& WoW.PlayerHasBuff("Bestial Wrath")
+						&&(WoW.PlayerHasBuff("Aspect of the Wild") || WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Ancient Hysteria") || WoW.PlayerHasBuff("Drums") || WoW.PlayerHasBuff("Netherwinds"))					
+						&& (WoW.SpellCooldownTimeRemaining("Kill Command") >= 3))
+                    {
+                        WoW.CastSpell("Cobra Shot");
+                        return;
+                    }
+					if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 110) && WoW.IsSpellInRange("Cobra Shot") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") >= 1.3 && WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 1)
+                    {
+                        WoW.CastSpell("Cobra Shot");
+                        return;
                     }					
 					if (WoW.CanCast("Multi-Shot") && (WoW.Focus >= 40) && !WoW.PetHasBuff("Beast Cleave") && WoW.IsSpellInRange("Multi-Shot"))
                     {
                         WoW.CastSpell("Multi-Shot");                        
                         return;
                     }
-                    if (WoW.CanCast("Multi-Shot") && (WoW.Focus >= 40) && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") <= 1 && WoW.IsSpellInRange("Multi-Shot"))
+                    if (WoW.CanCast("Multi-Shot") && (WoW.Focus >= 40) && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") <= 0.8 && WoW.IsSpellInRange("Multi-Shot"))
                     {
                         WoW.CastSpell("Multi-Shot");                        
                         return;
@@ -1463,18 +1490,19 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Barrage");
                         return;
                     }					
-					if (WoW.CanCast("Bestial Wrath") && WoW.IsSpellInRange("Cobra Shot") && !WoW.PlayerHasBuff("Turtle") && !WoW.IsSpellOnCooldown("Bestial Wrath"))
+					if (WoW.CanCast("Bestial Wrath") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") >= 1.3 && WoW.IsSpellInRange("Cobra Shot") && !WoW.PlayerHasBuff("AspectoftheTurtle") && !WoW.IsSpellOnCooldown("Bestial Wrath"))
                     {
                         WoW.CastSpell("Bestial Wrath");
                         return;
                     }
-					if (WoW.CanCast("Aspect of the Wild") && !WoW.IsSpellOnCooldown("Aspect of the Wild") && UseCooldowns && WoW.PlayerHasBuff("Bestial Wrath") && WoW.PlayerBuffTimeRemaining("Bestial Wrath") >= 10 && AspectoftheWild ) 
+					if (WoW.CanCast("Aspect of the Wild") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") >= 1.3 && !WoW.IsSpellOnCooldown("Aspect of the Wild") && UseCooldowns && WoW.PlayerHasBuff("Bestial Wrath") && WoW.PlayerBuffTimeRemaining("Bestial Wrath") >= 10 && AspectoftheWild) 
                     {
                         WoW.CastSpell("Aspect of the Wild");
+						WoW.CastSpell("Blood Fury");
 						return;
                     }	
 
-					if (WoW.CanCast("Dire Beast") && WoW.IsSpellInRange("Dire Beast") && !WoW.IsSpellOnCooldown("Dire Beast") && !(WoW.SpellCooldownTimeRemaining("Bestial Wrath") <= 3))
+					if (WoW.CanCast("Dire Beast") && WoW.IsSpellInRange("Dire Beast") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") >= 1.3 && !WoW.IsSpellOnCooldown("Dire Beast") && !(WoW.SpellCooldownTimeRemaining("Bestial Wrath") <= 3))
                     {
                         WoW.CastSpell("Dire Beast");
 						if (WoW.CanCast("Titan's Thunder") && !WoW.IsSpellOnCooldown("Titan's Thunder"))
@@ -1483,40 +1511,23 @@ namespace PixelMagic.Rotation
                         return;
 						}
                     }				
-
-					if (WoW.CanCast("Kill Command") && WoW.Focus >= 30 && WoW.IsSpellInRange("Kill Command") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") >= 1 && (WoW.PlayerHasBuff("Aspect of the Wild") || WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Ancient Hysteria") || WoW.PlayerHasBuff("Drums") || WoW.PlayerHasBuff("Netherwinds")))
-                    {
-                        WoW.CastSpell("Kill Command");
-                        return;
-                    }
-                    if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 40) && WoW.IsSpellInRange("Cobra Shot") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") >= 1 && WoW.PlayerHasBuff("Bestial Wrath") 
-						&& (WoW.SpellCooldownTimeRemaining("Kill Command") >= 3))
-                    {
-                        WoW.CastSpell("Cobra Shot");
-                        return;
-                    }
-					if (WoW.CanCast("Cobra Shot") && (WoW.Focus >= 110) && WoW.IsSpellInRange("Cobra Shot") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") >= 1 && WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 1)
-                    {
-                        WoW.CastSpell("Cobra Shot");
-                        return;
-                    }
 				}
             }
             if (combatRoutine.Type == RotationType.SingleTargetCleave)
             {
-                /*    if (WoW.CanCast("Death") && WoW.HealthPercent < 40 && Death && !WoW.IsSpellOnCooldown("Death") && WoW.HealthPercent != 0)
+                   if (WoW.CanCast("FeignDeath") && WoW.HealthPercent < 30 && FeignDeath && !WoW.IsSpellOnCooldown("FeignDeath") && WoW.HealthPercent != 0)
                     {
-                        WoW.CastSpell("Death");
+                        WoW.CastSpell("FeignDeath");
                         return;
                     }
-                    if (WoW.CanCast("Exhilaration") && WoW.HealthPercent < 30 && Exhilaration && !WoW.IsSpellOnCooldown("Exhilaration") && WoW.HealthPercent != 0)
+                    if (WoW.CanCast("Exhilaration") && WoW.HealthPercent < 40 && Exhilaration && !WoW.IsSpellOnCooldown("Exhil") && WoW.HealthPercent != 0)
                     {
                         WoW.CastSpell("Exhilaration");
                         return;
                     }	
-					if (WoW.CanCast("Turtle") && WoW.HealthPercent < 20 && Turtle && !WoW.IsSpellOnCooldown("Turtle") && WoW.HealthPercent != 0)
+					if (WoW.CanCast("AspectoftheTurtle") && WoW.HealthPercent < 20 && AspectoftheTurtle && !WoW.IsSpellOnCooldown("AspectoftheTurtle") && WoW.HealthPercent != 0)
                     {
-                        WoW.CastSpell("Turtle");
+                        WoW.CastSpell("AspectoftheTurtle");
                         return;
                     }
 					/*if (WoW.CanCast("Ancient Healing Potion") && WoW.HealthPercent < 20 && !WoW.IsSpellOnCooldown("Ancient Healing Potion") && WoW.HealthPercent != 0)
@@ -1576,7 +1587,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 115 
 						&& WoW.IsSpellInRange("Cobra Shot") 
 						&& WoW.IsSpellOnCooldown("Kill Command")						
-						&& !WoW.PlayerHasBuff("Turtle")) 
+						&& !WoW.PlayerHasBuff("AspectoftheTurtle")) 
                     {
                         WoW.CastSpell("Bestial Wrath");
                         return;
@@ -1585,7 +1596,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 90 
 						&& WoW.IsSpellInRange("Cobra Shot") 
 						&& !WoW.IsSpellOnCooldown("Kill Command")
-						&& !WoW.PlayerHasBuff("Turtle")) 
+						&& !WoW.PlayerHasBuff("AspectoftheTurtle")) 
                     {
                         WoW.CastSpell("Bestial Wrath");
                         return;
@@ -1662,8 +1673,8 @@ Spell,20572,Blood Fury,F9
 Spell,207068,Titan's Thunder,D7
 Spell,5116,Concussive,None
 Spell,109304,Exhilaration,None
-Spell,186265,Turtle,None
-Spell,5384,Death,None
+Spell,186265,AspectoftheTurtle,None
+Spell,5384,FeignDeath,None
 Spell,127834,Ancient Healing Potion,F5
 Spell,133940,Silkweave Bandage,None
 Spell,55709,Phoenix,F6
