@@ -1320,7 +1320,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 115 
 						&& WoW.IsSpellInRange("Cobra Shot") 
 						&& WoW.IsSpellOnCooldown("Kill Command")						
-						&& !WoW.PlayerHasBuff("Turtle")) 
+						&& !WoW.PlayerHasBuff("AspectoftheTurtle")) 
                     {
                         WoW.CastSpell("Bestial Wrath");
                         return;
@@ -1329,7 +1329,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 90 
 						&& WoW.IsSpellInRange("Cobra Shot") 
 						&& !WoW.IsSpellOnCooldown("Kill Command")
-						&& !WoW.PlayerHasBuff("Turtle")) 
+						&& !WoW.PlayerHasBuff("AspectoftheTurtle")) 
                     {
                         WoW.CastSpell("Bestial Wrath");
                         return;
@@ -1438,7 +1438,12 @@ namespace PixelMagic.Rotation
                     {
                         WoW.CastSpell("Volley");
                         return;
-                    }	
+                    }
+                    if (WoW.CanCast("Barrage") && Barrage && !WoW.IsSpellOnCooldown("Barrage") && WoW.IsSpellInRange("Cobra Shot") && WoW.Focus >= 60)
+                    {
+                        WoW.CastSpell("Barrage");
+                        return;
+                    }						
 					if (WoW.CanCast("Kill Command") 
 						&& WoW.Focus >= 55 
 						&& WoW.IsSpellInRange("Kill Command") 
@@ -1484,12 +1489,7 @@ namespace PixelMagic.Rotation
                     {
                         WoW.CastSpell("A Murder of Crows");
                         return;
-                    }
-                    if (WoW.CanCast("Barrage") && Barrage && WoW.IsSpellInRange("Barrage") && WoW.Focus >= 60)
-                    {
-                        WoW.CastSpell("Barrage");
-                        return;
-                    }					
+                    }				
 					if (WoW.CanCast("Bestial Wrath") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") >= 1.3 && WoW.IsSpellInRange("Cobra Shot") && !WoW.PlayerHasBuff("AspectoftheTurtle") && !WoW.IsSpellOnCooldown("Bestial Wrath"))
                     {
                         WoW.CastSpell("Bestial Wrath");
@@ -1666,15 +1666,15 @@ Spell,2643,Multi-Shot,D4
 Spell,34026,Kill Command,D2
 Spell,19574,Bestial Wrath,D8
 Spell,131894,A Murder of Crows,D5
-Spell,120360,Barrage,None
+Spell,120360,Barrage,D6
 Spell,147362,Counter Shot,D0
 Spell,193530,Aspect of the Wild,D9
 Spell,20572,Blood Fury,F9
 Spell,207068,Titan's Thunder,D7
 Spell,5116,Concussive,None
-Spell,109304,Exhilaration,None
-Spell,186265,AspectoftheTurtle,None
-Spell,5384,FeignDeath,None
+Spell,109304,Exhilaration,V
+Spell,186265,AspectoftheTurtle,G
+Spell,5384,FeignDeath,F2
 Spell,127834,Ancient Healing Potion,F5
 Spell,133940,Silkweave Bandage,None
 Spell,55709,Phoenix,F6
@@ -1684,7 +1684,7 @@ Spell,142117,Potion Power,F10
 Spell,136,Heal Pet,X
 Spell,144259,Kil'jaeden's Burning Wish,Q
 Spell,194386,Volley,F
-Aura,186265,Turtle
+Aura,186265,AspectoftheTurtle
 Aura,11196,Bandaged
 Aura,234143,Temptation
 Aura,2825,Bloodlust
