@@ -1282,11 +1282,17 @@ namespace PixelMagic.Rotation
 						WoW.CastSpell("Wolf") ;
 						return;
 					}
-					if (WoW.PetHealthPercent <= 0 && WoW.CanCast("Phoenix"))
+					/*if (WoW.PetHealthPercent <= 0 && WoW.CanCast("Phoenix"))
 					{
 						WoW.CastSpell("Phoenix") ;
 						return;
-					}					
+					}
+*/					
+					if (WoW.PetHealthPercent <= 90 && !WoW.PetHasBuff("Heal Pet") && WoW.CanCast("Revive Pet") && !WoW.IsMoving)
+					{
+						WoW.CastSpell("Heal Pet") ;
+						return;
+					}
 					if (WoW.PetHealthPercent <= 0 && WoW.IsSpellOnCooldown("Phoenix") && WoW.CanCast("Revive Pet") && !WoW.IsMoving)
 					{
 						WoW.CastSpell("Revive Pet") ;
@@ -1414,9 +1420,15 @@ namespace PixelMagic.Rotation
 						WoW.CastSpell("Wolf") ;
 						return;
 					}
-					if (WoW.PetHealthPercent <= 0 && WoW.CanCast("Phoenix"))
+					/*if (WoW.PetHealthPercent <= 0 && WoW.CanCast("Phoenix"))
 					{
 						WoW.CastSpell("Phoenix") ;
+						return;
+					}
+*/					
+					if (WoW.PetHealthPercent <= 90 && !WoW.PetHasBuff("Heal Pet") && WoW.CanCast("Revive Pet") && !WoW.IsMoving)
+					{
+						WoW.CastSpell("Heal Pet") ;
 						return;
 					}					
 					if (WoW.PetHealthPercent <= 0 && WoW.IsSpellOnCooldown("Phoenix") && WoW.CanCast("Revive Pet") && !WoW.IsMoving)
@@ -1549,9 +1561,15 @@ namespace PixelMagic.Rotation
 						WoW.CastSpell("Wolf") ;
 						return;
 					}
-					if (WoW.PetHealthPercent <= 0 && WoW.CanCast("Phoenix"))
+					/*if (WoW.PetHealthPercent <= 0 && WoW.CanCast("Phoenix"))
 					{
 						WoW.CastSpell("Phoenix") ;
+						return;
+					}
+*/					
+					if (WoW.PetHealthPercent <= 90 && !WoW.PetHasBuff("Heal Pet") && WoW.CanCast("Revive Pet") && !WoW.IsMoving)
+					{
+						WoW.CastSpell("Heal Pet") ;
 						return;
 					}					
 					if (WoW.PetHealthPercent <= 0 && WoW.IsSpellOnCooldown("Phoenix") && WoW.CanCast("Revive Pet") && !WoW.IsMoving)
@@ -1685,6 +1703,7 @@ Spell,136,Heal Pet,X
 Spell,144259,Kil'jaeden's Burning Wish,Q
 Spell,194386,Volley,F
 Aura,186265,AspectoftheTurtle
+Aura,136,Heal Pet
 Aura,11196,Bandaged
 Aura,234143,Temptation
 Aura,2825,Bloodlust

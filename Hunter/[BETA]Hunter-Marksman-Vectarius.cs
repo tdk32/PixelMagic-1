@@ -1341,7 +1341,7 @@ namespace PixelMagic.Rotation
 						&& !WoW.PlayerIsCasting						
 						&& WoW.IsSpellInRange("Windburst")
 						&& WoW.TargetHasDebuff("Vulnerable")						
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1))
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1.9))
 					{	
 					    WoW.CastSpell("Marked Shot");
                         return;
@@ -1397,7 +1397,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -1411,7 +1411,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -1425,7 +1425,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -1482,7 +1482,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& TrickShot
 						&& !WoW.PlayerIsChanneling					
@@ -1495,7 +1495,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& TrickShot
 						&& !WoW.PlayerIsChanneling					
@@ -1508,7 +1508,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& TrickShot
 						&& !WoW.PlayerIsChanneling					
@@ -1572,7 +1572,7 @@ namespace PixelMagic.Rotation
 						&& WoW.IsSpellInRange("Windburst") 
 						&& WoW.Focus <=94
 						&& WoW.TargetHasDebuff("Vulnerable")
-						&& WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1.7						
+						&& WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1.9						
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting)						
 						
@@ -1608,7 +1608,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus <=99
 						&& PiercingShot
 						&& WoW.IsSpellOnCooldown("Piercing Shot")
-						&& WoW.SpellCooldownTimeRemaining ("Piercing Shot") <3						
+						&& WoW.SpellCooldownTimeRemaining ("Piercing Shot") < 3						
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting)						
 						
@@ -1777,7 +1777,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -1791,7 +1791,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -1805,7 +1805,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -1862,7 +1862,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& TrickShot
 						&& !WoW.PlayerIsChanneling					
@@ -1875,7 +1875,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& TrickShot
 						&& !WoW.PlayerIsChanneling					
@@ -1888,7 +1888,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& TrickShot
 						&& !WoW.PlayerIsChanneling					
@@ -1952,7 +1952,7 @@ namespace PixelMagic.Rotation
 						&& WoW.IsSpellInRange("Windburst") 
 						&& WoW.Focus <=94
 						&& WoW.TargetHasDebuff("Vulnerable")
-						&& WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1.7						
+						&& WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1.9						
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting)						
 						
@@ -2157,7 +2157,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -2171,7 +2171,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -2185,7 +2185,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -2242,7 +2242,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& TrickShot
 						&& !WoW.PlayerIsChanneling					
@@ -2255,7 +2255,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& TrickShot
 						&& !WoW.PlayerIsChanneling					
@@ -2268,7 +2268,7 @@ namespace PixelMagic.Rotation
 						&& WoW.Focus >= 50 
 						&& WoW.TargetHasDebuff("Vulnerable") 
 						&& WoW.CanCast("AS") 
-						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 1.8) 
+						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") >= 2) 
 						&& WoW.IsSpellInRange("Windburst") 
 						&& TrickShot
 						&& !WoW.PlayerIsChanneling					
@@ -2332,7 +2332,7 @@ namespace PixelMagic.Rotation
 						&& WoW.IsSpellInRange("Windburst") 
 						&& WoW.Focus <=94
 						&& WoW.TargetHasDebuff("Vulnerable")
-						&& WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1.7						
+						&& WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1.9						
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting)						
 						
