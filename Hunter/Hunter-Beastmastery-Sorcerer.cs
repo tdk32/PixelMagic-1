@@ -170,16 +170,7 @@ namespace PixelMagic.Rotation
                         && PlayerBuffTimeRemaining("Bestial Wrath") >= 1200)
                     {
                         WoW.CastSpell("Aspect of the Wild");
-                    }
-
-                    //Legendary Trinket
-                    if (WoW.CanCast("Kil'jaeden's Burning Wish")
-                        && (((SpellCooldownTimeRemaining("Bestial Wrath") > 1500 && SpellCooldownTimeRemaining("Dire Beast") > 500)) || PlayerHasBuff("Bestial Wrath"))
-                        && !WoW.ItemOnCooldown("Kil'jaeden's Burning Wish")
-                        && WoW.IsSpellInRange("Cobra Shot"))
-                    {
-                        WoW.CastSpell("Kil'jaeden's Burning Wish");
-                    }
+                    }                    
 
                     //SINGLE TARGET
 
