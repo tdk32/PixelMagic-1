@@ -16,24 +16,20 @@ namespace PixelMagic.Rotation
         private readonly Stopwatch BeastCleave = new Stopwatch();
 
         public override string Name
-        {
-            get
-            {
-                return "Hunter BM";
-            }
-        }
+        {get{return "Hunter BM";}}
 
         public override string Class
-        {
-            get
-            {
-                return "Hunter";
-            }
-        }
+        {get{return "Hunter";}}
 
         public override void Initialize()
-        {
-            Log.Write("Welcome to Beastmastery Hunter", Color.Green);            
+        {	
+			Log.Write("Welcome to Beastmastery Hunter", Color.Green);
+			Log.Write("The rotation assumes you have Tier 19 4p bonus, no particular legendary and 4/4 Slithering Serpents weapon trait for optimal DPS but will work in any case", Color.Red);
+			Log.Write("All talents are supported and auto detected on any loading screen or when entering combat", Color.Red);
+            Log.Write("Potion/Healthstone will be used at 20% health or less, Exhilaration at 30% or less", Color.Red);
+			Log.Write("Counter Shot will be used on +75% of the spell's cast time", Color.Red);
+			Log.Write("To use Binding Shot and Tarps at cursor location you need macros: /cast [@cursor] Binding Shot, /cast [@cursor] Freezing Trap and /cast [@cursor] Tar Trap", Color.Red);
+			Log.Write("Stampede, if chosen, will be cast if Left Ctrl key is pressed", Color.Red);
             Log.Write("Use Scroll Lock key to toggle ST/AOE/CLEAVE auto detection", Color.Blue);
             Log.Write("If Scroll Lock LED is ON ST/AOE/CLEAVE auto detection is ENABLED", Color.Blue);
             Log.Write("If Scroll Lock LED is OFF ST/AOE/CLEAVE auto detection is DISABLED use the manual mode to select ST/AOE/CLEAVE (Default: ALT+S, ALT+A)", Color.Blue);
@@ -47,7 +43,6 @@ namespace PixelMagic.Rotation
         {
             for (int i = 1; i < 3; i++)
             {
-
                 AddonCreationPulse();
                 PlayerStats();
                 AoEStuff();
@@ -61,7 +56,7 @@ namespace PixelMagic.Rotation
                     && (WoW.ItemCount("Healthstone") >= 1 || WoW.ItemCount("Potion") >= 1)
                     && (!WoW.ItemOnCooldown("Healthstone") || !WoW.ItemOnCooldown("Potion"))
                     && !PlayerHasBuff("Feign Death")
-                    && WoW.HealthPercent <= 30
+                    && WoW.HealthPercent <= 20
                     && !IsMounted
                     && WoW.HealthPercent != 0)
                 {
@@ -73,7 +68,7 @@ namespace PixelMagic.Rotation
 
                 //Exhilaration
                 if (WoW.CanCast("Exhilaration")
-                    && WoW.HealthPercent <= 20
+                    && WoW.HealthPercent <= 30
                     && !IsMounted
                     && !PlayerHasBuff("Feign Death")
                     && WoW.HealthPercent != 0)
@@ -88,13 +83,22 @@ namespace PixelMagic.Rotation
                     && !WoW.IsSpellOnCooldown("Counter Shot")
                     && WoW.TargetIsCasting
                     && WoW.IsSpellInRange("Counter Shot")
-                    && WoW.TargetPercentCast > 80)
+                    && WoW.TargetPercentCast > 75)
                 {
                     WoW.CastSpell("Counter Shot");
                     return;
                 }
 
                 ////Revive Pet Call pet
+                if (!IsMounted
+                    && !PlayerHasBuff("Feign Death")
+                    && WoW.HealthPercent == 0)
+                {
+                    WoW.CastSpell("Heart of the Phoenix");
+                    WoW.CastSpell("Revive Pet");                    
+                    return;
+                }
+
                 if (!WoW.HasPet
                     && !IsMounted
                     && !PlayerHasBuff("Feign Death")
@@ -105,7 +109,7 @@ namespace PixelMagic.Rotation
                     Thread.Sleep(500);
                     WoW.CastSpell("Call Pet");
                     return;
-                }
+                }                
 
                 //Voley
                 if (WoW.CanCast("Voley")
@@ -127,10 +131,26 @@ namespace PixelMagic.Rotation
                     return;
                 }
 
+                //Freezing Trap
+                if ((DetectKeyPress.GetKeyState(DetectKeyPress.VK_KEY_X) < 0)
+                    && (WoW.CanCast("Freezing Trap")))
+                {
+                    WoW.CastSpell("Freezing Trap");
+                    return;
+                }
+
+				//Tar Trap
+                if ((DetectKeyPress.GetKeyState(DetectKeyPress.VK_KEY_C) < 0)
+                    && (WoW.CanCast("Tar Trap")))
+                {
+                    WoW.CastSpell("Tar Trap");
+                    return;
+                }
+				
                 if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !IsMounted && !WoW.PlayerIsChanneling && !PlayerHasBuff("Feign Death") && WoW.HealthPercent != 0)
                 {
                     //Stampede
-                    if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_LSHIFT) < 0
+                    if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_LCONTROL) < 0
                         && WoW.CanCast("Stampede")
                         && CharInfo.T7 == 1)
                     {
@@ -140,15 +160,16 @@ namespace PixelMagic.Rotation
 
                     //Cooldowns
                     if (UseCooldowns)
+                    {                        
+                    }
+
+                    //Aspect of the Wild
+                    if (WoW.CanCast("Aspect of the Wild")
+                        && !PlayerHasBuff("Aspect of the Turtle")
+                        && PlayerHasBuff("Bestial Wrath")
+                        && PlayerBuffTimeRemaining("Bestial Wrath") >= 1200)
                     {
-                        //Aspect of the Wild
-                        if (WoW.CanCast("Aspect of the Wild")
-                            && !PlayerHasBuff("Aspect of the Turtle")
-                            && PlayerHasBuff("Bestial Wrath")
-                            && PlayerBuffTimeRemaining("Bestial Wrath") >= 1200)
-                        {
-                            WoW.CastSpell("Aspect of the Wild");
-                        }
+                        WoW.CastSpell("Aspect of the Wild");
                     }
 
                     //Legendary Trinket
@@ -170,13 +191,14 @@ namespace PixelMagic.Rotation
                         && (WoW.Focus >= 105 || (WoW.Focus >= 90 && WoW.CanCast("Aspect of the Wild"))))
                     {
                         WoW.CastSpell("Bestial Wrath");
+                        WoW.CastSpell("A Murder of Crows");
                         WoW.CastSpell("Kill Command");
                     }
 
                     //A Murder of Crows
                     if (combatRoutine.Type == RotationType.SingleTarget
-                        && SpellCooldownTimeRemaining("Bestial Wrath") > 2300
                         && WoW.CanCast("A Murder of Crows")
+                        && PlayerHasBuff("Bestial Wrath")
                         && WoW.IsSpellInRange("Cobra Shot")
                         && CharInfo.T6 == 1
                         && WoW.Focus >= 30)
@@ -240,7 +262,7 @@ namespace PixelMagic.Rotation
 
                     //Cobra Shot
                     if (combatRoutine.Type == RotationType.SingleTarget
-                        && ((WoW.Focus >= 100) || (PlayerHasBuff("Bestial Wrath") && WoW.Focus >= 40))
+                        && ((WoW.Focus >= 100) || (PlayerHasBuff("Bestial Wrath") && WoW.Focus >= 32))
                         && WoW.IsSpellInRange("Cobra Shot")
                         && WoW.CanCast("Cobra Shot")
                         && !WoW.CanCast("Bestial Wrath"))
@@ -280,8 +302,8 @@ namespace PixelMagic.Rotation
                         && WoW.IsSpellInRange("Cobra Shot")
                         && CharInfo.T2 == 2)
                     {
-                        WoW.CastSpell("Dire Frenzy");
-                        WoW.CastSpell("Titan's Thunder");
+						WoW.CastSpell("Titan's Thunder");
+                        WoW.CastSpell("Dire Frenzy");                        
                         return;
                     }
 
@@ -321,8 +343,8 @@ namespace PixelMagic.Rotation
 
                     //A Murder of Crows
                     if (combatRoutine.Type == RotationType.SingleTarget
-                        && SpellCooldownTimeRemaining("Bestial Wrath") > 2300
                         && WoW.CanCast("A Murder of Crows")
+                        && PlayerHasBuff("Bestial Wrath")
                         && WoW.IsSpellInRange("Cobra Shot")
                         && CharInfo.T6 == 1
                         && WoW.Focus >= 30)
@@ -337,6 +359,7 @@ namespace PixelMagic.Rotation
                         && (!WoW.PetHasBuff("BeastCleave") || WoW.PetBuffTimeRemaining("BeastCleave") < 0.5)
                         && WoW.IsSpellInRange("Multi-Shot")
                         && !WoW.CanCast("Bestial Wrath")
+                        && !PlayerHasBuff("Bestial Wrath")
                         && WoW.Focus >= 40)
                     {
                         WoW.CastSpell("Multi-Shot");
@@ -362,8 +385,8 @@ namespace PixelMagic.Rotation
                         && WoW.IsSpellInRange("Cobra Shot")
                         && CharInfo.T2 == 2)
                     {
+						WoW.CastSpell("Titan's Thunder");
                         WoW.CastSpell("Dire Frenzy");
-                        WoW.CastSpell("Titan's Thunder");
                         return;
                     }
 
@@ -381,7 +404,6 @@ namespace PixelMagic.Rotation
                     //Kill Command
                     if (combatRoutine.Type == RotationType.SingleTargetCleave
                         && WoW.CanCast("Kill Command")
-                        //&& (SpellCooldownTimeRemaining("Bestial Wrath") - SpellCooldownTimeRemaining("Kill Command") > 2 || (SpellCooldownTimeRemaining("Bestial Wrath") >= 23 && SpellCooldownTimeRemaining("Dire Beast") - SpellCooldownTimeRemaining("Kill Command") > 2))
                         && WoW.Focus >= 30)
                     {
                         WoW.CastSpell("Kill Command");
@@ -401,7 +423,7 @@ namespace PixelMagic.Rotation
 
                     //Cobra Shot
                     if (combatRoutine.Type == RotationType.SingleTargetCleave
-                        && ((WoW.Focus >= 90) || (PlayerHasBuff("Bestial Wrath") && (WoW.Focus >= 40)))
+                        && ((WoW.Focus >= 90) || (PlayerHasBuff("Bestial Wrath") && (WoW.Focus >= 32)))
                         && WoW.IsSpellInRange("Cobra Shot")
                         && WoW.CanCast("Cobra Shot")
                         && !WoW.CanCast("Bestial Wrath"))
@@ -413,14 +435,14 @@ namespace PixelMagic.Rotation
                     //Mend Pet
                     if (WoW.HasPet
                         && WoW.CanCast("Mend Pet")
-                        && WoW.PetHealthPercent <= 70
+                        && WoW.HealthPercent != 0
+                        && WoW.PetHealthPercent <= 75
                         && !PlayerHasBuff("Feign Death"))
                     {
                         WoW.CastSpell("Mend Pet");
                         return;
                     }
                 }
-                //Thread.Sleep(25);
             }
         }
 
@@ -1074,8 +1096,8 @@ local Spec = {
 	[66] = 0.20,
 	[70] =0.21,
 	[256] = 0.22,
-	[257]=.23,
-	[257] =0.24,
+	[257]=0.23,
+	[258] =0.24,
 	[259] =0.25,
 	[260] =0.26,
 	[261] = 0.27,
@@ -1729,6 +1751,8 @@ local function HealinEventHandler(self,event, ...)
 		CharRaceUpdate()
         HasteInfoUpdate()
 		Talents()
+		updatePower()
+        updateUnitPower()
 		TurnOnPlates()
 		updateSetBonus()
 	end
@@ -1737,6 +1761,8 @@ local function HealinEventHandler(self,event, ...)
 		ClearNamePlates()
 		CharRaceUpdate()
 		Talents()
+        updatePower()
+        updateUnitPower()
 		UpdateMana()
 		updateCombat()
 		updateSetBonus()
@@ -2141,13 +2167,13 @@ AddonAuthor=Sorcerer
 AddonName=Quartz
 WoWVersion=Legion - 70100
 [SpellBook.db]
-Spell,136,Mend Pet,D8
-Spell,982,Revive Pet,D8
-Spell,883,Call Pet,D7
+Spell,136,Mend Pet,D0
+Spell,982,Revive Pet,D0
+Spell,883,Call Pet,OemMinus
 Spell,5512,Healthstone,D1
 Spell,127834,Potion,D1
-Spell,19577,Intimidation,D9
-Spell,109248,Binding Shot,D9
+Spell,19577,Intimidation,D7
+Spell,109248,Binding Shot,D7
 Spell,193455,Cobra Shot,NumPad2
 Spell,109304,Exhilaration,NumPad7
 Spell,120679,Dire Beast,NumPad1
@@ -2159,12 +2185,14 @@ Spell,194386,Voley,NumPad4
 Spell,2643,Multi-Shot,NumPad5
 Spell,207068,Titan's Thunder,Add
 Spell,19574,Bestial Wrath,NumPad9
-Spell,55709,Heart of the Phoenix,D8
-Spell,144259,Kil'jaeden's Burning Wish,D2
+Spell,55709,Heart of the Phoenix,D0
+Spell,144259,Kil'jaeden's Burning Wish,
 Spell,193530,Aspect of the Wild,Divide
 Spell,53209,Chimaera Shot,D0
 Spell,201430,Stampede,NumPad6
 Spell,147362,Counter Shot,Decimal
+Spell,187650,Freezing Trap,D8
+Spell,187698,Tar Trap,D9
 Aura,120694,Dire Beast
 Aura,5384,Feign Death
 Aura,19574,Bestial Wrath
