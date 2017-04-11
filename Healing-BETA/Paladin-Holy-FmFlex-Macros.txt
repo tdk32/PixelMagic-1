@@ -1,0 +1,58 @@
+Addon needed : long macros
+https://mods.curse.com/addons/wow/long-macros
+
+Type /lm to open long macro screen
+
+#showtooltip Bestow Faith
+/cast [mod:shift,mod:alt,@player] Bestow Faith;[mod:ctrl,mod:alt,@party4] Bestow Faith;[mod:shift,@party1] Bestow Faith;[mod:alt,@party2] Bestow Faith;[mod:ctrl,@party3] Bestow Faith; Bestow Faith
+
+#showtooltip Flash of Light
+/cast  [mod:shift,mod:alt,@player] Flash of Light;[mod:ctrl,mod:alt,@party4] Flash of Light;[mod:shift,@party1] Flash of Light;[mod:alt,@party2] Flash of Light;[mod:ctrl,@party3] Flash of Light; Flash of Light
+
+#showtooltip Holy Light
+/cast [mod:shift,mod:alt,@player] Holy Light;[mod:ctrl,mod:alt,@party4] Holy Light;[mod:shift,@party1] Holy Light;[mod:alt,@party2] Holy Light;[mod:ctrl,@party3] Holy Light; Holy Light
+
+#showtooltip Holy Shock
+/cast [mod:shift,mod:alt,@player] Holy Shock;[mod:ctrl,mod:alt,@party4] Holy Shock;[mod:shift,@party1] Holy Shock;[mod:alt,@party2] Holy Shock;[mod:ctrl,@party3] Holy Shock; Holy Shock
+
+#showtooltip Lay on Hands
+/cast [mod:shift,mod:alt,@player] Lay on Hands;[mod:ctrl,mod:alt,@party4] Lay on Hands;[mod:shift,@party1] Lay on Hands;[mod:alt,@party2] Lay on Hands;[mod:ctrl,@party3] Lay on Hands; Lay on Hands
+
+#showtooltip Light of the Martyr
+/cast [mod:ctrl,mod:alt,@party4] Light of the Martyr;[mod:shift,@party1] Light of the Martyr;[mod:alt,@party2] Light of the Martyr;[mod:ctrl,@party3] Light of the Martyr;  Light of the Martyr
+
+#showtooltip Beacon of Light
+/cast [mod:shift,mod:alt,@player] Beacon of Light;[mod:ctrl,mod:alt,@party4] Beacon of Light;[mod:shift,@party1] Beacon of Light;[mod:alt,@party2] Beacon of Light;[mod:ctrl,@party3] Beacon of Light; Beacon of Light
+
+#showtooltip Blessing of Protection
+/cast [mod:shift,mod:alt,@player] Blessing of Protection;[mod:ctrl,mod:alt,@party4] Blessing of Protection;[mod:shift,@party1] Blessing of Protection;[mod:alt,@party2] Blessing of Protection;[mod:ctrl,@party3] Blessing of Protection; Blessing of Protection
+
+#showtooltip Blessing of Sacrifice
+/cast [mod:shift,mod:alt,@player] Blessing of Sacrifice;[mod:ctrl,mod:alt,@party4] Blessing of Sacrifice;[mod:shift,@party1] Blessing of Sacrifice;[mod:alt,@party2] Blessing of Sacrifice;[mod:ctrl,@party3] Blessing of Sacrifice; Blessing of Sacrifice
+
+/target [group:raid,@raid1]
+/target [mod:alt,group:raid,@raid2]
+/target [mod:ctrl,group:raid,@raid3]
+/target [mod:shift,group:raid,@raid4]
+/target [mod:shift,mod:ctrl,group:raid,@raid5]
+/target [mod:shift,mod:alt,group:raid,@raid6]
+/target [mod:ctrl,mod:alt,group:raid,@raid7]
+/target [mod:ctrl,mod:alt,mod:shift,group:raid,@raid8]
+
+/target [group:raid,@raid9]
+/target [mod:alt,group:raid,@raid10]
+/target [mod:ctrl,group:raid,@raid11]
+/target [mod:shift,group:raid,@raid12]
+/target [mod:shift,mod:ctrl,group:raid,@raid13]
+/target [mod:shift,mod:alt,group:raid,@raid14]
+/target [mod:ctrl,mod:alt,group:raid,@raid15]
+/target [mod:ctrl,mod:alt,mod:shift,group:raid,@raid16]
+
+/target [group:raid,@raid17]
+/target [mod:alt,group:raid,@raid18]
+/target [mod:ctrl,group:raid,@raid19]
+/target [mod:shift,group:raid,@raid20]
+/target [mod:shift,mod:ctrl,group:raid,@raid21]
+/target [mod:shift,mod:alt,group:raid,@raid22]
+/target [mod:ctrl,mod:alt,group:raid,@raid23]
+/target [mod:ctrl,mod:alt,mod:shift,group:raid,@raid24]
