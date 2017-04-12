@@ -347,20 +347,22 @@ namespace PixelMagic.Rotation
 						WoW.CastSpell("Blood Fury");
 						return;
                     }
-					if (WoW.CanCast("Kill Command") && WoW.Focus >= 100 && WoW.IsSpellInRange("Kill Command"))
+					if (WoW.CanCast("Kill Command") && WoW.Focus >= 90 && WoW.IsSpellInRange("Kill Command"))
                     {
                         WoW.CastSpell("Kill Command");
                         return;
                     }
-                    if (WoW.CanCast("Dire Beast") && WoW.IsSpellInRange("Dire Beast") && !WoW.IsSpellOnCooldown("Dire Beast") && WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 3)
-                    {
-                        WoW.CastSpell("Dire Beast");
-						if (WoW.CanCast("Titan's Thunder") && !WoW.IsSpellOnCooldown("Titan's Thunder"))
-						{
+                    if (WoW.CanCast("Titan's Thunder") && !WoW.IsSpellOnCooldown("Titan's Thunder"))
+					{
                         WoW.CastSpell("Titan's Thunder");
+						return;
+					}
+                    if (WoW.CanCast("Dire Frenzy") && WoW.IsSpellInRange("Dire Frenzy") && !WoW.IsSpellOnCooldown("Dire Frenzy") && WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 3)
+                    {
+                        WoW.CastSpell("Dire Frenzy");
+						
                         return;
-						}
-                    }
+					}
                     if (WoW.CanCast("Kill Command") && WoW.Focus >= 30 && WoW.IsSpellInRange("Kill Command"))
                     {
                         WoW.CastSpell("Kill Command");
@@ -478,15 +480,17 @@ namespace PixelMagic.Rotation
 						WoW.CastSpell("Blood Fury");
 						return;
                     }
-					if (WoW.CanCast("Dire Beast") && WoW.IsSpellInRange("Dire Beast") && !WoW.IsSpellOnCooldown("Dire Beast") && !(WoW.SpellCooldownTimeRemaining("Bestial Wrath") <= 3))
-                    {
-                        WoW.CastSpell("Dire Beast");
-						if (WoW.CanCast("Titan's Thunder") && !WoW.IsSpellOnCooldown("Titan's Thunder"))
-						{
+					if (WoW.CanCast("Titan's Thunder") && !WoW.IsSpellOnCooldown("Titan's Thunder"))
+					{
                         WoW.CastSpell("Titan's Thunder");
+						return;
+					}
+                    if (WoW.CanCast("Dire Frenzy") && WoW.IsSpellInRange("Dire Frenzy") && !WoW.IsSpellOnCooldown("Dire Frenzy") && WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 3)
+                    {
+                        WoW.CastSpell("Dire Frenzy");
+						
                         return;
-						}
-                    }		//Z Key Multi Shot Spam			
+					}		//Z Key Multi Shot Spam			
 					if (WoW.CanCast("Multi-Shot") && (WoW.Focus >= 40) && WoW.IsSpellInRange("Multi-Shot") && (DetectKeyPress.GetKeyState(0x5A) < 0))  //Z key press
 					{
                             WoW.CastSpell("Multi-Shot");
