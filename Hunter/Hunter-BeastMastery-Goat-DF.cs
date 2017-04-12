@@ -331,7 +331,7 @@ namespace PixelMagic.Rotation
                             return;
                         }	
 					}	
-					if (WoW.CanCast("Bestial Wrath") && WoW.Focus >= 119 && WoW.IsSpellInRange("Cobra Shot") && !WoW.PlayerHasBuff("Turtle") && !WoW.IsSpellOnCooldown("Bestial Wrath"))
+					if (WoW.CanCast("Bestial Wrath") && WoW.Focus >= 90 && WoW.IsSpellInRange("Cobra Shot") && !WoW.PlayerHasBuff("Turtle") && !WoW.IsSpellOnCooldown("Bestial Wrath") && WoW.SpellCooldownTimeRemaining("Kill Command") <= 1)
                     {
                         WoW.CastSpell("Bestial Wrath");
                         return;
@@ -357,7 +357,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Titan's Thunder");
 						return;
 					}
-                    if (WoW.CanCast("Dire Frenzy") && WoW.IsSpellInRange("Dire Frenzy") && !WoW.IsSpellOnCooldown("Dire Frenzy") && WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 3)
+                    if (WoW.CanCast("Dire Frenzy") && WoW.IsSpellInRange("Kill Command") && !WoW.IsSpellOnCooldown("Dire Frenzy") && WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 3)
                     {
                         WoW.CastSpell("Dire Frenzy");
 						
@@ -485,7 +485,7 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Titan's Thunder");
 						return;
 					}
-                    if (WoW.CanCast("Dire Frenzy") && WoW.IsSpellInRange("Dire Frenzy") && !WoW.IsSpellOnCooldown("Dire Frenzy") && WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 3)
+                    if (WoW.CanCast("Dire Frenzy") && WoW.IsSpellInRange("Kill Command") && !WoW.IsSpellOnCooldown("Dire Frenzy") && WoW.SpellCooldownTimeRemaining("Bestial Wrath") >= 3)
                     {
                         WoW.CastSpell("Dire Frenzy");
 						
