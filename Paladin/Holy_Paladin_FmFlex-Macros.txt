@@ -1,7 +1,36 @@
-Addon needed : long macros
-https://mods.curse.com/addons/wow/long-macros
+Addon needed : macro toolkit
+https://mods.curse.com/addons/wow/Macro-Toolkit
 
-Type /lm to open long macro screen
+The file custom lua has to be in the same folder than PM exe. 
+
+IF YOU WANT TO OFFER ME A BEER : Paypal DONATION LINK
+https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=SH8GVLUVFD6M4&lc=BE&item_name=FmFlex%20Rotation&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
+
+NO GUI ATM  
+You can tweak the rotation from the following parameters :
+        public bool isTalentBestowFaith = true;
+		private bool isTalentJoL = true;
+        public static int minHealingHP = 90;
+        public static int minTankPriorityHP = 30;
+        public static int minSelfPriorityHP = 20;
+
+        public static int FlashofLightHp = 70;
+        public static int HolyLightHp = 90;
+        public static int HolyShockHp = 90;
+        public static int LightoftheMartyrHp = 60;
+        public static int DivineShieldHp = 40;
+        public static int BlessingofProtectionHp = 40;
+        public static int BlessingofSacrificeHp = 40;
+        public static int LayonHandsHp = 20;
+        public static int BestowFaithHp = 80;
+        public static int BeaconOfVertueHp = 50
+		
+SINGLE target mode = Healing and dps whenever its possible (Best mode)
+AOE mode = DPS only
+CLEAVE mode = Healing only		
+CURRENTLY NO SUPPORT FOR BEACON OF VERTUE
+		
+Assign the spell to the following macro:		
 
 #showtooltip Bestow Faith
 /cast [mod:shift,mod:alt,@player] Bestow Faith;[mod:ctrl,mod:alt,@party4] Bestow Faith;[mod:shift,@party1] Bestow Faith;[mod:alt,@party2] Bestow Faith;[mod:ctrl,@party3] Bestow Faith; Bestow Faith
@@ -30,6 +59,9 @@ Type /lm to open long macro screen
 #showtooltip Blessing of Sacrifice
 /cast [mod:shift,mod:alt,@player] Blessing of Sacrifice;[mod:ctrl,mod:alt,@party4] Blessing of Sacrifice;[mod:shift,@party1] Blessing of Sacrifice;[mod:alt,@party2] Blessing of Sacrifice;[mod:ctrl,@party3] Blessing of Sacrifice; Blessing of Sacrifice
 
+/use [@targettarget,harm,nodead][]Judgment
+
+target0
 /target [group:raid,@raid1]
 /target [mod:alt,group:raid,@raid2]
 /target [mod:ctrl,group:raid,@raid3]
@@ -39,6 +71,7 @@ Type /lm to open long macro screen
 /target [mod:ctrl,mod:alt,group:raid,@raid7]
 /target [mod:ctrl,mod:alt,mod:shift,group:raid,@raid8]
 
+target1
 /target [group:raid,@raid9]
 /target [mod:alt,group:raid,@raid10]
 /target [mod:ctrl,group:raid,@raid11]
@@ -48,6 +81,7 @@ Type /lm to open long macro screen
 /target [mod:ctrl,mod:alt,group:raid,@raid15]
 /target [mod:ctrl,mod:alt,mod:shift,group:raid,@raid16]
 
+target2
 /target [group:raid,@raid17]
 /target [mod:alt,group:raid,@raid18]
 /target [mod:ctrl,group:raid,@raid19]
@@ -56,3 +90,7 @@ Type /lm to open long macro screen
 /target [mod:shift,mod:alt,group:raid,@raid22]
 /target [mod:ctrl,mod:alt,group:raid,@raid23]
 /target [mod:ctrl,mod:alt,mod:shift,group:raid,@raid24]
+
+stopcasting
+/stopcasting
+/cleartarget
