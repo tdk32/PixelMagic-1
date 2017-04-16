@@ -11,6 +11,10 @@ namespace PixelMagic.Rotation
 {
     public class BMHunterVectarius : CombatRoutine
     {
+		//Pet Control	
+		private CheckBox HealPetBox;
+		// Items
+		private CheckBox KilJaedenBox;			
 		// Races
 		private CheckBox BloodElfBox;
 		private CheckBox OrcBox;		
@@ -63,6 +67,30 @@ namespace PixelMagic.Rotation
 		private CheckBox Preset5Box;
 		private CheckBox Preset6Box;
 
+				        private static bool KilJaeden
+        {
+            get
+            {
+                var KilJaeden = ConfigFile.ReadValue("HunterBeastmastery", "KilJaeden").Trim();
+
+                return KilJaeden != "" && Convert.ToBoolean(KilJaeden);
+            }
+            set { ConfigFile.WriteValue("HunterBeastmastery", "KilJaeden", value.ToString()); }
+        }	
+		
+        private static bool HealPet
+        {
+            get
+            {
+                var HealPet = ConfigFile.ReadValue("HunterBeastmastery", "HealPet").Trim();
+
+                return HealPet != "" && Convert.ToBoolean(HealPet);
+            }
+            set { ConfigFile.WriteValue("HunterBeastmastery", "HealPet", value.ToString()); }
+        }
+		
+		
+		
 		        private static bool BloodElf
         {
             get
@@ -430,7 +458,7 @@ namespace PixelMagic.Rotation
                 Text = "Beast Mastery Hunter",
                 StartPosition = FormStartPosition.CenterScreen,
                 Width = 1000,
-                Height = 600,
+                Height = 650,
                 ShowIcon = false
             };
 
@@ -440,7 +468,7 @@ namespace PixelMagic.Rotation
 			var lblTitle = new Label
             {
                 Text =
-                    "BM Hunter by Vectarius - Thank you Lesion!",
+                    "BM Hunter by Vectarius",
                 Size = new Size(270, 13),
                 Left = 61,
                 Top = 1
@@ -624,6 +652,28 @@ namespace PixelMagic.Rotation
 			lblTextBox4.ForeColor = Color.Black;
 			 SettingsForm.Controls.Add(lblTextBox4);
 			 
+						var lblTextBox5 = new Label
+            {
+                Text =
+                    "Pet Control",
+                Size = new Size(200, 17),
+                Left = 70,
+                Top = 475
+            };
+			lblTextBox5.ForeColor = Color.Black;
+			 SettingsForm.Controls.Add(lblTextBox5);			 
+
+						var lblTextBox6 = new Label
+            {
+                Text =
+                    "Items",
+                Size = new Size(200, 17),
+                Left = 70,
+                Top = 525
+            };
+			lblTextBox6.ForeColor = Color.Black;
+			 SettingsForm.Controls.Add(lblTextBox6);
+			 
 			var lblBloodElfBox = new Label
             {
                 Text =
@@ -648,11 +698,29 @@ namespace PixelMagic.Rotation
 			lblOrcBox.ForeColor = Color.Black;
             SettingsForm.Controls.Add(lblOrcBox);
 
-
-
-
-
+			var lblHealPetBox = new Label
+            {
+                Text =
+                    "Heal Pet",
+                Size = new Size(270, 15),
+                Left = 100,
+                Top = 500
+            };
 			
+			lblHealPetBox.ForeColor = Color.Black;
+            SettingsForm.Controls.Add(lblHealPetBox);	
+
+			var lblKilJaedenBox = new Label
+            {
+                Text =
+                    "Kil'Jaeden's Burning Wish",
+                Size = new Size(270, 15),
+                Left = 100,
+                Top = 550
+            };
+			
+			lblKilJaedenBox.ForeColor = Color.Black;
+            SettingsForm.Controls.Add(lblKilJaedenBox);			
 		   
 			var lblDiscordBox = new Label
             {
@@ -668,14 +736,21 @@ namespace PixelMagic.Rotation
 			
 			
 			
-			var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 5, Top = 525, Size = new Size(120, 31)};
+			var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 5, Top = 575, Size = new Size(120, 31)};
 			
-			var cmdReadme = new Button {Text = "Macros! Use Them", Width = 65, Height = 25, Left = 125, Top = 525, Size = new Size(120, 31)};
+			var cmdReadme = new Button {Text = "Macros! Use Them", Width = 65, Height = 25, Left = 125, Top = 575, Size = new Size(120, 31)};
 			
             BloodElfBox = new CheckBox {Checked = BloodElf, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 425};		
             SettingsForm.Controls.Add(BloodElfBox);
 			OrcBox = new CheckBox {Checked = Orc, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 450};			
             SettingsForm.Controls.Add(OrcBox);
+
+//items
+            KilJaedenBox = new CheckBox {Checked = KilJaeden, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 550};		
+            SettingsForm.Controls.Add(KilJaedenBox);
+//pet control			
+			HealPetBox = new CheckBox {Checked = HealPet, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 500};			
+            SettingsForm.Controls.Add(HealPetBox);
 			
 			// Checkboxes
             CounterShotBox = new CheckBox {Checked = CounterShot, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 300};		
@@ -806,6 +881,9 @@ namespace PixelMagic.Rotation
             OrcBox.CheckedChanged += Orc_Click;    
             BloodElfBox.CheckedChanged += BloodElf_Click;			
 			
+            KilJaedenBox.CheckedChanged += KilJaeden_Click;    
+            HealPetBox.CheckedChanged += HealPet_Click;				
+			
             AspectoftheWildBox.CheckedChanged += AspectoftheWild_Click;    
             ExhilarationBox.CheckedChanged += Exhilaration_Click; 
             CounterShotBox.CheckedChanged += CounterShot_Click;
@@ -849,12 +927,17 @@ namespace PixelMagic.Rotation
 			lblTextBox.BringToFront();
 			lblTextBox2.BringToFront();
 			lblTextBox3.BringToFront();		
-			lblTextBox4.BringToFront();				
+			lblTextBox4.BringToFront();		
+			lblTextBox5.BringToFront();		
+			lblTextBox6.BringToFront();				
 			lblTitle.BringToFront();
 
 
             BloodElfBox.BringToFront();	
             OrcBox.BringToFront();	
+			
+            KilJaedenBox.BringToFront();	
+            HealPetBox.BringToFront();				
 			
             AspectoftheWildBox.BringToFront();	
             CounterShotBox.BringToFront();	
@@ -898,7 +981,10 @@ namespace PixelMagic.Rotation
 			private void CmdSave_Click(object sender, EventArgs e)
         {
             BloodElf = BloodElfBox.Checked;		
-            Orc = OrcBox.Checked;				
+            Orc = OrcBox.Checked;	
+
+            KilJaeden = KilJaedenBox.Checked;		
+            HealPet = HealPetBox.Checked;				
 			
             AspectoftheWild = AspectoftheWildBox.Checked;		
             CounterShot = CounterShotBox.Checked;	
@@ -944,7 +1030,7 @@ namespace PixelMagic.Rotation
 		private void CmdReadme_Click(object sender, EventArgs e)
         {
             MessageBox.Show(
-                " no macros <.<",
+                " make sure you make macros of Kill Command and Dire Frenzy/Beast /petattack",
                 "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 			// Checkboxes
@@ -957,7 +1043,18 @@ namespace PixelMagic.Rotation
         {
             Orc = OrcBox.Checked;
         }			
+//items
+		private void KilJaeden_Click(object sender, EventArgs e)
+        {
+            KilJaeden = KilJaedenBox.Checked;
+        }			
 			
+//pet control			
+		private void HealPet_Click(object sender, EventArgs e)
+        {
+            HealPet = HealPetBox.Checked;
+        }	
+
 			
 		private void CounterShot_Click(object sender, EventArgs e)
         {
@@ -1389,7 +1486,7 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
 						return;
 					}
 */					
-					if (WoW.PetHealthPercent <= 90 && !WoW.PetHasBuff("Heal Pet") && WoW.CanCast("Revive Pet") && !WoW.IsMoving)
+					if (WoW.PetHealthPercent <= 90 && HealPet && !WoW.PetHasBuff("Heal Pet") && WoW.CanCast("Revive Pet") && !WoW.IsMoving)
 					{
 						WoW.CastSpell("Heal Pet") ;
 						return;
@@ -1444,7 +1541,7 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
                         WoW.CastSpell("Blood Fury");
                         return;
                     }					
-					if (WoW.CanCast("Kil'jaeden's Burning Wish") && !WoW.ItemOnCooldown("Kil'jaeden's Burning Wish") && !WoW.IsSpellOnCooldown("Kil'jaeden's Burning Wish"))  
+					if (WoW.CanCast("Kil'jaeden's Burning Wish") && KilJaeden && !WoW.ItemOnCooldown("Kil'jaeden's Burning Wish") && !WoW.IsSpellOnCooldown("Kil'jaeden's Burning Wish"))  
                     {
                         WoW.CastSpell("Kil'jaeden's Burning Wish");
                         return;
@@ -1500,6 +1597,16 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
                         return;
 						}
 					}
+					if (WoW.CanCast("Chimaera Shot") 
+						&& WoW.Focus <90
+						&& WoW.IsSpellOnCooldown("Dire Frenzy")
+						&& WoW.IsSpellOnCooldown("Kill Command")						
+						&& WoW.CanCast("Chimaera Shot")
+						&& ChimaeraShot)
+						{
+                        WoW.CastSpell("Chimaera Shot");
+                        return;
+						}						
 					if (WoW.CanCast("Titan's Thunder") 
 						&& !WoW.IsSpellOnCooldown("Titan's Thunder") 
 						&& !WoW.IsSpellOnCooldown("Dire Frenzy")
@@ -1536,7 +1643,18 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
                     {
                         WoW.CastSpell("Cobra Shot");
                         return;
-                    }					
+                    }	
+					if (WoW.CanCast("Cobra Shot") 
+						&& (WoW.Focus >= 32) 
+						&& WoW.IsSpellInRange("Cobra Shot") 
+						&& WoW.PlayerHasBuff("Bestial Wrath") 
+						&& WoW.PlayerBuffTimeRemaining("Bestial Wrath") <= 2
+						&& WoW.IsSpellOnCooldown("Kill Command") 
+						&& WoW.SpellCooldownTimeRemaining("Kill Command") > 1.3)
+                    {
+                        WoW.CastSpell("Cobra Shot");
+                        return;
+                    }						
 					if (WoW.CanCast("Cobra Shot") 
 						&& (WoW.Focus >= 90) 
 						&& WoW.IsSpellInRange("Cobra Shot") 
@@ -1592,7 +1710,8 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
 					}
 				
 					if (WoW.PetHealthPercent <= 90 
-						&& !WoW.PetHasBuff("Heal Pet") 
+						&& !WoW.PetHasBuff("Heal Pet")
+						&& HealPet						
 						&& WoW.CanCast("Revive Pet") 
 						&& !WoW.IsMoving)
 					{
@@ -1620,7 +1739,7 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
                             return;
                         }	
 					}
-					if (WoW.CanCast("Kil'jaeden's Burning Wish") && !WoW.ItemOnCooldown("Kil'jaeden's Burning Wish") && !WoW.IsSpellOnCooldown("Kil'jaeden's Burning Wish"))  
+					if (WoW.CanCast("Kil'jaeden's Burning Wish") && KilJaeden && !WoW.ItemOnCooldown("Kil'jaeden's Burning Wish") && !WoW.IsSpellOnCooldown("Kil'jaeden's Burning Wish"))  
                     {
                         WoW.CastSpell("Kil'jaeden's Burning Wish");
                         return;
@@ -1655,7 +1774,17 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
                     {
                         WoW.CastSpell("Barrage");
                         return;
-                    }		
+                    }	
+					if (WoW.CanCast("Chimaera Shot") 
+						&& WoW.Focus <90
+						&& WoW.IsSpellOnCooldown("Dire Frenzy")
+						&& WoW.IsSpellOnCooldown("Kill Command")						
+						&& WoW.CanCast("Chimaera Shot")
+						&& ChimaeraShot)
+						{
+                        WoW.CastSpell("Chimaera Shot");
+                        return;
+						}					
 					if (WoW.CanCast("A Murder of Crows") 
 						&& MurderofCrows
 						&& WoW.Focus >= 25 
@@ -1832,7 +1961,7 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
 						return;
 					}
 */					
-					if (WoW.PetHealthPercent <= 90 && !WoW.PetHasBuff("Heal Pet") && WoW.CanCast("Revive Pet") && !WoW.IsMoving)
+					if (WoW.PetHealthPercent <= 90 && HealPet && !WoW.PetHasBuff("Heal Pet") && WoW.CanCast("Revive Pet") && !WoW.IsMoving)
 					{
 						WoW.CastSpell("Heal Pet") ;
 						return;
@@ -1888,7 +2017,7 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
                         WoW.CastSpell("Blood Fury");
                         return;
                     }					
-					if (WoW.CanCast("Kil'jaeden's Burning Wish") && !WoW.ItemOnCooldown("Kil'jaeden's Burning Wish") && !WoW.IsSpellOnCooldown("Kil'jaeden's Burning Wish"))  
+					if (WoW.CanCast("Kil'jaeden's Burning Wish") && KilJaeden && !WoW.ItemOnCooldown("Kil'jaeden's Burning Wish") && !WoW.IsSpellOnCooldown("Kil'jaeden's Burning Wish"))  
                     {
                         WoW.CastSpell("Kil'jaeden's Burning Wish");
                         return;
@@ -1929,6 +2058,16 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
                         WoW.CastSpell("Aspect of the Wild");
 						return;
                     }	
+					if (WoW.CanCast("Chimaera Shot") 
+						&& WoW.Focus <90
+						&& WoW.IsSpellOnCooldown("Dire Frenzy")
+						&& WoW.IsSpellOnCooldown("Kill Command")						
+						&& WoW.CanCast("Chimaera Shot")
+						&& ChimaeraShot)
+						{
+                        WoW.CastSpell("Chimaera Shot");
+                        return;
+						}					
 					if (WoW.CanCast("Dire Beast") 
 						&& WoW.IsSpellInRange("Cobra Shot") 
 					&& (Stomp || ChimaeraShot)
@@ -1975,6 +2114,17 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
 						&& (WoW.Focus >= 50) 
 						&& WoW.IsSpellInRange("Cobra Shot") 
 						&& WoW.PlayerHasBuff("Bestial Wrath") 
+						&& WoW.IsSpellOnCooldown("Kill Command") 
+						&& WoW.SpellCooldownTimeRemaining("Kill Command") > 1.3)
+                    {
+                        WoW.CastSpell("Cobra Shot");
+                        return;
+                    }
+					if (WoW.CanCast("Cobra Shot") 
+						&& (WoW.Focus >= 32) 
+						&& WoW.IsSpellInRange("Cobra Shot") 
+						&& WoW.PlayerHasBuff("Bestial Wrath") 
+						&& WoW.PlayerBuffTimeRemaining("Bestial Wrath") <= 2
 						&& WoW.IsSpellOnCooldown("Kill Command") 
 						&& WoW.SpellCooldownTimeRemaining("Kill Command") > 1.3)
                     {
@@ -2033,6 +2183,7 @@ Spell,136,Heal Pet,X
 Spell,144259,Kil'jaeden's Burning Wish,F4
 Spell,194386,Volley,F
 Spell,80483,Arcane Torrent,F3
+Spell,53209,Chimaera Shot,none
 Aura,186265,AspectoftheTurtle
 Aura,136,Heal Pet
 Aura,11196,Bandaged
