@@ -12,7 +12,7 @@ namespace PixelMagic.Rotation
     public class DKFrostMGFmflex : CombatRoutine
     {
 
-        private string gcdTime = "1.245";
+        private string gcdTime = "1.2";
         private bool AddonEdited = false;
 
         private bool haveCoF = true;
@@ -263,6 +263,7 @@ namespace PixelMagic.Rotation
         public override void Initialize()
         {
             Log.Write("Welcome to the Frost DK by Fmflex - fixed by smartie", Color.Green);
+			Log.Write("Hold down Z key (Y for US) for Sindragosa's Fury", Color.Red);
             SettingsFormDFF = new SettingsFormDFF();
             SettingsForm = SettingsFormDFF;
 
@@ -279,7 +280,8 @@ namespace PixelMagic.Rotation
             SettingsFormDFF.checkHotkeysFrostIceboundFortitude.Checked = isCheckHotkeysFrostIceboundFortitude;
             SettingsFormDFF.checkHotkeysFrostIFPercent.Text = FrostIceboundHPPercent.ToString();
             SettingsFormDFF.checkHotkeysFrostAMSPercent.Text = FrostAMSHPPercent.ToString();
-            try
+
+			try
 			{
 			}
             catch (Exception ex)
@@ -439,9 +441,9 @@ namespace PixelMagic.Rotation
                 {
                     WoW.CastSpell("Mind Freeze");
                 }
-                if (WoW.CanCast("Sindragosa Airline") && (DetectKeyPress.GetKeyState(0x5A) < 0))
+                if (WoW.CanCast("Sindragosa's Fury") && (DetectKeyPress.GetKeyState(0x5A) < 0))
                 {																
-                    WoW.CastSpell("Sindragosa Airline");
+                    WoW.CastSpell("Sindragosa's Fury");
                     return;
                 }
                 if (CanCastNoRange("Anti-Magic Shell") && WoW.HealthPercent <= FrostAMSHPPercent && !WoW.IsSpellOnCooldown("Anti-Magic Shell") && isCheckHotkeysFrostIceboundFortitude)
@@ -707,6 +709,11 @@ namespace PixelMagic.Rotation
                 {
                     WoW.CastSpell("Death Strike");
                 }
+				if (WoW.CanCast("Sindragosa's Fury") && (DetectKeyPress.GetKeyState(0x5A) < 0))
+                {																
+                    WoW.CastSpell("Sindragosa's Fury");
+                    return;
+                }
             }
         }
 
@@ -751,7 +758,6 @@ namespace PixelMagic.Rotation
         private readonly GroupBox groupBox12;
         private readonly GroupBox groupBox13;
         private readonly GroupBox groupBox22;
-        private readonly GroupBox groupBoxKick;
         private readonly Label spellIdLabel;
         public ListBox spellList;
         public TextBox spellText;
@@ -759,7 +765,6 @@ namespace PixelMagic.Rotation
         public TabPage tabPage2;
         private readonly TabPage tabPage5;
 
-        private readonly TabPage tabPageKick;
 
         #region Windows Form Designer generated code
 
@@ -769,8 +774,6 @@ namespace PixelMagic.Rotation
         /// </summary>
         public SettingsFormDFF()
         {
-            this.tabPageKick = new System.Windows.Forms.TabPage();
-            this.groupBoxKick = new System.Windows.Forms.GroupBox();
             this.spellList = new System.Windows.Forms.ListBox();
             this.spellText = new System.Windows.Forms.TextBox();
             this.spellIdLabel = new System.Windows.Forms.Label();
@@ -796,38 +799,12 @@ namespace PixelMagic.Rotation
             this.btnHotkeysFrostOffensiveCooldowns = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabControl3 = new System.Windows.Forms.TabControl();
-            this.tabPageKick.SuspendLayout();
             this.tabPage5.SuspendLayout();
             this.groupBox12.SuspendLayout();
             this.groupBox22.SuspendLayout();
             this.groupBox13.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabControl3.SuspendLayout();
-            // 
-            // tabPageKick
-            // 
-            this.tabPageKick.Controls.Add(this.groupBoxKick);
-            this.tabPageKick.Location = new System.Drawing.Point(4, 22);
-            this.tabPageKick.Name = "tabPageKick";
-            this.tabPageKick.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageKick.Size = new System.Drawing.Size(582, 406);
-            this.tabPageKick.TabIndex = 6;
-            this.tabPageKick.Text = "Kick Settings";
-            this.tabPageKick.UseVisualStyleBackColor = true;
-            // 
-            // groupBoxKick
-            // 
-            this.groupBoxKick.Controls.Add(this.spellIdLabel);
-            this.groupBoxKick.Controls.Add(this.spellText);
-            this.groupBoxKick.Controls.Add(this.spellList);
-            this.groupBoxKick.Controls.Add(this.btnaddspell);
-            this.groupBoxKick.Controls.Add(this.btnremovespell);
-            this.groupBoxKick.Location = new System.Drawing.Point(8, 8);
-            this.groupBoxKick.Name = "groupBoxKick";
-            this.groupBoxKick.Size = new System.Drawing.Size(561, 380);
-            this.groupBoxKick.TabIndex = 2;
-            this.groupBoxKick.TabStop = false;
-            this.groupBoxKick.Text = "Spells to Kick";
             /*
             this.spellIdLabel = new System.Windows.Forms.Label();
             this.btnaddspell = new System.Windows.Forms.Button();
@@ -1090,7 +1067,6 @@ namespace PixelMagic.Rotation
             // 
             this.tabControl3.Controls.Add(this.tabPage5);
             this.tabControl3.Controls.Add(this.tabPage2);
-            this.tabControl3.Controls.Add(this.tabPageKick);
             this.tabControl3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl3.Location = new System.Drawing.Point(0, 0);
             this.tabControl3.Name = "tabControl3";
@@ -1106,7 +1082,6 @@ namespace PixelMagic.Rotation
             this.Controls.Add(this.tabControl3);
             this.Name = "SettingsForm";
             this.Text = "SettingsForm";
-            this.tabPageKick.ResumeLayout(false);
             this.tabPage5.ResumeLayout(false);
             this.groupBox12.ResumeLayout(false);
             this.groupBox12.PerformLayout();
@@ -1146,7 +1121,7 @@ Spell,207256,Obliteration,D9
 Spell,47528,Mind Freeze,F
 Spell,152279,Breath,D0
 Spell,57330,Horn,D6
-Spell,190778,Sindragosa Airline,D8
+Spell,190778,Sindragosa's Fury,D8
 Aura,51124,Killing Machine
 Aura,194879,Icy Talons
 Aura,55095,Frost Fever
