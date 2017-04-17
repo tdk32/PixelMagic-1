@@ -13,7 +13,6 @@ namespace PixelMagic.Rotation.DeathKnight.DK
         public string gcdTime = "0.7";
         public bool AddonEdited = false;
 
-        private static int[] spellToKick = { 0 };
         private int bonesStack;
         private readonly CheckBox checkIsTalentBloodDrinker = new CheckBox();
         private readonly CheckBox checkIsTalentBoneStorm = new CheckBox();
@@ -22,7 +21,6 @@ namespace PixelMagic.Rotation.DeathKnight.DK
         private bool isMelee;
         private bool renewBones;
         private int runicPower;
-        private TextBox spellToKickTextBox;
 
 
         public override string Name
@@ -53,19 +51,6 @@ namespace PixelMagic.Rotation.DeathKnight.DK
             set { ConfigFile.WriteValue("DKBlood", "isCDDefEnable", value.ToString()); }
         }
 
-        public static string spellToKickString
-        {
-            get
-            {
-                var spellToKickString = ConfigFile.ReadValue("DKBlood", "spellToKick").Trim();
-                if (spellToKickString != "")
-                {
-                    spellToKick = Array.ConvertAll(spellToKickString.Split(','), int.Parse);
-                }
-                return spellToKickString;
-            }
-            set { ConfigFile.WriteValue("DKBlood", "spellToKick", value); }
-        }
 
         public static bool isTalentBoneStorm
         {
@@ -128,23 +113,6 @@ namespace PixelMagic.Rotation.DeathKnight.DK
             //isCDDefEnableBox.Appearance = Appearance.Button;
             SettingsForm.Controls.Add(isCDDefEnableBox);
 
-            var labelSpellToKick = new Label //12; 114 LEFT is first value, Top is second.
-            {
-                Text = "Spell to kick ID: (separate them with comma)",
-                Size = new Size(350, 20), //81; 13
-                Left = 12,
-                Top = 140
-            };
-            labelSpellToKick.Font = new Font("Arial", 9.0f);
-            labelSpellToKick.BackColor = Color.Black;
-            labelSpellToKick.ForeColor = Color.White;
-            SettingsForm.Controls.Add(labelSpellToKick);
-
-            spellToKickTextBox = new TextBox { Text = spellToKickString, Size = new Size(350, 35), Left = 12, Top = 160 };
-            spellToKickTextBox.Multiline = true;
-
-            SettingsForm.Controls.Add(spellToKickTextBox);
-
             checkIsTalentBoneStorm.AutoSize = true;
             checkIsTalentBoneStorm.Location = new Point(12, 28);
             checkIsTalentBoneStorm.Name = "checkIsTalentBoneStorm";
@@ -168,17 +136,10 @@ namespace PixelMagic.Rotation.DeathKnight.DK
             SettingsForm.Controls.Add(checkIsTalentBloodDrinker);
             isCDDefEnableBox.CheckedChanged += isCDDefEnable_Click;
             labelIsCDDefEnable.BringToFront();
-            spellToKickTextBox.TextChanged += spellToKick_Click;
             checkIsTalentBoneStorm.CheckedChanged += checkIsTalentBoneStorm_Click;
             checkIsTalentBloodDrinker.CheckedChanged += checkIsTalentBloodDrinker_Click;
         }
 
-
-        private void spellToKick_Click(object sender, EventArgs e)
-        {
-            spellToKickString = spellToKickTextBox.Text;
-            spellToKick = Array.ConvertAll(spellToKickString.Split(','), int.Parse);
-        }
 
         private void isCDDefEnable_Click(object sender, EventArgs e)
         {
@@ -222,11 +183,6 @@ namespace PixelMagic.Rotation.DeathKnight.DK
                 {
                     if (isCDDefEnable)
                         useCDDef();
-                    if (WoW.TargetIsCasting && CanCastInRange("Mind Freeze") && isCastingListedSpell())
-                    {
-                        WoW.CastSpell("Mind Freeze");
-                        return;
-                    }
                     if ((renewBones || bonesStack < 3) && isMelee)
                     {
                         if (currentRunes >= 2)
@@ -288,11 +244,6 @@ namespace PixelMagic.Rotation.DeathKnight.DK
                 {
                     if (isCDDefEnable)
                         useCDDef();
-                    if (WoW.TargetIsCasting && CanCastInRange("Mind Freeze") && isCastingListedSpell())
-                    {
-                        WoW.CastSpell("Mind Freeze");
-                        return;
-                    }
                     if ((renewBones || bonesStack < 3) && isMelee)
                     {
                         if (currentRunes >= 2)
@@ -377,18 +328,6 @@ namespace PixelMagic.Rotation.DeathKnight.DK
             {
                 WoW.CastSpell("Vampiric Blood");
             }
-        }
-
-        public bool isCastingListedSpell()
-        {
-            foreach (var spellid in spellToKick)
-            {
-                if (WoW.TargetCastingSpellID == spellid)
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }
