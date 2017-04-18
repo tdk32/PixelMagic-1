@@ -7,6 +7,8 @@
 // - Sometimes overcapping Astral Power due PixelMagic not detecting Astral Power fast enough.
 // - Oneth's Intuition not yet coded to normal rotation, will do it next.
 // Changelog :
+// Version r31
+// - Fixed typo on AstralCommunion
 // Version r30
 // - Additional checks to Emerald Dreamcatcher rotation
 // Version r29
@@ -382,7 +384,7 @@ namespace PixelMagic.Rotation
 
             Log.Write("Natures Balance = " + NaturesBalance);
 			Log.Write("Incarnation = " + NaturesBalance);
-			Log.Write("Astral Communion = " + NaturesBalance);
+			Log.Write("Astral Communion = " + AstralCommunion);
             Log.Write("StellarFlare = " + StellarFlare);
             Log.Write("Healing under 30% HP = " + HealingLowHP);
             Log.Write("Renewal = " + Renewal);
