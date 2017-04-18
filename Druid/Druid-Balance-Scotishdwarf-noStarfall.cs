@@ -5,6 +5,8 @@
 // Balance Druid rotation by Scotishdwarf and Daniel
 // NOTE : THIS BUILD IS WITHOUT STARFALL, USER NEED TO USE IT MANUALLY
 // Changelog :
+// Version r32
+// - Removed Astral Communion from Emerald Dreamcatcher Rotation
 // Version r31
 // - Fixed typo on AstralCommunion
 // Version r30
@@ -542,12 +544,12 @@ namespace PixelMagic.Rotation
                 // Emerald Dreamcatcher Rotation
                 if (EmeraldDreamcatcher && WoW.IsInCombat && WoW.HasTarget && UseCooldowns && WoW.TargetIsEnemy && WoW.PlayerHasBuff("Moonkin"))
                 {
-                    // actions.ed=astral_communion,if=astral_power.deficit>=75&buff.the_emerald_dreamcatcher.up
-                    if (AstralCommunion && WoW.CurrentAstralPower <= 25 && WoW.PlayerHasBuff("EmeraldDreamcatcherBuff"));
-                    {
-                        WoW.CastSpell("AstralCommunion");
-                        return;
-                    }
+                    //// actions.ed=astral_communion,if=astral_power.deficit>=75&buff.the_emerald_dreamcatcher.up
+                    //if (AstralCommunion && WoW.CurrentAstralPower <= 25 && WoW.PlayerHasBuff("EmeraldDreamcatcherBuff"));
+                    //{
+                    //    WoW.CastSpell("AstralCommunion");
+                    //    return;
+                    //}
                     // actions.ed+=/incarnation,if=astral_power>=85&!buff.the_emerald_dreamcatcher.up|buff.bloodlust.up
                     if (Incarnation && WoW.CurrentAstralPower >= 85 && (!WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") || WoW.PlayerHasBuff("Bloodlust")));
                     {
