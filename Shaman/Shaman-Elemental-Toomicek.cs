@@ -1,4 +1,4 @@
-﻿// winifix@gmail.com
+// winifix@gmail.com
 // ReSharper disable UnusedMember.Global
 
 
@@ -10,9 +10,15 @@ namespace PixelMagic.Rotation
 {
     public class Elemental : CombatRoutine
     {
-        public override string Name => "Elemental Toomicek";
+		public override string Name
+        {
+            get { return "Elemental Toomicek"; }
+        }
 
-        public override string Class => "Shaman";
+        public override string Class
+        {
+            get { return "Shaman"; }
+        }
 
         public override Form SettingsForm { get; set; }
 
