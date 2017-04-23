@@ -795,7 +795,7 @@ namespace PixelMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Lesion
-AddonName=badgggggggggerui
+AddonName=RGB
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,23922,Shield Slam,D1
@@ -816,12 +816,12 @@ Spell,23920,SpellReflect,D0
 Spell,1719,Battle Cry,F2
 Spell,0,HealthPotion,D7
 Spell,1,Healthstone,D8
-Item,5512,Healthstone,D8
-Item,127834,HealthPotion,D7
 Aura,2565,Shield Block
 Aura,132168,ShockWavestun
 Aura,202573,Vengeance Revenge
 Aura,202574,Vengeance Ignore Pain
 Aura,190456,Ignore Pain
 Aura,203576,Dragon Scales
+Item,5512,Healthstone
+Item,127834,HealthPotion
 */

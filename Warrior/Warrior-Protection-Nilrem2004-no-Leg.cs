@@ -223,7 +223,7 @@ namespace PixelMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=WiNiFiX
-AddonName=PixelMagic
+AddonName=RGB
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,6343,Thunder Clap,V
