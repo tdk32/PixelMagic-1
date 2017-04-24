@@ -2,7 +2,7 @@
 // v2.0 fmflex rotation
 // v2.1 fixed for latest pm, removed kick settings, removed double reload
 // v2.2 added hotkey for Sindragosa's Fury
-// v2.3 added support for Legendary Ring
+// v2.3 added support for Legendary Ring thx @TWonderchild for helping me out here :-)
 
 using System;
 using System.ComponentModel;
