@@ -407,6 +407,8 @@ namespace PixelMagic.Rotation
             HSHPPercentValue.BringToFront();
             IVHPPercentValue.BringToFront();
 
+			Log.Write("Player Talents = " + WoW.Talent(1) + WoW.Talent(2) + WoW.Talent(3) + WoW.Talent(4) + WoW.Talent(5) + WoW.Talent(6) + WoW.Talent(7), Color.Green);
+			
             Log.Write("---------------------------------------------------------", Color.Blue);
             Log.Write("Interupt all 				= " + generalInterrupts, Color.Red);
             Log.Write("Mythic Plus				= " + mythicplusinterrupts, Color.Red);
@@ -623,10 +625,6 @@ namespace PixelMagic.Rotation
                                     WoW.CastSpell("SpellReflect");
                                     return;
                                 }
-
-                                //		WoW.CastSpell("Pummel");
-                                //WoW.CastSpell("SpellReflect");
-                                //return;
                             }
                         }
                     }
@@ -730,12 +728,6 @@ namespace PixelMagic.Rotation
                             return;
                         }
                     }
-                    //Re-add the lines below if you are swimmming in rage
-                    //
-                    //if (WoW.CanCast("Revenge") && WoW.Rage >= 34 && WoW.PlayerHasBuff("Vengeance Revenge") &&!WoW.IsSpellOnCooldown("Revenge"))
-                    //{
-                    //	WoW.CastSpell("Revenge");
-                    //}
 
                     //Rotational shiz
 
@@ -795,8 +787,8 @@ namespace PixelMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Lesion
-AddonName=RGB
-WoWVersion=Legion - 70100
+AddonName=PixelMagic
+WoWVersion=Legion - 70200
 [SpellBook.db]
 Spell,23922,Shield Slam,D1
 Spell,20243,Devastate,D2
@@ -816,12 +808,12 @@ Spell,23920,SpellReflect,D0
 Spell,1719,Battle Cry,F2
 Spell,0,HealthPotion,D7
 Spell,1,Healthstone,D8
+Item,5512,Healthstone,D8
+Item,127834,HealthPotion,D7
 Aura,2565,Shield Block
 Aura,132168,ShockWavestun
 Aura,202573,Vengeance Revenge
 Aura,202574,Vengeance Ignore Pain
 Aura,190456,Ignore Pain
 Aura,203576,Dragon Scales
-Item,5512,Healthstone
-Item,127834,HealthPotion
 */
