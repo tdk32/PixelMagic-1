@@ -1,7 +1,6 @@
 ﻿// winifix@gmail.com
 // ReSharper disable UnusedMember.Global
 
-
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
@@ -13,15 +12,24 @@ namespace PixelMagic.Rotation
     public class DemonHunterVeng : CombatRoutine
     {
         private readonly Stopwatch interruptwatch = new Stopwatch();
-        public override string Name => "PixelMagic Vengeance";
+		
+        public override string Name 
+		{
+			get
+			{
+				return "PixelMagic Vengeance";
+			}
+		}
 
-        public override string Class => "Demon Hunter";
+        public override string Class 
+		{
+			get
+			{
+				return "Demon Hunter";
+			}
+		}
 
-        public override Form SettingsForm
-        {
-            get { return new frmVengance(); }
-            set { }
-        }
+		public override Form SettingsForm { get; set; }
 
         public override void Initialize()
         {
@@ -44,8 +52,6 @@ namespace PixelMagic.Rotation
             if (UseCooldowns)
             {
             }
-
-            //if (WoW.PlayerHasBuff("Mount")) return;
 
             if (combatRoutine.Type != RotationType.SingleTarget && combatRoutine.Type != RotationType.AOE) return;
 

@@ -13,9 +13,21 @@ namespace PixelMagic.Rotation
     {
         private NumericUpDown nudBlurPercentValue;
 
-        public override string Name => "Havoc";
+        public override string Name 
+		{
+			get
+			{
+				return "Havoc";
+			}
+		}
 
-        public override string Class => "Demon Hunter";
+        public override string Class 
+		{
+			get
+			{
+				return "DemonHunter";
+			}
+		}
 
         public override Form SettingsForm { get; set; }
 
@@ -155,7 +167,7 @@ namespace PixelMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Zanrub(Lfstyles Edit)
-AddonName=
+AddonName=RGB
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,198013,Eye Beam,D4
