@@ -16,9 +16,21 @@ namespace PixelMagic.Rotation
         public static int dreadnumber;
         public Stopwatch CombatWatch = new Stopwatch();
 
-        public override string Name => "DemonologyWarlock";
+        public override string Name 
+		{
+			get
+			{
+				return "Demo Warlock";
+			}
+		}
 
-        public override string Class => "Warlock";
+        public override string Class 
+		{
+			get
+			{
+				return "Warlock";
+			}
+		}
 
         public override Form SettingsForm { get; set; }
 
@@ -368,7 +380,7 @@ namespace PixelMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Nilrem-aka-Dova
-AddonName=PixelMagic
+AddonName=RGB
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,157695,Demonbolt,D2
