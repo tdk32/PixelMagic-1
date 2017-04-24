@@ -1,7 +1,6 @@
 // ReSharper disable UnusedMember.Global
 
 /* 	Mixo's WindWalker Rotation v2.5
-
 	This rotation is based on the writings of Walkingthewind.com, a prime WW theorycrafting site.
 
 	Information and guidelines:
@@ -731,7 +730,7 @@ namespace PixelMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Mixo
-AddonName=
+AddonName=RGB
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,115080,TouchOfDeath,G
