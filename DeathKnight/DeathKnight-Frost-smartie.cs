@@ -1,3 +1,9 @@
+//Changelog
+// v2.0 fmflex rotation
+// v2.1 fixed for latest pm, removed kick settings, removed double reload
+// v2.2 added hotkey for Sindragosa's Fury
+// v2.3 added support for Legendary Ring
+
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -22,6 +28,7 @@ namespace PixelMagic.Rotation
         private int currentRunes;
         private bool hasBreath;
         private bool useNextHRWCharge = false;
+		private bool legyringtest = true;
 
         private bool isMelee;
         private int runicPower;
@@ -182,6 +189,22 @@ namespace PixelMagic.Rotation
             set { ConfigFile.WriteValue("DkFrost", "isCheckHotkeysFrostIceboundFortitude", value.ToString()); }
         }
 
+        public static bool isCheckHotkeyslegyring
+        {
+            get
+            {
+                var isCheckHotkeyslegyring = ConfigFile.ReadValue("DkFrost", "isCheckHotkeyslegyring").Trim();
+
+                if (isCheckHotkeyslegyring != "")
+                {
+                    return Convert.ToBoolean(isCheckHotkeyslegyring);
+                }
+
+                return true;
+            }
+            set { ConfigFile.WriteValue("DkFrost", "isCheckHotkeyslegyring", value.ToString()); }
+        }
+
         public static int FrostIceboundHPPercent
         {
             get
@@ -262,7 +285,7 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            Log.Write("Welcome to the Frost DK by Fmflex - fixed by smartie", Color.Green);
+            Log.Write("Welcome to the Frost DK v. 2.3", Color.Green);
 			Log.Write("Hold down Z key (Y for US) for Sindragosa's Fury", Color.Red);
             SettingsFormDFF = new SettingsFormDFF();
             SettingsForm = SettingsFormDFF;
@@ -278,6 +301,7 @@ namespace PixelMagic.Rotation
             SettingsFormDFF.checkHotkeysFrostOffensivePillarofFrost.Checked = isCheckHotkeysFrostOffensivePillarofFrost;
             SettingsFormDFF.checkHotkeysFrostAntiMagicShield.Checked = isCheckHotkeysFrostAntiMagicShield;
             SettingsFormDFF.checkHotkeysFrostIceboundFortitude.Checked = isCheckHotkeysFrostIceboundFortitude;
+            SettingsFormDFF.checkHotkeyslegyring.Checked = isCheckHotkeyslegyring;
             SettingsFormDFF.checkHotkeysFrostIFPercent.Text = FrostIceboundHPPercent.ToString();
             SettingsFormDFF.checkHotkeysFrostAMSPercent.Text = FrostAMSHPPercent.ToString();
 
@@ -296,6 +320,7 @@ namespace PixelMagic.Rotation
             SettingsFormDFF.checkTalentBoS.CheckedChanged += isTalentBoS_Click;
             SettingsFormDFF.checkTalentGlacialAdvance.CheckedChanged += isTalentGlacialAdvance_Click;
             SettingsFormDFF.checkHotkeysFrostIceboundFortitude.CheckedChanged += isCheckHotkeysFrostIceboundFortitude_Click;
+            SettingsFormDFF.checkHotkeyslegyring.CheckedChanged += isCheckHotkeyslegyring_Click;
             SettingsFormDFF.checkHotkeysFrostIFPercent.TextChanged += isCheckHotkeysFrostIFPercent_Click;
             SettingsFormDFF.checkHotkeysFrostAntiMagicShield.CheckedChanged += isCheckHotkeysFrostAntiMagicShield_Click;
             SettingsFormDFF.checkHotkeysFrostAMSPercent.TextChanged += isCheckHotkeysFrostAMSPercent_Click;
@@ -334,6 +359,11 @@ namespace PixelMagic.Rotation
         private void isCheckHotkeysFrostIceboundFortitude_Click(object sender, EventArgs e)
         {
             isCheckHotkeysFrostIceboundFortitude = SettingsFormDFF.checkHotkeysFrostIceboundFortitude.Checked;
+        }
+		
+        private void isCheckHotkeyslegyring_Click(object sender, EventArgs e)
+        {
+            isCheckHotkeyslegyring = SettingsFormDFF.checkHotkeyslegyring.Checked;
         }
 
         private void isCheckHotkeysFrostIFPercent_Click(object sender, EventArgs e)
@@ -479,11 +509,21 @@ namespace PixelMagic.Rotation
             {
                 WoW.CastSpell("PillarofFrost");
             }
-            if ((haveCoF || useNextHRWCharge) && haveHRW && runicPower <= 30 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.PlayerHasBuff("HEmpower Rune") && !WoW.IsSpellOnCooldown("HEmpower Rune") && hasBreath)
+            if ((haveCoF || useNextHRWCharge) && isCheckHotkeyslegyring && haveHRW && runicPower <= 30 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.PlayerHasBuff("HEmpower Rune") && !WoW.IsSpellOnCooldown("HEmpower Rune") && hasBreath && legyringtest == true)
+            {
+                useNextHRWCharge = false;
+                WoW.CastSpell("HEmpower Rune");
+				legyringtest = false;
+            }
+            if ((haveCoF || useNextHRWCharge) && !isCheckHotkeyslegyring && haveHRW && runicPower <= 30 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.PlayerHasBuff("HEmpower Rune") && !WoW.IsSpellOnCooldown("HEmpower Rune") && hasBreath)
             {
                 useNextHRWCharge = false;
                 WoW.CastSpell("HEmpower Rune");
             }
+			if (isCheckHotkeyslegyring && !WoW.PlayerHasBuff("Breath"))
+			{
+				legyringtest = true;
+			}
             if ((haveCoF || useNextHRWCharge) && !haveHRW && runicPower <= 50 && currentRunes <=1 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.IsSpellOnCooldown("HEmpower Rune") && hasBreath)
             {
                 WoW.CastSpell("Empower Rune");
@@ -740,6 +780,7 @@ namespace PixelMagic.Rotation
         private readonly Label checkHotkeysFrostAMSPercentLabel;
         public CheckBox checkHotkeysFrostAntiMagicShield;
         public CheckBox checkHotkeysFrostIceboundFortitude;
+        public CheckBox checkHotkeyslegyring;
         public TextBox checkHotkeysFrostIFPercent;
         public Label checkHotkeysFrostIFPercentLabel;
         public CheckBox checkHotkeysFrostOffensiveErW;
@@ -788,6 +829,7 @@ namespace PixelMagic.Rotation
             this.checkTalentOblitaration = new System.Windows.Forms.CheckBox();
             this.checkTalentFrostScythe = new System.Windows.Forms.CheckBox();
             this.checkHotkeysFrostIceboundFortitude = new System.Windows.Forms.CheckBox();
+            this.checkHotkeyslegyring = new System.Windows.Forms.CheckBox();
             this.checkHotkeysFrostAntiMagicShield = new System.Windows.Forms.CheckBox();
             this.checkHotkeysFrostIFPercent = new System.Windows.Forms.TextBox();
             this.checkHotkeysFrostIFPercentLabel = new System.Windows.Forms.Label();
@@ -1013,6 +1055,7 @@ namespace PixelMagic.Rotation
             this.groupBox13.Controls.Add(this.checkHotkeysFrostOffensiveErW);
             this.groupBox13.Controls.Add(this.checkHotkeysFrostOffensivePillarofFrost);
             this.groupBox13.Controls.Add(this.btnHotkeysFrostOffensiveCooldowns);
+            this.groupBox13.Controls.Add(this.checkHotkeyslegyring);
             this.groupBox13.Location = new System.Drawing.Point(8, 8);
             this.groupBox13.Name = "groupBox13";
             this.groupBox13.Size = new System.Drawing.Size(556, 90);
@@ -1042,6 +1085,17 @@ namespace PixelMagic.Rotation
             this.checkHotkeysFrostOffensivePillarofFrost.Text = "Pillar of Frost";
             this.checkHotkeysFrostOffensivePillarofFrost.UseVisualStyleBackColor = true;
 
+            // 
+            // checkHotkeyslegyring
+            // 
+            this.checkHotkeyslegyring.AutoSize = true;
+            this.checkHotkeyslegyring.Location = new System.Drawing.Point(300, 32);
+            this.checkHotkeyslegyring.Name = "checkHotkeyslegyring";
+            this.checkHotkeyslegyring.Size = new System.Drawing.Size(99, 17);
+            this.checkHotkeyslegyring.TabIndex = 4;
+            this.checkHotkeyslegyring.Text = "Legendary Ring";
+            this.checkHotkeyslegyring.UseVisualStyleBackColor = true;
+			
             // 
             // btnHotkeysFrostOffensiveCooldowns
             // 
