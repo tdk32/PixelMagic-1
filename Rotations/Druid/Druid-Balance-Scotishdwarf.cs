@@ -7,12 +7,8 @@
 // - Sometimes overcapping Astral Power due PixelMagic not detecting Astral Power fast enough.
 // - Oneth's Intuition not yet coded to normal rotation, will do it next.
 // Changelog :
-// Version r33
-// - Added AC back to ED rotation, fixed AC, Incarnation and Celestial Alignment with ED rotation.
-// Version r32
-// - Removed Astral Communion from Emerald Dreamcatcher Rotation
-// Version r31
-// - Fixed typo on AstralCommunion
+// Version r31 
+// - Fixed ED rotation
 // Version r30
 // - Additional checks to Emerald Dreamcatcher rotation
 // Version r29
@@ -388,7 +384,7 @@ namespace PixelMagic.Rotation
 
             Log.Write("Natures Balance = " + NaturesBalance);
 			Log.Write("Incarnation = " + NaturesBalance);
-			Log.Write("Astral Communion = " + AstralCommunion);
+			Log.Write("Astral Communion = " + NaturesBalance);
             Log.Write("StellarFlare = " + StellarFlare);
             Log.Write("Healing under 30% HP = " + HealingLowHP);
             Log.Write("Renewal = " + Renewal);
@@ -474,7 +470,20 @@ namespace PixelMagic.Rotation
         {
             StarfallMacro = StarfallMacroBox.Checked;
         }
-
+        private int GCD
+        {
+            get
+            {
+                if (150 / (1 + (WoW.HastePercent / 100)) > 75)
+                {
+                    return 150 / (1 + (WoW.HastePercent / 100));
+                }
+                else
+                {
+                    return 75;
+                }
+            }
+        }
 
         public override void Stop()
         {
@@ -546,39 +555,39 @@ namespace PixelMagic.Rotation
                     return;
                 }
                 // Emerald Dreamcatcher Rotation
-                if (EmeraldDreamcatcher && WoW.IsInCombat && WoW.HasTarget && UseCooldowns && WoW.TargetIsEnemy && WoW.PlayerHasBuff("Moonkin"))
+                if (EmeraldDreamcatcher && WoW.IsInCombat && WoW.HasTarget && WoW.TargetIsEnemy && WoW.PlayerHasBuff("Moonkin"))
                 {
                     // actions.ed=astral_communion,if=astral_power.deficit>=75&buff.the_emerald_dreamcatcher.up
-                    if (AstralCommunion && WoW.CanCast("AstralCommunion") && WoW.CurrentAstralPower <= 25 && WoW.PlayerHasBuff("EmeraldDreamcatcherBuff"));
+                    if (AstralCommunion && UseCooldowns && WoW.CanCast("AstralCommunion") && WoW.CurrentAstralPower <= 25 && WoW.PlayerHasBuff("EmeraldDreamcatcherBuff"))
                     {
                         WoW.CastSpell("AstralCommunion");
                         return;
                     }
                     // actions.ed+=/incarnation,if=astral_power>=85&!buff.the_emerald_dreamcatcher.up|buff.bloodlust.up
-                    if (Incarnation && WoW.CanCast("Incarnation") && WoW.CurrentAstralPower >= 85 && (!WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") || WoW.PlayerHasBuff("Bloodlust")));
+                    if (Incarnation && UseCooldowns && WoW.CanCast("Incarnation") && WoW.CurrentAstralPower >= 85 && (!WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") || WoW.PlayerHasBuff("Bloodlust")))
                     {
                         WoW.CastSpell("Incarnation");
                         return;
                     }
                     // actions.ed+=/celestial_alignment,if=astral_power>=85&!buff.the_emerald_dreamcatcher.up
-                    if (!Incarnation && WoW.CanCast("CelestialAlignment") && WoW.CurrentAstralPower >= 85 && !WoW.PlayerHasBuff("EmeraldDreamcatcherBuff"));
+                    if (!Incarnation && UseCooldowns && WoW.CanCast("CelestialAlignment") && WoW.CurrentAstralPower >= 85 && !WoW.PlayerHasBuff("EmeraldDreamcatcherBuff"))
                     {
                         WoW.CastSpell("CelestialAlignment");
                         return;
                     }
                     // (EXECUTE_TIME NOT CODED) actions.ed+=/starsurge,if=(buff.celestial_alignment.up&buff.celestial_alignment.remains<(10))|(buff.incarnation.up&buff.incarnation.remains<(3*execute_time)&astral_power>78)|(buff.incarnation.up&buff.incarnation.remains<(2*execute_time)&astral_power>52)|(buff.incarnation.up&buff.incarnation.remains<execute_time&astral_power>26)
                     if (WoW.CanCast("Starsurge")
-                        && (WoW.PlayerHasBuff("CelestialAlignment") && WoW.PlayerBuffTimeRemaining("CelestialAlignment") < 10)
-                        || (WoW.PlayerHasBuff("Incarnation") && WoW.PlayerBuffTimeRemaining("Incarnation") <= 3 && WoW.CurrentAstralPower >= 78)
-                        || (WoW.PlayerHasBuff("Incarnation") && WoW.PlayerBuffTimeRemaining("Incarnation") <= 2 && WoW.CurrentAstralPower >= 52)
-                        || (WoW.PlayerHasBuff("Incarnation") && WoW.PlayerBuffTimeRemaining("Incarnation") <= 1 && WoW.CurrentAstralPower >= 26));
+                        && (WoW.PlayerHasBuff("CelestialAlignment") && WoW.PlayerBuffTimeRemaining("CelestialAlignment") < 100)
+                        || (WoW.PlayerHasBuff("Incarnation") && WoW.PlayerBuffTimeRemaining("Incarnation") <= 300 && WoW.CurrentAstralPower >= 78)
+                        || (WoW.PlayerHasBuff("Incarnation") && WoW.PlayerBuffTimeRemaining("Incarnation") <= 200 && WoW.CurrentAstralPower >= 52)
+                        || (WoW.PlayerHasBuff("Incarnation") && WoW.PlayerBuffTimeRemaining("Incarnation") <= 100 && WoW.CurrentAstralPower >= 26))
                     {
                         WoW.CastSpell("Starsurge");
                         return;
                     }
                     // actions.ed+=/stellar_flare,cycle_targets=1,max_cycle_targets=4,if=active_enemies<4&remains<7.2&astral_power>=15
                     // need add multiple target detection
-                    if (StellarFlare && WoW.CanCast("StellarFlare") && WoW.TargetDebuffTimeRemaining("StellarFlare") <= 7 && WoW.CurrentAstralPower >= 15);
+                    if (StellarFlare && WoW.CanCast("StellarFlare") && WoW.TargetDebuffTimeRemaining("StellarFlare") <= 700 && WoW.CurrentAstralPower >= 15)
                     {
                         WoW.CastSpell("StellarFlare");
                         return;
@@ -591,8 +600,8 @@ namespace PixelMagic.Rotation
                     }
                     // actions.ed+=/moonfire,if=((talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
                     if (WoW.CanCast("Moonfire")
-                        && ((NaturesBalance && WoW.TargetHasDebuff("Moonfire") && WoW.TargetDebuffTimeRemaining("Moonfire") < 3) || (!NaturesBalance && WoW.TargetHasDebuff("Moonfire") && WoW.TargetDebuffTimeRemaining("Moonfire") < 6.6))
-                        && (WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1 || !WoW.PlayerHasBuff("EmeraldDreamcatcherBuff")))
+                        && ((NaturesBalance && WoW.TargetHasDebuff("Moonfire") && WoW.TargetDebuffTimeRemaining("Moonfire") < 300) || (!NaturesBalance && WoW.TargetHasDebuff("Moonfire") && WoW.TargetDebuffTimeRemaining("Moonfire") < 660))
+                        && (WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 100 || !WoW.PlayerHasBuff("EmeraldDreamcatcherBuff")))
                     {
                         WoW.CastSpell("Moonfire");
                         return;
@@ -605,50 +614,50 @@ namespace PixelMagic.Rotation
                     }
                     // actions.ed+=/sunfire,if=((talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled))&(buff.the_emerald_dreamcatcher.remains>gcd.max|!buff.the_emerald_dreamcatcher.up)
                     if (WoW.CanCast("Sunfire")
-                        && ((NaturesBalance && WoW.TargetHasDebuff("Sunfire") && WoW.TargetDebuffTimeRemaining("Sunfire") < 3) || (!NaturesBalance && WoW.TargetHasDebuff("Sunfire") && WoW.TargetDebuffTimeRemaining("Sunfire") < 5.4))
-                        && (WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1 || !WoW.PlayerHasBuff("EmeraldDreamcatcherBuff")))
+                        && ((NaturesBalance && WoW.TargetHasDebuff("Sunfire") && WoW.TargetDebuffTimeRemaining("Sunfire") < 300) || (!NaturesBalance && WoW.TargetHasDebuff("Sunfire") && WoW.TargetDebuffTimeRemaining("Sunfire") < 540))
+                        && (WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 100 || !WoW.PlayerHasBuff("EmeraldDreamcatcherBuff")))
                     {
                         WoW.CastSpell("Moonfire");
                         return;
                     }
                     // actions.ed+=/starfall,if=buff.oneths_overconfidence.up&buff.the_emerald_dreamcatcher.remains>execute_time&remains<2
-                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence") && WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1)
+                    if (StarfallMacro && WoW.CanCast("Starfall") && WoW.PlayerHasBuff("OnethsOverconfidence") && WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 100)
                     {
                         WoW.CastSpell("Starfall");
                         return;
                     }
                     // actions.ed+=/half_moon,if=astral_power<=80&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=6
-                    if (WoW.CanCast("HalfMoon") && WoW.CurrentAstralPower <= 80 && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1.5 && WoW.CurrentAstralPower > 6);
+                    if (WoW.CanCast("HalfMoon") && WoW.CurrentAstralPower <= 80 && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 150 && WoW.CurrentAstralPower > 6)
                     {
                         WoW.CastSpell("HalfMoon");
                         return;
                     }
                     // actions.ed+=/full_moon,if=astral_power<=60&buff.the_emerald_dreamcatcher.remains>execute_time
-                    if (WoW.CanCast("HalfMoon") && WoW.CurrentAstralPower <= 60 && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 2.5);
+                    if (WoW.CanCast("HalfMoon") && WoW.CurrentAstralPower <= 60 && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 250)
                     {
                         WoW.CastSpell("FullMoon");
                         return;
                     }
                     // actions.ed+=/solar_wrath,if=buff.solar_empowerment.stack>1&buff.the_emerald_dreamcatcher.remains>2*execute_time&astral_power>=6&(dot.moonfire.remains>5|(dot.sunfire.remains<5.4&dot.moonfire.remains>6.6))&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power<=90|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power<=85)
-                    if (WoW.CanCast("SolarW") && WoW.PlayerBuffStacks("SolarEmp") > 1 && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 3 && WoW.CurrentAstralPower >= 6 && (WoW.TargetDebuffTimeRemaining("Moonfire") > 5 || (WoW.TargetDebuffTimeRemaining("Sunfire") > 6.6)) && ((!WoW.PlayerHasBuff("CelestialAlignment") || !WoW.PlayerHasBuff("Incarnation")) && WoW.CurrentAstralPower <= 90 || (WoW.PlayerHasBuff("CelestialAlignment") || WoW.PlayerHasBuff("Incarnation")) && WoW.CurrentAstralPower <= 85));
+                    if (WoW.CanCast("SolarW") && WoW.PlayerBuffStacks("SolarEmp") > 1 && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 300 && WoW.CurrentAstralPower >= 6 && (WoW.TargetDebuffTimeRemaining("Moonfire") > 500 || (WoW.TargetDebuffTimeRemaining("Sunfire") > 660)) && ((!WoW.PlayerHasBuff("CelestialAlignment") || !WoW.PlayerHasBuff("Incarnation")) && WoW.CurrentAstralPower <= 90 || (WoW.PlayerHasBuff("CelestialAlignment") || WoW.PlayerHasBuff("Incarnation")) && WoW.CurrentAstralPower <= 85))
                     {
                         WoW.CastSpell("SolarW");
                         return;
                     }
                     // actions.ed+=/lunar_strike,if=buff.lunar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=11&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power<=85|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power<=77.5)
-                    if (WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp") && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 2.5 && WoW.CurrentAstralPower>=11&&((!WoW.PlayerHasBuff("CelestialAlignment")||!WoW.PlayerHasBuff("Incarnation")&&WoW.CurrentAstralPower<=85||(WoW.PlayerHasBuff("CelestialAlignment")||WoW.PlayerHasBuff("Incarnation"))&&WoW.CurrentAstralPower<=77)));
+                    if (WoW.CanCast("LStrike") && WoW.PlayerHasBuff("LunarEmp") && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 250 && WoW.CurrentAstralPower>=11&&((!WoW.PlayerHasBuff("CelestialAlignment")||!WoW.PlayerHasBuff("Incarnation")&&WoW.CurrentAstralPower<=85||(WoW.PlayerHasBuff("CelestialAlignment")||WoW.PlayerHasBuff("Incarnation"))&&WoW.CurrentAstralPower<=77)))
                     {
                         WoW.CastSpell("LStrike");
                         return;
                     }
                     // actions.ed+=/solar_wrath,if=buff.solar_empowerment.up&buff.the_emerald_dreamcatcher.remains>execute_time&astral_power>=16&(!(buff.celestial_alignment.up|buff.incarnation.up)&astral_power<=90|(buff.celestial_alignment.up|buff.incarnation.up)&astral_power<=85)
-                    if (WoW.CanCast("SolarW") && WoW.PlayerHasBuff("SolarEmp") && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 1.5 && WoW.CurrentAstralPower >= 16 && ((!WoW.PlayerHasBuff("CelestialAlignment") || !WoW.PlayerHasBuff("Incarnation") && WoW.CurrentAstralPower <= 90 || (WoW.PlayerHasBuff("CelestialAlignment") || WoW.PlayerHasBuff("Incarnation")) && WoW.CurrentAstralPower <= 85)));
+                    if (WoW.CanCast("SolarW") && WoW.PlayerHasBuff("SolarEmp") && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") > 150 && WoW.CurrentAstralPower >= 16 && ((!WoW.PlayerHasBuff("CelestialAlignment") || !WoW.PlayerHasBuff("Incarnation") && WoW.CurrentAstralPower <= 90 || (WoW.PlayerHasBuff("CelestialAlignment") || WoW.PlayerHasBuff("Incarnation")) && WoW.CurrentAstralPower <= 85)))
                     {
                         WoW.CastSpell("SolarW");
                         return;
                     }
                     // actions.ed+=/starsurge,if=(buff.the_emerald_dreamcatcher.up&buff.the_emerald_dreamcatcher.remains<gcd.max)|astral_power>90|((buff.celestial_alignment.up|buff.incarnation.up)&astral_power>=85)|(buff.the_emerald_dreamcatcher.up&astral_power>=77.5&(buff.celestial_alignment.up|buff.incarnation.up))
-                    if (WoW.CanCast("Starsurge") && (WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") < 1) || WoW.CurrentAstralPower > 90 || ((WoW.PlayerHasBuff("CelestialAlignment") || WoW.PlayerHasBuff("Incarnation")) && WoW.CurrentAstralPower >= 85) || (WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") && WoW.CurrentAstralPower >= 77 && (WoW.PlayerHasBuff("CelestialAlignment") || (WoW.PlayerHasBuff("Incarnation")))));
+                    if (WoW.CanCast("Starsurge") && (WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") && WoW.PlayerBuffTimeRemaining("EmeraldDreamcatcherBuff") < 100) || WoW.CurrentAstralPower > 90 || ((WoW.PlayerHasBuff("CelestialAlignment") || WoW.PlayerHasBuff("Incarnation")) && WoW.CurrentAstralPower >= 85) || (WoW.PlayerHasBuff("EmeraldDreamcatcherBuff") && WoW.CurrentAstralPower >= 77 && (WoW.PlayerHasBuff("CelestialAlignment") || (WoW.PlayerHasBuff("Incarnation")))))
                     {
                         WoW.CastSpell("Starsurge");
                         return;
@@ -672,7 +681,7 @@ namespace PixelMagic.Rotation
                         return;
                     }
                     // actions.ed+=/full_moon,if=astral_power<=60&((cooldown.incarnation.remains>65&cooldown.full_moon.charges>0)|(cooldown.incarnation.remains>50&cooldown.full_moon.charges>1)|(cooldown.incarnation.remains>25&cooldown.full_moon.charges>2))
-                    if (WoW.CanCast("FullMoon") && WoW.CurrentAstralPower <= 60&&((Incarnation && WoW.SpellCooldownTimeRemaining("Incarnation") > 65 && WoW.PlayerSpellCharges("FullMoon") > 0) || (WoW.SpellCooldownTimeRemaining("Incarnation") > 50 && WoW.PlayerSpellCharges("FullMoon") > 1) || (WoW.SpellCooldownTimeRemaining("Incarnation") > 25 && WoW.PlayerSpellCharges("FullMoon") > 2)))
+                    if (WoW.CanCast("FullMoon") && WoW.CurrentAstralPower <= 60&&((Incarnation && WoW.SpellCooldownTimeRemaining("Incarnation") > 6500 && WoW.PlayerSpellCharges("FullMoon") > 0) || (WoW.SpellCooldownTimeRemaining("Incarnation") > 5000 && WoW.PlayerSpellCharges("FullMoon") > 1) || (WoW.SpellCooldownTimeRemaining("Incarnation") > 2500 && WoW.PlayerSpellCharges("FullMoon") > 2)))
                     {
                         WoW.CastSpell("FullMoon");
                         return;
@@ -796,8 +805,8 @@ namespace PixelMagic.Rotation
 						if (NaturesBalance 
 							&& WoW.IsSpellInRange("SolarW")
 							&& WoW.CanCast("SolarW")
-							&& WoW.TargetDebuffTimeRemaining("Sunfire") <= 5
-							&& WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
+							&& WoW.TargetDebuffTimeRemaining("Sunfire") <= 500
+							&& WoW.TargetDebuffTimeRemaining("Sunfire") >= 200)
 						{
 							WoW.CastSpell("SolarW");
                             
@@ -807,8 +816,8 @@ namespace PixelMagic.Rotation
 						if (NaturesBalance 
 							&& WoW.IsSpellInRange("LStrike")
 							&& WoW.CanCast("LStrike")
-							&& WoW.TargetDebuffTimeRemaining("Moonfire") <= 6
-							&& WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
+							&& WoW.TargetDebuffTimeRemaining("Moonfire") <= 600
+							&& WoW.TargetDebuffTimeRemaining("Moonfire") >= 300)
 						{
 							WoW.CastSpell("LStrike");
                             
@@ -827,7 +836,7 @@ namespace PixelMagic.Rotation
 						if (StellarFlare && WoW.IsSpellInRange("StellarFlare")
 							&& WoW.CanCast("StellarFlare")
 							&& WoW.CurrentAstralPower >= 15
-							&& WoW.TargetDebuffTimeRemaining("StellarFlare") <= 5)
+							&& WoW.TargetDebuffTimeRemaining("StellarFlare") <= 500)
 						{
 							WoW.CastSpell("StellarFlare");
 							return;
@@ -903,8 +912,8 @@ namespace PixelMagic.Rotation
 						if (NaturesBalance 
 							&& WoW.IsSpellInRange("SolarW")
 							&& WoW.CanCast("SolarW")
-							&& WoW.TargetDebuffTimeRemaining("Sunfire") <= 5
-							&& WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
+							&& WoW.TargetDebuffTimeRemaining("Sunfire") <= 500
+							&& WoW.TargetDebuffTimeRemaining("Sunfire") >= 200)
 						{
 							WoW.CastSpell("SolarW");
 							return;
@@ -913,8 +922,8 @@ namespace PixelMagic.Rotation
 						if (NaturesBalance 
 							&& WoW.IsSpellInRange("LStrike")
 							&& WoW.CanCast("LStrike")
-							&& WoW.TargetDebuffTimeRemaining("Moonfire") <= 6
-							&& WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
+							&& WoW.TargetDebuffTimeRemaining("Moonfire") <= 600
+							&& WoW.TargetDebuffTimeRemaining("Moonfire") >= 300)
 						{
 							WoW.CastSpell("LStrike");
 							return;
@@ -932,7 +941,7 @@ namespace PixelMagic.Rotation
 						if (StellarFlare && WoW.IsSpellInRange("StellarFlare")
 							&& WoW.CanCast("StellarFlare")
 							&& WoW.CurrentAstralPower >= 15
-							&& WoW.TargetDebuffTimeRemaining("StellarFlare") <= 5)
+							&& WoW.TargetDebuffTimeRemaining("StellarFlare") <= 500)
 						{
 							WoW.CastSpell("StellarFlare");
 							return;
@@ -1081,8 +1090,8 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 					    && WoW.IsSpellInRange("SolarW")
                         && WoW.CanCast("SolarW")
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 5
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 500
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") >= 200)
                     {
                         WoW.CastSpell("SolarW");
                         
@@ -1092,8 +1101,8 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 						&& WoW.IsSpellInRange("LStrike")
                         && WoW.CanCast("LStrike")
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 6
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 600
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") >= 300)
                     {
                         WoW.CastSpell("LStrike");
                         
@@ -1208,8 +1217,8 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 					    && WoW.IsSpellInRange("SolarW")
                         && WoW.CanCast("SolarW")
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 5
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 500
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") >= 200)
                     {
                         WoW.CastSpell("SolarW");
                         
@@ -1219,8 +1228,8 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 						&& WoW.IsSpellInRange("LStrike")
                         && WoW.CanCast("LStrike")
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 6
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 600
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") >= 300)
                     {
                         WoW.CastSpell("LStrike");
                         
@@ -1361,7 +1370,7 @@ namespace PixelMagic.Rotation
                     if (!NaturesBalance
                         && WoW.IsSpellInRange("Moonfire")
                         && WoW.CanCast("Moonfire")
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 6.6)
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 660)
                     {
                         WoW.CastSpell("Moonfire");
                         return;
@@ -1370,7 +1379,7 @@ namespace PixelMagic.Rotation
                     if (!NaturesBalance 
                         && WoW.IsSpellInRange("Sunfire")
                         && WoW.CanCast("Sunfire")
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 5.4)
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 540)
                     {
                         WoW.CastSpell("Sunfire");
                         return;
@@ -1379,7 +1388,7 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 					    && WoW.IsSpellInRange("Moonfire")
                         && WoW.CanCast("Moonfire")
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 3)
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 300)
                     {
                         WoW.CastSpell("Moonfire");
                         return;
@@ -1388,7 +1397,7 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance
 					    && WoW.IsSpellInRange("Sunfire")
                         && WoW.CanCast("Sunfire")
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 3)
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 300)
                     {
                         WoW.CastSpell("Sunfire");
                         return;
@@ -1397,19 +1406,19 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("StellarFlare")
                         && WoW.CanCast("StellarFlare")
                         && WoW.CurrentAstralPower >= 15
-                        && WoW.TargetDebuffTimeRemaining("StellarFlare") <= 7.2)
+                        && WoW.TargetDebuffTimeRemaining("StellarFlare") <= 720)
                     {
                         WoW.CastSpell("StellarFlare");
                         return;
                     }
                     // Solar Wrath at 3 solar empowerement
-                    if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerBuffStacks("SolarEmp") == 3)
+                    if (WoW.IsSpellInRange("SolarW") && WoW.CanCast("SolarW") && WoW.PlayerBuffStacks("SolarEmp") == 300)
                     {
                         WoW.CastSpell("SolarW");
                         return;
                     }
                     // Lunar Strike at 3 solar empowerement
-                    if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerBuffStacks("LunarEmp") == 3)
+                    if (WoW.IsSpellInRange("LStrike") && WoW.CanCast("LStrike") && WoW.PlayerBuffStacks("LunarEmp") == 300)
                     {
                         WoW.CastSpell("LStrike");
                         return;
@@ -1441,7 +1450,7 @@ namespace PixelMagic.Rotation
                     // StellarFlare if not on target
                     if (WoW.IsSpellInRange("StellarFlare")
                         && WoW.CanCast("StellarFlare")
-                        && WoW.TargetDebuffTimeRemaining("StellarFlare") < 5)
+                        && WoW.TargetDebuffTimeRemaining("StellarFlare") < 500)
                     {
                         WoW.CastSpell("StellarFlare");
                         return;
@@ -1500,8 +1509,8 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 					    && WoW.IsSpellInRange("SolarW")
                         && WoW.CanCast("SolarW")
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 5
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 500
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") >= 200)
                     {
                         WoW.CastSpell("SolarW");
                         return;
@@ -1510,8 +1519,8 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 						&& WoW.IsSpellInRange("LStrike")
                         && WoW.CanCast("LStrike")
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 6
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 600
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") >= 300)
                     {
                         WoW.CastSpell("LStrike");
                         return;
@@ -1536,27 +1545,27 @@ namespace PixelMagic.Rotation
                 // Stellar Drift and Moving
                 if (StellarDrift && WoW.IsMoving && WoW.PlayerHasBuff("StarfallP") && WoW.IsSpellInRange("LStrike"))
                 {
-                    if (WoW.CanCast("FullMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 3)
+                    if (WoW.CanCast("FullMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 300)
                     {
                         WoW.CastSpell("FullMoon");
                         return;
                     }
-                    if (WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 2.5)
+                    if (WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 250)
                     {
                         WoW.CastSpell("LStrike");
                         return;
                     }
-                    if (WoW.CanCast("Moon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 1.2)
+                    if (WoW.CanCast("Moon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 120)
                     {
                         WoW.CastSpell("Moon");
                         return;
                     }
-                    if (WoW.CanCast("HalfMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 2)
+                    if (WoW.CanCast("HalfMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 200)
                     {
                         WoW.CastSpell("HalfMoon");
                         return;
                     }
-                    if (WoW.CanCast("SolarW") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 2)
+                    if (WoW.CanCast("SolarW") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 200)
                     {
                         WoW.CastSpell("SolarW");
                         return;
@@ -1650,23 +1659,23 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("Moonfire");
                         return;
                     }
-                    if (StellarDrift && WoW.IsMoving && WoW.CanCast("FullMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 3)
+                    if (StellarDrift && WoW.IsMoving && WoW.CanCast("FullMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 300)
                     {
                         WoW.CastSpell("FullMoon");
                         return;
                     }
-                    if (StellarDrift && WoW.IsMoving && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 2.5)
+                    if (StellarDrift && WoW.IsMoving && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 250)
                     {
                         WoW.CastSpell("LStrike");
                         
                         return;
                     }
-                    if (StellarDrift && WoW.IsMoving && WoW.CanCast("Moon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 1.2)
+                    if (StellarDrift && WoW.IsMoving && WoW.CanCast("Moon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 120)
                     {
                         WoW.CastSpell("Moon");
                         return;
                     }
-                    if (StellarDrift && WoW.IsMoving && WoW.CanCast("HalfMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 2)
+                    if (StellarDrift && WoW.IsMoving && WoW.CanCast("HalfMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 200)
                     {
                         WoW.CastSpell("HalfMoon");
                         return;
@@ -1723,23 +1732,23 @@ namespace PixelMagic.Rotation
                         WoW.CastSpell("KBW");
                         return;
                     }
-                    if (WoW.CanCast("FullMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 3)
+                    if (WoW.CanCast("FullMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 30)
                     {
                         WoW.CastSpell("FullMoon");
                         return;
                     }
-                    if (WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 2.5)
+                    if (WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 250)
                     {
                         WoW.CastSpell("LStrike");
                         
                         return;
                     }
-                    if (WoW.CanCast("Moon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 1.2)
+                    if (WoW.CanCast("Moon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 120)
                     {
                         WoW.CastSpell("Moon");
                         return;
                     }
-                    if (WoW.IsMoving && WoW.CanCast("HalfMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 2)
+                    if (WoW.IsMoving && WoW.CanCast("HalfMoon") && WoW.PlayerHasBuff("StarfallP") && WoW.PlayerBuffTimeRemaining("StarfallP") >= 200)
                     {
                         WoW.CastSpell("HalfMoon");
                         return;
@@ -1784,8 +1793,8 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 					    && WoW.IsSpellInRange("SolarW")
                         && WoW.CanCast("SolarW")
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 5
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 500
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") >= 200)
                     {
                         WoW.CastSpell("SolarW");
                         
@@ -1795,8 +1804,8 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 						&& WoW.IsSpellInRange("LStrike")
                         && WoW.CanCast("LStrike")
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 6
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 600
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") >= 300)
                     {
                         WoW.CastSpell("LStrike");
                         
@@ -1858,8 +1867,8 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 					    && WoW.IsSpellInRange("SolarW")
                         && WoW.CanCast("SolarW")
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 5
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") >= 2)
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 500
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") >= 200)
                     {
                         WoW.CastSpell("SolarW");
                         
@@ -1869,8 +1878,8 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 						&& WoW.IsSpellInRange("LStrike")
                         && WoW.CanCast("LStrike")
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 6
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 600
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") >= 300)
                     {
                         WoW.CastSpell("LStrike");
                         
@@ -1959,7 +1968,7 @@ namespace PixelMagic.Rotation
                     if (!NaturesBalance
                         && WoW.IsSpellInRange("Moonfire")
                         && WoW.CanCast("Moonfire")
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 6.6)
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 660)
                     {
                         WoW.CastSpell("Moonfire");
                         return;
@@ -1968,7 +1977,7 @@ namespace PixelMagic.Rotation
                     if (!NaturesBalance
                         && WoW.IsSpellInRange("Sunfire")
                         && WoW.CanCast("Sunfire")
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 5.4)
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 540)
                     {
                         WoW.CastSpell("Sunfire");
                         return;
@@ -1977,7 +1986,7 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 						&& WoW.IsSpellInRange("Moonfire")
                         && WoW.CanCast("Moonfire")
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 3)
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 300)
                     {
                         WoW.CastSpell("Moonfire");
                         return;
@@ -1986,7 +1995,7 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 						&& WoW.IsSpellInRange("Sunfire")
                         && WoW.CanCast("Sunfire")
-                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 3)
+                        && WoW.TargetDebuffTimeRemaining("Sunfire") <= 300)
                     {
                         WoW.CastSpell("Sunfire");
                         return;
@@ -1995,7 +2004,7 @@ namespace PixelMagic.Rotation
                     if (WoW.IsSpellInRange("StellarFlare")
                         && WoW.CanCast("StellarFlare")
                         && WoW.CurrentAstralPower >= 15
-                        && WoW.TargetDebuffTimeRemaining("StellarFlare") <= 7.2)
+                        && WoW.TargetDebuffTimeRemaining("StellarFlare") <= 720)
                     {
                         WoW.CastSpell("StellarFlare");
                         return;
@@ -2041,7 +2050,7 @@ namespace PixelMagic.Rotation
                     // StellarFlare if not on target
                     if (WoW.IsSpellInRange("StellarFlare")
                         && WoW.CanCast("StellarFlare")
-                        && WoW.TargetDebuffTimeRemaining("StellarFlare") < 5)
+                        && WoW.TargetDebuffTimeRemaining("StellarFlare") < 500)
                     {
                         WoW.CastSpell("StellarFlare");
                         return;
@@ -2094,8 +2103,8 @@ namespace PixelMagic.Rotation
                     if (NaturesBalance 
 						&& WoW.IsSpellInRange("LStrike")
                         && WoW.CanCast("LStrike")
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 6
-                        && WoW.TargetDebuffTimeRemaining("Moonfire") >= 3)
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") <= 600
+                        && WoW.TargetDebuffTimeRemaining("Moonfire") >= 300)
                     {
                         WoW.CastSpell("LStrike");
                         
