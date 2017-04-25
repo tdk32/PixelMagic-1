@@ -2,7 +2,8 @@
 // v2.0 fmflex rotation
 // v2.1 fixed for latest pm, removed kick settings, removed double reload
 // v2.2 added hotkey for Sindragosa's Fury
-// v2.3 added support for Legendary Ring thx @TWonderchild for helping me out here :-)
+// v2.3 added support for Legendary Ring
+// v2.4 updated for the newest PM
 
 using System;
 using System.ComponentModel;
@@ -285,7 +286,7 @@ namespace PixelMagic.Rotation
 
         public override void Initialize()
         {
-            Log.Write("Welcome to the Frost DK v. 2.3", Color.Green);
+            Log.Write("Welcome to the Frost DK v. 2.4", Color.Green);
 			Log.Write("Hold down Z key (Y for US) for Sindragosa's Fury", Color.Red);
             SettingsFormDFF = new SettingsFormDFF();
             SettingsForm = SettingsFormDFF;
@@ -505,7 +506,7 @@ namespace PixelMagic.Rotation
             {
                 WoW.CastSpell("PillarofFrost");
             }
-            if (isMelee && combatRoutine.UseCooldowns && isCheckHotkeysFrostOffensivePillarofFrost && !WoW.IsSpellOnCooldown("PillarofFrost") && WoW.SpellCooldownTimeRemaining("Breath") >= 59)
+            if (isMelee && combatRoutine.UseCooldowns && isCheckHotkeysFrostOffensivePillarofFrost && !WoW.IsSpellOnCooldown("PillarofFrost") && WoW.SpellCooldownTimeRemaining("Breath") >= 59000)
             {
                 WoW.CastSpell("PillarofFrost");
             }
@@ -544,7 +545,7 @@ namespace PixelMagic.Rotation
                 WoW.CastSpell("Howling Blast");
                 return;
             }
-            if (isMelee && currentRunes >= 1 && ((runicPower >= 48 && hasBreath) || !hasBreath) && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 15)) && CanCastNoRange("Remorseless Winter"))
+            if (isMelee && currentRunes >= 1 && ((runicPower >= 48 && hasBreath) || !hasBreath) && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 15000)) && CanCastNoRange("Remorseless Winter"))
             {
                 WoW.CastSpell("Remorseless Winter");
                 return;
@@ -575,12 +576,12 @@ namespace PixelMagic.Rotation
                 WoW.CastSpell("Obliterate");
                 return;
             }
-            if (runicPower >= 25 && CanCastInRange("Frost Strike") && !hasBreath && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 15)))
+            if (runicPower >= 25 && CanCastInRange("Frost Strike") && !hasBreath && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 15000)))
             {
                 WoW.CastSpell("Frost Strike");
                 return;
             }
-            if (isTalentHornofWinter && currentRunes <= 4 && runicPower <= 70 && CanCastNoRange("Horn") && !WoW.PlayerHasBuff("HEmpower Rune") && (hasBreath || (!hasBreath && WoW.SpellCooldownTimeRemaining("Breath") >= 15)))
+            if (isTalentHornofWinter && currentRunes <= 4 && runicPower <= 70 && CanCastNoRange("Horn") && !WoW.PlayerHasBuff("HEmpower Rune") && (hasBreath || (!hasBreath && WoW.SpellCooldownTimeRemaining("Breath") >= 15000)))
             {
                 WoW.CastSpell("Horn");
             }
@@ -602,7 +603,7 @@ namespace PixelMagic.Rotation
             }
             if (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave) // Do Single Target Stuff here
             {
-                if (CanCastInRange("Frost Strike") && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 2) && runicPower >= 25 &&
+                if (CanCastInRange("Frost Strike") && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 2000) && runicPower >= 25 &&
                     !(combatRoutine.UseCooldowns && CanCastNoRange("Obliteration") && isTalentOblitaration) &&
                     (!isTalentOblitaration || (isTalentOblitaration && !WoW.PlayerHasBuff("Obliteration"))))
                 {
@@ -684,7 +685,7 @@ namespace PixelMagic.Rotation
             }
             if (combatRoutine.Type == RotationType.AOE)
             {
-                if (CanCastInRange("Frost Strike") && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 2) && runicPower >= 25)
+                if (CanCastInRange("Frost Strike") && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 2000) && runicPower >= 25)
                 {
                     WoW.CastSpell("Frost Strike");
                     return;
