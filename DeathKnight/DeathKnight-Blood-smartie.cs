@@ -172,7 +172,7 @@ namespace PixelMagic.Rotation.DeathKnight.DK
 
         public override void Pulse() // Updated for Legion (tested and working for single target)
         {
-            renewBones = !WoW.PlayerHasBuff("Bone Shield") || WoW.PlayerBuffTimeRemaining("Bone Shield") <= 5000;
+            renewBones = !WoW.PlayerHasBuff("Bone Shield") || WoW.PlayerBuffTimeRemaining("Bone Shield") <= 500;
             isMelee = WoW.CanCast("Marrowrend", false, false, true, false, false);
             bonesStack = WoW.PlayerBuffStacks("Bone Shield");
             currentRunes = WoW.CurrentRunes;
@@ -278,7 +278,7 @@ namespace PixelMagic.Rotation.DeathKnight.DK
                         return;
                     }
                     if (isTalentBoneStorm && isMelee && runicPower >= 45 &&
-                        ((runicPower >= 85 && WoW.SpellCooldownTimeRemaining("Bonestorm") >= 3000) || WoW.HealthPercent < 70 || WoW.HealthPercent < 50))
+                        ((runicPower >= 85 && WoW.SpellCooldownTimeRemaining("Bonestorm") >= 300) || WoW.HealthPercent < 70 || WoW.HealthPercent < 50))
                     {
                         WoW.CastSpell("Death Strike");
                         return;
