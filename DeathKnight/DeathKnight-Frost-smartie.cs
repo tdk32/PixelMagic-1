@@ -3,6 +3,7 @@
 // v2.1 fixed for latest pm, removed kick settings, removed double reload
 // v2.2 added hotkey for Sindragosa's Fury
 // v2.3 added support for Legendary Ring
+// v2.4 updated for the latest PM
 
 using System;
 using System.ComponentModel;
