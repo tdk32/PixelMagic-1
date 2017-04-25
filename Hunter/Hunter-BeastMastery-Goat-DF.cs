@@ -338,7 +338,7 @@ namespace PixelMagic.Rotation
 						WoW.CastSpell("Blood Fury");
 						return;
                     }
-					if (WoW.CanCast("Kill Command") && WoW.Focus >= 90 && WoW.IsSpellInRange("Kill Command") && !(WoW.SpellCooldownTimeRemaining("Bestial Wrath") <= 150))
+					if (WoW.CanCast("Kill Command") && WoW.Focus >= 90 && WoW.IsSpellInRange("Kill Command") && !(WoW.SpellCooldownTimeRemaining("Bestial Wrath") <= 100))
                     {
                         WoW.CastSpell("Kill Command");
                         return;
@@ -354,7 +354,7 @@ namespace PixelMagic.Rotation
 						
                         return;
 					}
-                    if (WoW.CanCast("Kill Command") && WoW.Focus >= 30 && WoW.IsSpellInRange("Kill Command") && !(WoW.SpellCooldownTimeRemaining("Bestial Wrath") <= 150))
+                    if (WoW.CanCast("Kill Command") && WoW.Focus >= 30 && WoW.IsSpellInRange("Kill Command") && !(WoW.SpellCooldownTimeRemaining("Bestial Wrath") <= 100))
                     {
                         WoW.CastSpell("Kill Command");
                         return;
